@@ -1,335 +1,751 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PYTHEAS - AI Interface</title>
-    <!-- Plotly.js for Data Visualizations -->
-    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-    <style>
-        :root {
-            --bg-color: #ffffff;
-            --card-bg: #ffffff;
-            --text-color: #1f1f1f;
-            --text-subtle: #444746;
-            --accent-blue: #0b57d0;
-            --input-bg: #ffffff;
-            --user-msg-bg: #f0f4f9;
-            --border-color: #e1e3e1;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pytheas AI Explorer</title>
+  <!-- Plotly.js CDN -->
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #ffffff;
+      color: #1f1f1f;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    /* Fixed Centered Header */
+    .top-header {
+      padding: 20px 24px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      z-index: 10;
+    }
+    .top-header a {
+      display: inline-block;
+      text-decoration: none;
+    }
+    .main-logo {
+      height: 72px;
+      width: auto;
+    }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-        }
+    /* Dialogue Sequence Stream */
+    .chat-stream {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
 
-        /* Top Header with Larger Logo */
-        header {
-            padding: 1.5rem 2rem;
-            display: flex;
-            align-items: center;
-            gap: 1.25rem;
-            background-color: var(--bg-color);
-            border-bottom: 1px solid var(--border-color);
-        }
+    /* Message Bubbles */
+    .message {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+    }
+    .message.user {
+      justify-content: flex-end;
+    }
+    .user-bubble {
+      background-color: #f0f4f9;
+      color: #1f1f1f;
+      padding: 12px 18px;
+      border-radius: 18px;
+      max-width: 80%;
+      font-size: 15px;
+      line-height: 1.5;
+    }
 
-        .header-logo img {
-            height: 80px; /* Increased size */
-            width: auto;
-            display: block;
-        }
+    /* AI Response Card */
+    .ai-card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+      width: 100%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .ai-card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .small-logo {
+      height: 24px;
+      width: auto;
+    }
+    .ai-card-title {
+      font-size: 13px;
+      color: #6b7280;
+      font-weight: 500;
+    }
 
-        .header-logo h1 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            color: var(--accent-blue);
-            letter-spacing: -0.5px;
-        }
+    /* Center-aligned Summary Table with Color Swatches */
+    .data-table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: center;
+    }
+    .data-table th {
+      font-weight: 700;
+      font-size: 11px;
+      color: #374151;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 8px 12px;
+      text-align: center;
+      border-bottom: 1px solid #ffffff;
+    }
+    .data-table td {
+      padding: 8px 12px;
+      color: #4b5563;
+      font-weight: 500;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .data-table td.gene-name {
+      font-style: italic;
+    }
 
-        /* Dialogue Sequence Container */
-        .chat-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            max-width: 900px;
-            width: 100%;
-            margin: 0 auto;
-        }
+    /* Table Legend Color Swatch */
+    .color-swatch {
+      display: inline-block;
+      width: 24px;
+      height: 10px;
+      border-radius: 3px;
+      vertical-align: middle;
+    }
 
-        .message {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            max-width: 100%;
-            animation: fadeIn 0.3s ease-in-out;
-        }
+    .chart-container {
+      width: 100%;
+      height: 400px;
+    }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .message.user {
-            align-self: flex-end;
-            background-color: var(--user-msg-bg);
-            padding: 0.85rem 1.25rem;
-            border-radius: 18px 18px 4px 18px;
-            max-width: 80%;
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-        }
-
-        .message.ai {
-            align-self: flex-start;
-            width: 100%;
-            background-color: var(--card-bg);
-            padding: 1.25rem;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .ai-header {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--accent-blue);
-            margin-bottom: 0.5rem;
-        }
-
-        .chart-box {
-            width: 100%;
-            min-height: 400px;
-            margin-top: 1rem;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-        }
-
-        /* Bottom Fixed Input Box */
-        .input-wrapper {
-            padding: 1.5rem 2rem;
-            background-color: var(--bg-color);
-            display: flex;
-            justify-content: center;
-        }
-
-        .input-container {
-            position: relative;
-            width: 100%;
-            max-width: 900px;
-        }
-
-        .input-container input {
-            width: 100%;
-            padding: 1.2rem 3.5rem 1.2rem 1.5rem;
-            background-color: var(--input-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 28px;
-            color: var(--text-color);
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-        }
-
-        .input-container input:focus {
-            border-color: var(--accent-blue);
-            box-shadow: 0 2px 8px rgba(11, 87, 208, 0.15);
-        }
-
-        .input-container button {
-            position: absolute;
-            right: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--accent-blue);
-            border: none;
-            color: #ffffff;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .input-container button:hover {
-            opacity: 0.9;
-        }
-    </style>
+    /* Bottom Input Container */
+    .input-container {
+      padding: 16px 24px 24px 24px;
+      background: #ffffff;
+      display: flex;
+      justify-content: center;
+    }
+    .chat-box {
+      width: 100%;
+      max-width: 900px;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .chat-input {
+      width: 100%;
+      padding: 14px 48px 14px 20px;
+      font-size: 16px;
+      border: 1px solid #d1d5db;
+      border-radius: 28px;
+      outline: none;
+      background-color: #ffffff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .chat-input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 2px 10px rgba(37, 99, 235, 0.15);
+    }
+    .send-btn {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    .send-btn svg {
+      fill: #2563eb;
+      width: 24px;
+      height: 24px;
+    }
+    .send-btn:hover {
+      background-color: #f3f4f6;
+    }
+  </style>
 </head>
 <body>
 
-    <header>
-        <div class="header-logo" style="display: flex; align-items: center; gap: 1rem;">
-            <img src="data/PYTHEAS_Logo.svg" alt="PYTHEAS Logo" onerror="this.onerror=null; this.src='https://pytheasdb.com/static/images/PYTHEAS_Logo.svg';">
-            <h1>PYTHEAS AI</h1>
-        </div>
-    </header>
+  <!-- Centered Top Header -->
+  <header class="top-header">
+    <a href="index.html">
+      <img src="data/PYTHEAS_Logo.svg" alt="Pytheas Logo" class="main-logo" onerror="this.src='https://via.placeholder.com/220x72?text=PYTHEAS'" />
+    </a>
+  </header>
 
-    <div class="chat-container" id="chatContainer">
-        <!-- Initial Welcome Dialogue -->
-        <div class="message ai">
-            <div class="ai-header">PYTHEAS AI</div>
-            <p>Welcome. Ask any question about statistical distributions, disease demographics, or symptoms (e.g., <em>"Show me sex-ratio for disease stats"</em> or <em>"Plot symptoms distribution"</em>).</p>
+  <!-- Dialogue Stream Window -->
+  <main class="chat-stream" id="chatStream">
+    <!-- AI Welcome Message -->
+    <div class="message ai">
+      <div class="ai-card">
+        <div class="ai-card-header">
+          <img src="data/PYTHEAS_Logo.svg" alt="Pytheas" class="small-logo" onerror="this.src='https://via.placeholder.com/24x24?text=P'" />
+          <span class="ai-card-title">Pytheas Assistant</span>
         </div>
+        <p>Ask a query to explore metrics (e.g., <em>"survival PFIC1 PFIC2"</em> or <em>"survival PFIC1 PFIC2 boys"</em>).</p>
+      </div>
     </div>
+  </main>
 
-    <div class="input-wrapper">
-        <div class="input-container">
-            <input type="text" id="userInput" placeholder="Ask a question or enter keywords like 'sex-ratio', 'symptom'..." onkeydown="if(event.key === 'Enter') processQuery()">
-            <button onclick="processQuery()">&#8594;</button>
-        </div>
+  <!-- Sticky Dialogue Input Box -->
+  <div class="input-container">
+    <div class="chat-box">
+      <input type="text" id="queryInput" class="chat-input" placeholder="Ask Pytheas a question..." />
+      <button class="send-btn" onclick="submitQuery()" aria-label="Send query">
+        <svg viewBox="0 0 24 24">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+        </svg>
+      </button>
     </div>
+  </div>
 
-    <script>
-        let chartCounter = 0;
+<script>
+  /**
+   * D3.js Category Palettes
+   */
+  const D3_CATEGORY10 = [
+    "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
+    "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"
+  ];
 
-        // Light Mode Plotly Layout Configuration
-        const lightModePlotlyLayout = {
-            paper_bgcolor: '#ffffff',
-            plot_bgcolor: '#ffffff',
-            font: { color: '#1f1f1f' },
-            xaxis: { gridcolor: '#f0f0f0', zerolinecolor: '#e0e0e0' },
-            yaxis: { gridcolor: '#f0f0f0', zerolinecolor: '#e0e0e0' },
-            margin: { t: 40, r: 20, l: 50, b: 50 }
-        };
+  const D3_CATEGORY20 = [
+    "#1f77b4", "#aec7e8", "#ff7f0e", "#ffbb78", "#2ca02c", "#98df8a",
+    "#d62728", "#ff9896", "#9467bd", "#c5b0d5", "#8c564b", "#c49c94",
+    "#e377c2", "#f7b6d2", "#7f7f7f", "#c7c7c7", "#bcbd22", "#dbdb8d",
+    "#17becf", "#9edae5"
+  ];
 
-        async function processQuery() {
-            const inputField = document.getElementById('userInput');
-            const query = inputField.value.trim();
-            if (!query) return;
+  function getD3Color(index, totalCount) {
+    if (totalCount < 10) {
+      return D3_CATEGORY10[index % D3_CATEGORY10.length];
+    }
+    return D3_CATEGORY20[index % D3_CATEGORY20.length];
+  }
 
-            // Render User Message
-            appendMessage(query, 'user');
-            inputField.value = '';
+  // Primary Datasets
+  const fallbackDiseaseData = [
+    { 
+      name: "PFIC1", 
+      gene: "ATP8B1", 
+      aliases: ["FIC1"], 
+      patients: { boys: 51, girls: 36, total: 117 },
+      survival: {
+        all: {
+          surv_x: [0, 0.2, 0.5, 1.0, 1.5, 2.0, 2.8, 3.5, 4.2, 5.0, 7.0, 10.0, 15.0, 17.5, 18.0],
+          surv_y: [1.0, 0.99, 0.98, 0.96, 0.95, 0.93, 0.91, 0.90, 0.88, 0.86, 0.85, 0.82, 0.82, 0.82, 0.82],
+          status: ["0", "0", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "0", "0", "0"]
+        },
+        boys: {
+          surv_x: [0, 1.0, 2.0, 5.0, 10.0, 14.0],
+          surv_y: [1.0, 0.95, 0.90, 0.85, 0.80, 0.80],
+          status: ["0", "1", "1", "1", "0", "0"]
+        }
+      }
+    },
+    { 
+      name: "PFIC2", 
+      gene: "ABCB11", 
+      aliases: ["BSEP"], 
+      patients: { boys: 124, girls: 89, total: 325 },
+      survival: {
+        all: {
+          surv_x: [0, 0.3, 0.8, 1.2, 2.1, 3.2, 4.0, 5.1, 5.6, 6.2, 6.8, 8.0, 10.1, 14.8, 18.0],
+          surv_y: [1.0, 0.98, 0.97, 0.95, 0.93, 0.91, 0.90, 0.87, 0.86, 0.85, 0.84, 0.83, 0.81, 0.90, 0.88],
+          status: ["0", "1", "1", "0", "1", "1", "0", "1"]
+        },
+        boys: {
+          surv_x: [0, 1.0, 3.0, 6.0, 12.0, 18.0],
+          surv_y: [1.0, 0.94, 0.89, 0.82, 0.78, 0.75],
+          status: ["0", "1", "1", "1"]
+        }
+      }
+    }
+  ];
 
-            // Route and process the request dynamically
-            const lowerQuery = query.toLowerCase();
+  const fallbackSymptomData = [
+    { name: "Jaundice", code: "HP:0000952", patients: { boys: 80, girls: 50 } },
+    { name: "Pruritus", code: "HP:0000989", patients: { boys: 70, girls: 70 } },
+    { name: "Hepatomegaly", code: "HP:0002240", patients: { boys: 40, girls: 30 } }
+  ];
 
-            if (lowerQuery.includes('sex-ratio') || lowerQuery.includes('sex') || lowerQuery.includes('gender') || lowerQuery.includes('disease')) {
-                await handleDiseaseQuery(query);
-            } else if (lowerQuery.includes('symptom') || lowerQuery.includes('hp_symptom')) {
-                await handleSymptomQuery(query);
-            } else {
-                appendMessage("I couldn't match specific statistics keywords. Try asking for <strong>'sex-ratio'</strong> or <strong>'symptoms'</strong>.", 'ai');
-            }
+  let diseaseData = null;
+  let symptomData = null;
+  let chartCounter = 0;
+
+  function hexToRgba(hexStr, opacity) {
+    let c = hexStr.replace('#', '');
+    if (c.length === 3) {
+      c = c.split('').map(char => char + char).join('');
+    }
+    const num = parseInt(c, 16);
+    const r = (num >> 16) & 255;
+    const g = (num >> 8) & 255;
+    const b = num & 255;
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+  }
+
+  function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  async function initData() {
+    try {
+      const resDisease = await fetch('data/hp_disease_stats.json');
+      if (!resDisease.ok) throw new Error();
+      diseaseData = await resDisease.json();
+    } catch (e) {
+      diseaseData = fallbackDiseaseData;
+    }
+
+    try {
+      const resSymptom = await fetch('data/hp_symptom_stats.json');
+      if (!resSymptom.ok) throw new Error();
+      symptomData = await resSymptom.json();
+    } catch (e) {
+      symptomData = fallbackSymptomData;
+    }
+  }
+
+  function parseAndRoute(query) {
+    const normalized = query.toLowerCase().trim();
+    
+    const isSurvivalIntent = normalized.includes('survival') || normalized.includes('kaplan') || normalized.includes('outcome') || normalized.includes('death');
+
+    let dataset = (diseaseData && diseaseData.length) ? diseaseData : fallbackDiseaseData;
+    let datasetLabel = "Disease Dataset";
+    let isSymptom = false;
+
+    if (normalized.includes('symptom') || normalized.includes('hp:')) {
+      dataset = (symptomData && symptomData.length) ? symptomData : fallbackSymptomData;
+      datasetLabel = "Symptom Dataset";
+      isSymptom = true;
+    }
+
+    let matches = dataset.filter(item => {
+      if (!item) return false;
+
+      const nameMatch = item.name ? new RegExp(`\\b${escapeRegExp(String(item.name).toLowerCase())}\\b`, 'i').test(normalized) : false;
+      const geneMatch = item.gene ? new RegExp(`\\b${escapeRegExp(String(item.gene).toLowerCase())}\\b`, 'i').test(normalized) : false;
+      const codeMatch = item.code ? new RegExp(`\\b${escapeRegExp(String(item.code).toLowerCase())}\\b`, 'i').test(normalized) : false;
+      const aliasMatch = Array.isArray(item.aliases) && item.aliases.some(a => a && new RegExp(`\\b${escapeRegExp(String(a).toLowerCase())}\\b`, 'i').test(normalized));
+      
+      return nameMatch || geneMatch || codeMatch || aliasMatch;
+    });
+
+    if (matches.length === 0 && !isSurvivalIntent) {
+      const rangeMatch = normalized.match(/(?:ratio|sex ratio)?\s*(>|<|>=|<=|over|under)\s*(\d+(?:\.\d+)?)/i);
+      if (rangeMatch) {
+        const op = rangeMatch[1];
+        const val = parseFloat(rangeMatch[2]);
+        matches = dataset.filter(item => {
+          if (!item || !item.patients) return false;
+          const ratio = item.patients.girls > 0 ? (item.patients.boys / item.patients.girls) : 0;
+          if (op === '>' || op === 'over') return ratio > val;
+          if (op === '<' || op === 'under') return ratio < val;
+          if (op === '>=') return ratio >= val;
+          if (op === '<=') return ratio <= val;
+          return true;
+        });
+      }
+    }
+
+    const targets = matches.length > 0 ? matches : dataset;
+
+    let subgroupKey = 'all';
+    if (isSurvivalIntent) {
+      const possibleSubgroups = ['boys', 'girls', 'lof_lof', 'mis_mis', 'lof_mis'];
+      for (const sg of possibleSubgroups) {
+        if (normalized.includes(sg.replace('_', ' ')) || normalized.includes(sg)) {
+          if (sg === 'boys') subgroupKey = 'boys';
+          else if (sg === 'girls') subgroupKey = 'girls';
+          else if (sg === 'lof_lof') subgroupKey = 'LoF_LoF';
+          else if (sg === 'mis_mis') subgroupKey = 'Mis_Mis';
+          else subgroupKey = sg;
+          break;
+        }
+      }
+    }
+
+    return { targets, datasetLabel, isSymptom, isSurvivalIntent, subgroupKey };
+  }
+
+  function submitQuery() {
+    const input = document.getElementById('queryInput');
+    const query = input.value.trim();
+    if (!query) return;
+
+    appendUserMessage(query);
+    input.value = '';
+
+    const { targets, datasetLabel, isSymptom, isSurvivalIntent, subgroupKey } = parseAndRoute(query);
+    appendAiResponse(query, targets, datasetLabel, isSymptom, isSurvivalIntent, subgroupKey);
+  }
+
+  function appendUserMessage(text) {
+    const stream = document.getElementById('chatStream');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'message user';
+    msgDiv.innerHTML = `<div class="user-bubble">${escapeHtml(text)}</div>`;
+    stream.appendChild(msgDiv);
+    stream.scrollTop = stream.scrollHeight;
+  }
+
+  function appendAiResponse(query, targets, datasetLabel, isSymptom, isSurvivalIntent, subgroupKey) {
+    const stream = document.getElementById('chatStream');
+    chartCounter++;
+    const chartId = `plotly-chart-${chartCounter}`;
+
+    const tableHtml = renderSummaryTable(targets, isSymptom, isSurvivalIntent, subgroupKey);
+
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'message ai';
+    msgDiv.innerHTML = `
+      <div class="ai-card">
+        <div class="ai-card-header">
+          <img src="data/PYTHEAS_Logo.svg" alt="Pytheas" class="small-logo" onerror="this.src='https://via.placeholder.com/24x24?text=P'" />
+          <span class="ai-card-title">Pytheas Result (${datasetLabel}${isSurvivalIntent ? ' - ' + subgroupKey : ''})</span>
+        </div>
+        ${tableHtml}
+        <div id="${chartId}" class="chart-container"></div>
+      </div>
+    `;
+    stream.appendChild(msgDiv);
+    stream.scrollTop = stream.scrollHeight;
+
+    if (isSurvivalIntent) {
+      renderSurvivalPlot(chartId, targets, subgroupKey);
+    } else {
+      renderBarChart(chartId, targets);
+    }
+  }
+
+  function renderSummaryTable(targets, isSymptom, isSurvivalIntent, subgroupKey) {
+    const totalCount = targets.length;
+
+    if (isSurvivalIntent) {
+      let rowsHtml = targets.map((item, index) => {
+        const cohort = (item.survival && item.survival[subgroupKey]) ? item.survival[subgroupKey] : (item.survival ? item.survival.all : null);
+        const color = getD3Color(index, totalCount);
+
+        let sampleSize = item.patients?.total || "-";
+        if (cohort && cohort.status) {
+          sampleSize = cohort.status.length;
         }
 
-        function appendMessage(text, sender) {
-            const container = document.getElementById('chatContainer');
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${sender}`;
-            
-            if (sender === 'ai') {
-                msgDiv.innerHTML = `<div class="ai-header">PYTHEAS AI</div><div>${text}</div>`;
-            } else {
-                msgDiv.innerHTML = text;
-            }
-
-            container.appendChild(msgDiv);
-            container.scrollTop = container.scrollHeight;
-            return msgDiv;
+        let deaths = 0;
+        if (cohort && cohort.status) {
+          deaths = cohort.status.filter(s => String(s) === "1").length;
         }
 
-        // Query Routing Handler 1: Disease Stats & Sex-Ratio
-        async function handleDiseaseQuery(query) {
-            const responseElement = appendMessage("Querying <code>data/hp_disease_stats.json</code> for sex-ratio breakdown...", 'ai');
-            
-            try {
-                const res = await fetch('data/hp_disease_stats.json');
-                const data = await res.json();
+        return `
+          <tr>
+            <td><span class="color-swatch" style="background-color: ${color};"></span></td>
+            <td>${item.name || "Unknown"}</td>
+            <td class="gene-name">${item.gene || "-"}</td>
+            <td>${subgroupKey}</td>
+            <td>${sampleSize}</td>
+            <td>${deaths}</td>
+          </tr>
+        `;
+      }).join('');
 
-                let totalGirls = 0;
-                let totalBoys = 0;
-                const genes = [];
-                const girlsArr = [];
-                const boysArr = [];
+      return `
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>COLOR</th>
+                <th>DISEASE</th>
+                <th>GENE</th>
+                <th>SUBGROUP</th>
+                <th>PATIENTS</th>
+                <th>DEATHS</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
 
-                data.forEach(item => {
-                    const g = item.patients?.girls || 0;
-                    const b = item.patients?.boys || 0;
-                    totalGirls += g;
-                    totalBoys += b;
+    const entityHeader = isSymptom ? "SYMPTOM" : "DISEASE";
+    const subHeader = isSymptom ? "CODE" : "GENE";
 
-                    if (item.gene) {
-                        genes.push(item.gene);
-                        girlsArr.push(g);
-                        boysArr.push(b);
-                    }
-                });
+    let rowsHtml = targets.map((item, index) => {
+      const color = getD3Color(index, totalCount);
+      const boys = item.patients?.boys || 0;
+      const girls = item.patients?.girls || 0;
+      const total = item.patients?.total || (boys + girls);
+      const ratio = girls > 0 ? (boys / girls).toFixed(2) : "0.00";
+      const subVal = isSymptom ? (item.code || "-") : (item.gene || "-");
 
-                chartCounter++;
-                const chartId = `chart_${chartCounter}`;
-                responseElement.innerHTML += `<div id="${chartId}" class="chart-box"></div>`;
+      return `
+        <tr>
+          <td><span class="color-swatch" style="background-color: ${color};"></span></td>
+          <td>${item.name || "Unknown"}</td>
+          <td>${subVal}</td>
+          <td>${total}</td>
+          <td>${boys} / ${girls}</td>
+          <td>${ratio}</td>
+        </tr>
+      `;
+    }).join('');
 
-                const traces = [
-                    { x: genes, y: girlsArr, name: 'Girls', type: 'bar', marker: { color: '#e83e8c' } },
-                    { x: genes, y: boysArr, name: 'Boys', type: 'bar', marker: { color: '#0b57d0' } }
-                ];
+    return `
+      <div class="data-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>COLOR</th>
+              <th>${entityHeader}</th>
+              <th>${subHeader}</th>
+              <th>PATIENTS</th>
+              <th>BOYS / GIRLS</th>
+              <th>SEX RATIO</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
 
-                const layout = {
-                    ...lightModePlotlyLayout,
-                    title: 'Sex-Ratio Distribution by Gene',
-                    barmode: 'group'
-                };
+  function renderSurvivalPlot(containerId, targets, subgroupKey) {
+    const traces = [];
+    const maxXVals = [];
+    const totalTraces = targets.length;
 
-                Plotly.newPlot(chartId, traces, layout, { responsive: true });
+    targets.forEach((item, index) => {
+      let cohort = (item.survival && item.survival[subgroupKey]) ? item.survival[subgroupKey] : (item.survival ? item.survival.all : null);
 
-            } catch (err) {
-                responseElement.innerHTML += `<br><span style="color:#d93025;">Failed to fetch or parse <code>data/hp_disease_stats.json</code>. Ensure the JSON path exists.</span>`;
-            }
+      let xVals = [0, 2, 5, 10, 15, 18];
+      let yVals = [1.0, 0.95, 0.90, 0.85, 0.82, 0.80];
+
+      if (cohort && cohort.surv_x && cohort.surv_y) {
+        xVals = cohort.surv_x;
+        yVals = cohort.surv_y;
+      } else if (item.survival && item.survival.years && item.survival.rates) {
+        xVals = item.survival.years;
+        yVals = item.survival.rates;
+      }
+
+      if (xVals && xVals.length > 0) {
+        maxXVals.push(Math.max(...xVals));
+      }
+
+      const color = getD3Color(index, totalTraces);
+
+      traces.push({
+        x: xVals,
+        y: yVals,
+        name: `${item.name} (${subgroupKey})`,
+        type: 'scatter',
+        mode: 'lines',
+        line: {
+          shape: 'hv',
+          color: color,
+          width: 2
+        },
+        hovertemplate: `<b>${item.name}</b> (${subgroupKey})<br>Years: %{x}<br>Survival: %{y:.2f}<extra></extra>`
+      });
+    });
+
+    const xMaxLimit = maxXVals.length > 0 ? Math.min(...maxXVals) : 18;
+
+    const layout = {
+      title: false,
+      showlegend: false,
+      margin: { t: 20, l: 40, r: 20, b: 45 },
+      paper_bgcolor: '#ffffff',
+      plot_bgcolor: '#ffffff',
+      xaxis: {
+        title: { text: 'Years of age', font: { size: 12, color: '#374151' } },
+        showgrid: false,
+        showline: true,
+        linecolor: '#1f1f1f',
+        linewidth: 1,
+        tickfont: { color: '#374151', size: 12 },
+        range: [0, xMaxLimit]
+      },
+      yaxis: {
+        showgrid: false,
+        showline: true,
+        linecolor: '#1f1f1f',
+        linewidth: 1,
+        tickfont: { color: '#374151', size: 12 },
+        dtick: 0.2,
+        range: [0, 1.05]
+      }
+    };
+
+    const config = { responsive: true, displayModeBar: false };
+    Plotly.newPlot(containerId, traces, layout, config);
+  }
+
+  function renderBarChart(containerId, targets) {
+    const xLabels = [];
+    const yValues = [];
+    const shapes = [];
+    const annotations = [];
+
+    const numBars = targets.length;
+    const maxVal = Math.max(...targets.map(item => {
+      const boys = item.patients?.boys || 0;
+      const girls = item.patients?.girls || 0;
+      return girls > 0 ? (boys / girls) : 0;
+    }), 1.0);
+
+    const cornerRadiusY = maxVal * 0.04; 
+
+    targets.forEach((item, index) => {
+      const boys = item.patients?.boys || 0;
+      const girls = item.patients?.girls || 0;
+      const ratio = girls > 0 ? parseFloat((boys / girls).toFixed(2)) : 0;
+
+      const label = item.name || "Unknown";
+      xLabels.push(label);
+      yValues.push(ratio);
+
+      const strokeColor = getD3Color(index, numBars);
+      const fillColor = hexToRgba(strokeColor, 0.45);
+
+      const xLeft = index - 0.28;
+      const xRight = index + 0.28;
+      const rX = 0.04; 
+
+      const barPath = `
+        M ${xLeft},0
+        L ${xLeft},${ratio - cornerRadiusY}
+        Q ${xLeft},${ratio} ${xLeft + rX},${ratio}
+        L ${xRight - rX},${ratio}
+        Q ${xRight},${ratio} ${xRight},${ratio - cornerRadiusY}
+        L ${xRight},0
+        Z
+      `;
+
+      shapes.push({
+        type: 'path',
+        path: barPath,
+        xref: 'x',
+        yref: 'y',
+        fillcolor: fillColor,
+        line: { color: strokeColor, width: 2 },
+        layer: 'below'
+      });
+
+      annotations.push({
+        x: index,
+        y: ratio,
+        yshift: -22,
+        text: `${ratio.toFixed(2)}`,
+        showarrow: false,
+        font: {
+          color: '#4b5563',
+          size: 13,
+          weight: 500,
+          family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto'
         }
+      });
+    });
 
-        // Query Routing Handler 2: Symptom Stats
-        async function handleSymptomQuery(query) {
-            const responseElement = appendMessage("Querying <code>data/hp_symptom_stats.json</code> for symptom distributions...", 'ai');
-            
-            try {
-                const res = await fetch('data/hp_symptom_stats.json');
-                const data = await res.json();
+    shapes.push({
+      type: 'line',
+      xref: 'paper',
+      yref: 'y',
+      x0: 0,
+      x1: 1,
+      y0: 0,
+      y1: 0,
+      line: {
+        color: '#1f1f1f',
+        width: 2
+      },
+      layer: 'above'
+    });
 
-                const categories = data.map(d => d.name || d.symptom || 'Unknown');
-                const counts = data.map(d => d.count || d.value || 0);
+    const dummyTrace = {
+      x: xLabels,
+      y: yValues,
+      type: 'scatter',
+      mode: 'markers',
+      marker: { opacity: 0 }
+    };
 
-                chartCounter++;
-                const chartId = `chart_${chartCounter}`;
-                responseElement.innerHTML += `<div id="${chartId}" class="chart-box"></div>`;
+    const layout = {
+      title: false,
+      showlegend: false,
+      margin: { t: 10, l: 30, r: 10, b: 40 },
+      paper_bgcolor: '#ffffff',
+      plot_bgcolor: '#ffffff',
+      shapes: shapes,
+      annotations: annotations,
+      xaxis: {
+        ticksuffix: " ",
+        automargin: true,
+        showgrid: false,
+        showline: false,
+        tickfont: { color: '#333333', size: 12 },
+        range: [-0.6, numBars - 0.4]
+      },
+      yaxis: {
+        showgrid: false,
+        showticklabels: false,
+        automargin: true,
+        range: [0, maxVal * 1.15]
+      }
+    };
 
-                const traces = [{
-                    x: categories,
-                    y: counts,
-                    type: 'bar',
-                    marker: { color: '#0b57d0' }
-                }];
+    const config = { responsive: true, displayModeBar: false };
+    Plotly.newPlot(containerId, [dummyTrace], layout, config);
+  }
 
-                const layout = {
-                    ...lightModePlotlyLayout,
-                    title: 'Top Reported Symptoms Frequency'
-                };
+  function escapeHtml(text) {
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
 
-                Plotly.newPlot(chartId, traces, layout, { responsive: true });
-
-            } catch (err) {
-                responseElement.innerHTML += `<br><span style="color:#d93025;">Failed to fetch or parse <code>data/hp_symptom_stats.json</code>. Ensure the JSON path exists.</span>`;
-            }
-        }
-    </script>
+  window.onload = async () => {
+    await initData();
+    document.getElementById('queryInput').addEventListener('keyup', (e) => {
+      if (e.key === 'Enter') submitQuery();
+    });
+  };
+</script>
 </body>
 </html>
