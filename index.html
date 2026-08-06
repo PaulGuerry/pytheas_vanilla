@@ -1,490 +1,522 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PytheasDB Assistant</title>
-  
-  <!-- Font Awesome & Plotly -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
-  
-  <style>
-    :root {
-      --bg-color: #0b131b;
-      --card-bg: #14212d;
-      --card-border: #233547;
-      --accent-gold: #ffc107;
-      --text-main: #f0f4f8;
-      --text-muted: #94a3b8;
-      --user-msg-bg: #1e2d3b;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PYTHEAS - Disease Statistics</title>
+    <!-- Chart.js and Plotly.js libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.min.js"></script>
+    <style>
+        :root {
+            --primary-blue: #0056b3;
+            --secondary-blue: #004085;
+            --light-blue: #e6f0fa;
+            --border-blue: #b8daff;
+            --text-dark: #212529;
+            --text-muted: #6c757d;
+            --bg-white: #ffffff;
+            --card-bg: #f8f9fa;
+        }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-white);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+        }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-    }
+        header {
+            background-color: var(--bg-white);
+            border-bottom: 2px solid var(--primary-blue);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-    /* Minimalist Top Bar (Logo Only) */
-    header {
-      padding: 18px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--card-border);
-    }
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
 
-    .logo-container {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-    }
+        .header-logo img {
+            height: 48px;
+            width: auto;
+        }
 
-    .logo-icon {
-      width: 32px;
-      height: 32px;
-      background: var(--accent-gold);
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #000;
-      font-weight: bold;
-      font-size: 18px;
-    }
+        .header-logo h1 {
+            color: var(--primary-blue);
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
 
-    .logo-text {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text-main);
-      letter-spacing: -0.5px;
-    }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
 
-    .logo-text span {
-      color: var(--accent-gold);
-    }
+        .controls {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
 
-    /* Main Chat Container */
-    main {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+        .controls select {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            border: 1px solid var(--border-blue);
+            border-radius: 4px;
+            background-color: var(--bg-white);
+            color: var(--primary-blue);
+            font-weight: 600;
+            cursor: pointer;
+        }
 
-    .chat-wrapper {
-      width: 100%;
-      max-width: 860px;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      padding-bottom: 40px;
-    }
+        .controls select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.25);
+        }
 
-    /* Welcome Banner */
-    .welcome-screen {
-      text-align: center;
-      margin: 40px 0 20px 0;
-    }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
 
-    .welcome-screen h1 {
-      font-size: 32px;
-      font-weight: 600;
-      margin-bottom: 12px;
-    }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
 
-    .welcome-screen h1 span {
-      color: var(--accent-gold);
-    }
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-blue);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
 
-    .welcome-screen p {
-      color: var(--text-muted);
-      font-size: 16px;
-    }
+        .card-header {
+            color: var(--primary-blue);
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-blue);
+            padding-bottom: 0.5rem;
+        }
 
-    /* Chat Messages */
-    .message {
-      display: flex;
-      gap: 16px;
-      width: 100%;
-      animation: fadeIn 0.3s ease-in-out;
-    }
+        .stat-badge {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+        .chart-container {
+            position: relative;
+            min-height: 300px;
+            width: 100%;
+        }
 
-    .message.user {
-      justify-content: flex-end;
-    }
+        .plotly-container {
+            min-height: 350px;
+            width: 100%;
+        }
 
-    .avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      flex-shrink: 0;
-    }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
 
-    .avatar.assistant {
-      background-color: var(--card-bg);
-      border: 1px solid var(--card-border);
-      color: var(--accent-gold);
-    }
+        th, td {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-blue);
+        }
 
-    .avatar.user {
-      background-color: var(--accent-gold);
-      color: #000;
-      font-weight: bold;
-    }
+        th {
+            background-color: var(--light-blue);
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
 
-    .message-content {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 16px 20px;
-      max-width: 100%;
-      width: 100%;
-    }
+        tr:hover {
+            background-color: #f1f7ff;
+        }
 
-    .message.user .message-content {
-      background: var(--user-msg-bg);
-      width: auto;
-      max-width: 80%;
-      border-color: transparent;
-    }
+        a {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
 
-    /* Embedded Component Styles inside Response */
-    .chart-box {
-      width: 100%;
-      height: 400px;
-      margin-top: 15px;
-    }
+        a:hover {
+            text-decoration: underline;
+        }
 
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-      font-size: 13px;
-    }
+        .badge {
+            display: inline-block;
+            padding: 0.25em 0.4em;
+            font-size: 75%;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+            color: #fff;
+            background-color: var(--primary-blue);
+        }
 
-    .data-table th, .data-table td {
-      padding: 10px 12px;
-      text-align: left;
-      border-bottom: 1px solid var(--card-border);
-    }
+        .badge-lof { background-color: #dc3545; }
+        .badge-missense { background-color: #0d6efd; }
+        .badge-synonymous { background-color: #198754; }
+        .badge-other { background-color: #6c757d; }
 
-    .data-table th {
-      color: var(--accent-gold);
-      font-weight: 600;
-    }
-
-    .data-table tr:hover {
-      background-color: rgba(255, 255, 255, 0.02);
-    }
-
-    /* Prompt Suggestions */
-    .suggestions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 20px;
-    }
-
-    .chip {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      color: var(--text-main);
-      padding: 10px 16px;
-      border-radius: 20px;
-      font-size: 13px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .chip:hover {
-      border-color: var(--accent-gold);
-      color: var(--accent-gold);
-      transform: translateY(-1px);
-    }
-
-    /* Floating Dialog Input Area */
-    .input-container {
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-      background: linear-gradient(180deg, rgba(11,19,27,0) 0%, var(--bg-color) 40%);
-    }
-
-    .input-box {
-      width: 100%;
-      max-width: 860px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 28px;
-      padding: 8px 16px 8px 22px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-      transition: border-color 0.2s ease;
-    }
-
-    .input-box:focus-within {
-      border-color: var(--accent-gold);
-    }
-
-    .input-box input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--text-main);
-      font-size: 15px;
-      padding: 8px 0;
-    }
-
-    .input-box input::placeholder {
-      color: var(--text-muted);
-    }
-
-    .send-btn {
-      background: var(--accent-gold);
-      color: #000;
-      border: none;
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 0.2s;
-    }
-
-    .send-btn:hover {
-      opacity: 0.9;
-    }
-  </style>
+        .hidden { display: none; }
+    </style>
 </head>
 <body>
 
-  <!-- Minimal Header -->
-  <header>
-    <a href="#" class="logo-container">
-      <div class="logo-icon"><i class="fa-solid fa-database"></i></div>
-      <div class="logo-text">Pytheas<span>DB</span></div>
-    </a>
-  </header>
-
-  <!-- Interactive Chat Stream -->
-  <main id="main-stream">
-    <div class="chat-wrapper" id="chat-wrapper">
-      
-      <div class="welcome-screen" id="welcome-screen">
-        <h1>Explore <span>PytheasDB</span> Intelligence</h1>
-        <p>Ask questions or query dataset visualisations using natural language.</p>
-        
-        <div class="suggestions">
-          <div class="chip" onclick="submitQuery('compare sex-ratio between PFIC1 and PFIC2')">
-            <i class="fa-solid fa-chart-bar"></i> "compare sex-ratio between PFIC1 and PFIC2"
-          </div>
-          <div class="chip" onclick="submitQuery('compare survival between all PFIC diseases')">
-            <i class="fa-solid fa-chart-line"></i> "compare survival between all PFIC diseases"
-          </div>
+    <header>
+        <div class="header-logo">
+            <img src="data/PYTHEAS_Logo.svg" alt="PYTHEAS Logo" onerror="this.onerror=null; this.src='https://pytheasdb.com/static/images/PYTHEAS_Logo.svg';">
+            <h1>PYTHEAS Disease Statistics</h1>
         </div>
-      </div>
+    </header>
 
+    <div class="container">
+        <!-- Controls -->
+        <div class="controls">
+            <label for="geneSelect"><strong>Select Gene / Disease:</strong></label>
+            <select id="geneSelect"></select>
+        </div>
+
+        <!-- Overview Cards -->
+        <div class="grid-3">
+            <div class="card">
+                <h3 class="card-header">Total Patients</h3>
+                <div class="stat-badge" id="totalPatients">0</div>
+                <div id="genderDistribution">Girls: 0 | Boys: 0</div>
+            </div>
+            <div class="card">
+                <h3 class="card-header">Data Completeness</h3>
+                <div class="stat-badge" id="symptomCount">0</div>
+                <div id="variableCompleteness">Symptoms Reported</div>
+            </div>
+            <div class="card">
+                <h3 class="card-header">Consanguinity</h3>
+                <div class="stat-badge" id="consanguinityRatio">0%</div>
+                <div id="consanguinityDetails">Yes: 0 | No: 0 | Missing: 0</div>
+            </div>
+        </div>
+
+        <!-- Charts Grid 1 -->
+        <div class="grid-2">
+            <div class="card">
+                <h3 class="card-header">Zygosity Overview</h3>
+                <div class="chart-container">
+                    <canvas id="zygosityChart"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <h3 class="card-header">Protein Variant Types</h3>
+                <div class="chart-container">
+                    <canvas id="protVarChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Survival / Kaplan-Meier Plots -->
+        <div class="grid-2">
+            <div class="card">
+                <h3 class="card-header">Age at First Symptom (Cumulative)</h3>
+                <div id="ageSymptomPlot" class="plotly-container"></div>
+            </div>
+            <div class="card">
+                <h3 class="card-header">Survival Analysis</h3>
+                <div id="survivalPlot" class="plotly-container"></div>
+            </div>
+        </div>
+
+        <!-- Animal Model Orthologs -->
+        <div class="card" style="margin-bottom: 2rem;">
+            <h3 class="card-header">Animal Model Orthologs</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Species</th>
+                        <th>Gene Identifier</th>
+                        <th>UniProt Code</th>
+                    </tr>
+                </thead>
+                <tbody id="animalTableBody"></tbody>
+            </table>
+        </div>
+
+        <!-- Variants Table -->
+        <div class="card">
+            <h3 class="card-header">Variants & Publications</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>cVariant</th>
+                        <th>pVariant</th>
+                        <th>Prefix</th>
+                        <th>Type</th>
+                        <th>References</th>
+                    </tr>
+                </thead>
+                <tbody id="variantTableBody"></tbody>
+            </table>
+        </div>
     </div>
-  </main>
 
-  <!-- Input Dock -->
-  <div class="input-container">
-    <form class="input-box" id="query-form" onsubmit="handleFormSubmit(event)">
-      <input type="text" id="user-input" placeholder="Ask PytheasDB to plot or compare data..." autocomplete="off">
-      <button type="submit" class="send-btn"><i class="fa-solid fa-arrow-up"></i></button>
-    </form>
-  </div>
+    <script>
+        let dbData = [];
+        let zygosityChartInstance = null;
+        let protVarChartInstance = null;
 
-  <script>
-    let chartCounter = 0;
+        // Colors for UI Theme
+        const primaryBlue = '#0056b3';
+        const lightBlue = '#66b0ff';
+        const darkBlue = '#002752';
+        const accentBlue = '#3392ff';
+        const mutedGray = '#a6b5c5';
 
-    function handleFormSubmit(e) {
-      e.preventDefault();
-      const input = document.getElementById('user-input');
-      const query = input.value.trim();
-      if (!query) return;
+        // Load and parse JSON
+        fetch('hp_disease_stats.json')
+            .then(response => response.json())
+            .then(data => {
+                dbData = data;
+                initApp();
+            })
+            .catch(error => {
+                console.error("Error loading hp_disease_stats.json:", error);
+            });
 
-      submitQuery(query);
-      input.value = '';
-    }
+        function initApp() {
+            const select = document.getElementById('geneSelect');
+            select.innerHTML = '';
+            dbData.forEach((item, index) => {
+                const opt = document.createElement('option');
+                opt.value = index;
+                opt.textContent = `${item.gene} (${item.name})`;
+                select.appendChild(opt);
+            });
 
-    function submitQuery(queryText) {
-      // Hide welcome screen on first query
-      const welcomeScreen = document.getElementById('welcome-screen');
-      if (welcomeScreen) welcomeScreen.style.display = 'none';
+            select.addEventListener('change', (e) => {
+                renderGeneData(dbData[e.target.value]);
+            });
 
-      const chatWrapper = document.getElementById('chat-wrapper');
+            if (dbData.length > 0) {
+                renderGeneData(dbData[0]);
+            }
+        }
 
-      // 1. Render User Message
-      const userMsg = document.createElement('div');
-      userMsg.className = 'message user';
-      userMsg.innerHTML = `
-        <div class="message-content">${queryText}</div>
-        <div class="avatar user"><i class="fa-solid fa-user"></i></div>
-      `;
-      chatWrapper.appendChild(userMsg);
+        function renderGeneData(data) {
+            // Update Text Summary
+            document.getElementById('totalPatients').innerText = data.patients.total || 0;
+            document.getElementById('genderDistribution').innerText = `Girls: ${data.patients.girls || 0} | Boys: ${data.patients.boys || 0}`;
 
-      // 2. Process Intent & Query JSON Data
-      const lowerQuery = queryText.toLowerCase();
+            document.getElementById('symptomCount').innerText = data.symptom_count || 0;
+            document.getElementById('variableCompleteness').innerText = `Present: ${data.variables.present || 0} | Missing: ${data.variables.missing || 0}`;
 
-      if (lowerQuery.includes('sex-ratio') || lowerQuery.includes('sex ratio')) {
-        renderSexRatioResponse(chatWrapper, queryText);
-      } else if (lowerQuery.includes('survival')) {
-        renderSurvivalResponse(chatWrapper);
-      } else {
-        renderGenericResponse(chatWrapper, "I can fetch and display comparative statistics from the database. Try asking to compare sex ratios or survival curves between diseases.");
-      }
+            const consYes = data.consanguinous.yes || 0;
+            const consNo = data.consanguinous.no || 0;
+            const consTotal = consYes + consNo;
+            const consPct = consTotal > 0 ? ((consYes / consTotal) * 100).toFixed(1) : 0;
+            document.getElementById('consanguinityRatio').innerText = `${consPct}%`;
+            document.getElementById('consanguinityDetails').innerText = `Yes: ${consYes} | No: ${consNo} | Missing: ${data.consanguinous.missing || 0}`;
 
-      // Scroll to bottom
-      document.getElementById('main-stream').scrollTop = document.getElementById('main-stream').scrollHeight;
-    }
+            // Render Charts
+            renderZygosityChart(data.zygosity);
+            renderProtVarChart(data.protvartypes);
+            renderAgeSymptomPlot(data.age_at_first_symp);
+            renderSurvivalPlot(data.survival);
 
-    // Dynamic Sex Ratio Handler (Fetches hp_disease_stats.json)
-    function renderSexRatioResponse(container, queryText) {
-      chartCounter++;
-      const chartId = `plotly-chart-${chartCounter}`;
+            // Render Tables
+            renderAnimalTable(data.animals);
+            renderVariantTable(data.variants);
+        }
 
-      const assistantMsg = document.createElement('div');
-      assistantMsg.className = 'message assistant';
-      assistantMsg.innerHTML = `
-        <div class="avatar assistant"><i class="fa-solid fa-robot"></i></div>
-        <div class="message-content">
-          <p>Here is the sex-ratio comparison derived from <code>hp_disease_stats.json</code>:</p>
-          <div id="${chartId}" class="chart-box"></div>
-          <table class="data-table">
-            <thead>
-              <tr><th>DISEASE</th><th>GENE</th><th>PATIENTS</th><th>SEX RATIO</th></tr>
-            </thead>
-            <tbody id="${chartId}-table"></tbody>
-          </table>
-        </div>
-      `;
-      container.appendChild(assistantMsg);
+        function renderZygosityChart(zygosity) {
+            const ctx = document.getElementById('zygosityChart').getContext('2d');
+            if (zygosityChartInstance) zygosityChartInstance.destroy();
 
-      // Fetch JSON and render Plotly chart
-      fetch('data/hp_disease_stats.json')
-        .then(res => res.json())
-        .then(data => {
-          // Filter if specific diseases mentioned
-          let filtered = data;
-          if (queryText.toLowerCase().includes('pfic1') && queryText.toLowerCase().includes('pfic2')) {
-            filtered = data.filter(d => ['PFIC1', 'PFIC2'].includes((d.disease || d.name || '').toUpperCase()));
-          }
+            zygosityChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Homozygous', 'Compound Heterozygous', 'Heterozygous', 'Unknown'],
+                    datasets: [{
+                        data: [zygosity.homo, zygosity.compound, zygosity.hetero, zygosity.unknown],
+                        backgroundColor: [primaryBlue, lightBlue, accentBlue, mutedGray]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
 
-          // Populate Table
-          const tableBody = document.getElementById(`${chartId}-table`);
-          filtered.forEach(row => {
-            const tr = document.createElement('tr');
-            const ratio = row.sexRatio ?? row.ratio ?? (row.boys && row.girls ? (row.boys / row.girls) : 0);
-            tr.innerHTML = `
-              <td>${row.disease || row.name || '-'}</td>
-              <td>${row.gene || '-'}</td>
-              <td>${row.patients?.total || row.patients || '-'}</td>
-              <td>${typeof ratio === 'number' ? ratio.toFixed(2) : '-'}</td>
-            `;
-            tableBody.appendChild(tr);
-          });
+        function renderProtVarChart(protVar) {
+            const ctx = document.getElementById('protVarChart').getContext('2d');
+            if (protVarChartInstance) protVarChartInstance.destroy();
 
-          // Populate Plotly Dark Bar Chart
-          const xVals = filtered.map(d => d.disease || d.name);
-          const yVals = filtered.map(d => d.sexRatio ?? d.ratio ?? (d.boys && d.girls ? d.boys / d.girls : 0));
+            protVarChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['LoF/LoF', 'LoF/Mis', 'Mis/Mis', 'LoF/Het', 'Mis/Het', 'Unknown'],
+                    datasets: [{
+                        label: 'Patients',
+                        data: [
+                            protVar.LoF_LoF, 
+                            protVar.LoF_Mis, 
+                            protVar.Mis_Mis, 
+                            protVar.LoF_Het, 
+                            protVar.Mis_Het, 
+                            protVar.Unknown
+                        ],
+                        backgroundColor: primaryBlue
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
 
-          const trace = {
-            x: xVals,
-            y: yVals,
-            type: 'bar',
-            marker: { color: '#ffc107', cornerstyle: 'rounded' }
-          };
+        function renderAgeSymptomPlot(ageData) {
+            const traces = [];
+            const keys = ['all', 'boys', 'girls', 'LoF_LoF', 'LoF_Mis', 'Mis_Mis'];
+            const colors = [primaryBlue, '#17a2b8', '#e83e8c', '#dc3545', '#fd7e14', '#28a745'];
 
-          const layout = {
-            paper_bgcolor: 'rgba(0,0,0,0)',
-            plot_bgcolor: 'rgba(0,0,0,0)',
-            font: { color: '#f0f4f8' },
-            margin: { t: 20, b: 40, l: 40, r: 20 },
-            xaxis: { gridcolor: '#233547' },
-            yaxis: { gridcolor: '#233547', title: 'Sex Ratio (M/F)' }
-          };
+            keys.forEach((key, i) => {
+                if (ageData[key] && ageData[key].surv_x && ageData[key].surv_x.length > 0) {
+                    traces.push({
+                        x: ageData[key].surv_x,
+                        y: ageData[key].surv_y,
+                        mode: 'lines',
+                        name: ageData[key].name,
+                        line: { shape: 'hv', color: colors[i % colors.length] }
+                    });
+                }
+            });
 
-          Plotly.newPlot(chartId, [trace], layout, { responsive: true, displayModeBar: false });
-        })
-        .catch(err => {
-          console.error("Failed to load JSON data:", err);
-        });
-    }
+            const layout = {
+                margin: { t: 10, r: 10, l: 40, b: 40 },
+                xaxis: { title: 'Age (months)' },
+                yaxis: { title: 'Cumulative Proportion' },
+                legend: { orientation: 'h', y: -0.2 }
+            };
 
-    // Dynamic Survival Kaplan-Meier Placeholder Response
-    function renderSurvivalResponse(container) {
-      chartCounter++;
-      const chartId = `plotly-chart-${chartCounter}`;
+            Plotly.newPlot('ageSymptomPlot', traces, layout, {responsive: true});
+        }
 
-      const assistantMsg = document.createElement('div');
-      assistantMsg.className = 'message assistant';
-      assistantMsg.innerHTML = `
-        <div class="avatar assistant"><i class="fa-solid fa-robot"></i></div>
-        <div class="message-content">
-          <p>Displaying overall survival estimates across all cataloged PFIC diseases:</p>
-          <div id="${chartId}" class="chart-box"></div>
-        </div>
-      `;
-      container.appendChild(assistantMsg);
+        function renderSurvivalPlot(survData) {
+            const traces = [];
+            const keys = ['all', 'boys', 'girls', 'LoF_LoF', 'LoF_Mis', 'Mis_Mis'];
+            const colors = [primaryBlue, '#17a2b8', '#e83e8c', '#dc3545', '#fd7e14', '#28a745'];
 
-      const trace1 = { x: [0, 2, 5, 10, 15], y: [1.0, 0.92, 0.85, 0.78, 0.70], mode: 'lines', name: 'PFIC1', line: { color: '#ffc107', shape: 'hv' } };
-      const trace2 = { x: [0, 2, 5, 10, 15], y: [1.0, 0.88, 0.79, 0.65, 0.55], mode: 'lines', name: 'PFIC2', line: { color: '#17a2b8', shape: 'hv' } };
+            keys.forEach((key, i) => {
+                if (survData[key] && survData[key].surv_x && survData[key].surv_x.length > 0) {
+                    traces.push({
+                        x: survData[key].surv_x,
+                        y: survData[key].surv_y,
+                        mode: 'lines',
+                        name: survData[key].name,
+                        line: { shape: 'hv', color: colors[i % colors.length] }
+                    });
+                }
+            });
 
-      const layout = {
-        paper_bgcolor: 'rgba(0,0,0,0)',
-        plot_bgcolor: 'rgba(0,0,0,0)',
-        font: { color: '#f0f4f8' },
-        margin: { t: 20, b: 40, l: 40, r: 20 },
-        xaxis: { gridcolor: '#233547', title: 'Years' },
-        yaxis: { gridcolor: '#233547', title: 'Survival Probability' }
-      };
+            const layout = {
+                margin: { t: 10, r: 10, l: 40, b: 40 },
+                xaxis: { title: 'Time (years)' },
+                yaxis: { title: 'Survival Probability', range: [0, 1.05] },
+                legend: { orientation: 'h', y: -0.2 }
+            };
 
-      Plotly.newPlot(chartId, [trace1, trace2], layout, { responsive: true, displayModeBar: false });
-    }
+            Plotly.newPlot('survivalPlot', traces, layout, {responsive: true});
+        }
 
-    function renderGenericResponse(container, text) {
-      const assistantMsg = document.createElement('div');
-      assistantMsg.className = 'message assistant';
-      assistantMsg.innerHTML = `
-        <div class="avatar assistant"><i class="fa-solid fa-robot"></i></div>
-        <div class="message-content"><p>${text}</p></div>
-      `;
-      container.appendChild(assistantMsg);
-    }
-  </script>
+        function renderAnimalTable(animals) {
+            const tbody = document.getElementById('animalTableBody');
+            tbody.innerHTML = '';
+            if (!animals || animals.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3">No animal model data available.</td></tr>';
+                return;
+            }
+
+            animals.forEach(anim => {
+                const tr = document.createElement('tr');
+                const geneCell = anim.link 
+                    ? `<a href="${anim.link}" target="_blank">${anim.gene}</a>`
+                    : anim.gene;
+
+                const uniprotCell = (anim.uniprot && anim.uniprot.code) 
+                    ? (anim.uniprot.link 
+                        ? `<a href="${anim.uniprot.link}" target="_blank">${anim.uniprot.code}</a>` 
+                        : anim.uniprot.code)
+                    : '-';
+
+                tr.innerHTML = `
+                    <td><em>${anim.species}</em></td>
+                    <td>${geneCell}</td>
+                    <td>${uniprotCell}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderVariantTable(variants) {
+            const tbody = document.getElementById('variantTableBody');
+            tbody.innerHTML = '';
+            if (!variants || variants.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">No variant data available.</td></tr>';
+                return;
+            }
+
+            variants.forEach(v => {
+                const tr = document.createElement('tr');
+                
+                let badgeClass = 'badge-other';
+                if (v.type === 'missense') badgeClass = 'badge-missense';
+                else if (v.type === 'LoF') badgeClass = 'badge-lof';
+                else if (v.type === 'synonymous') badgeClass = 'badge-synonymous';
+
+                const doiLinks = (v.DOIs || []).map((doi, idx) => {
+                    return `<a href="${doi}" target="_blank">[Ref ${idx + 1}]</a>`;
+                }).join(' ');
+
+                tr.innerHTML = `
+                    <td><strong>${v.cvariant || '-'}</strong></td>
+                    <td>${v.pvariant || '-'}</td>
+                    <td><small>${v.prefix || '-'}</small></td>
+                    <td><span class="badge ${badgeClass}">${v.type || 'other'}</span></td>
+                    <td>${doiLinks || '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
 </body>
 </html>
