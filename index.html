@@ -100,7 +100,7 @@
       font-weight: 500;
     }
 
-    /* Center-aligned Summary Table with Color Swatches */
+    /* Summary Table Styling */
     .data-table-container {
       width: 100%;
       overflow-x: auto;
@@ -472,12 +472,12 @@
 
         return `
           <tr>
-            <td><span class="color-swatch" style="background-color: ${color};"></span></td>
             <td>${item.name || "Unknown"}</td>
             <td class="gene-name">${item.gene || "-"}</td>
             <td>${subgroupKey}</td>
             <td>${sampleSize}</td>
             <td>${deaths}</td>
+            <td><span class="color-swatch" style="background-color: ${color};"></span></td>
           </tr>
         `;
       }).join('');
@@ -487,12 +487,12 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th>COLOR</th>
                 <th>DISEASE</th>
                 <th>GENE</th>
                 <th>SUBGROUP</th>
                 <th>PATIENTS</th>
                 <th>DEATHS</th>
+                <th>COLOR</th>
               </tr>
             </thead>
             <tbody>
@@ -516,12 +516,12 @@
 
       return `
         <tr>
-          <td><span class="color-swatch" style="background-color: ${color};"></span></td>
           <td>${item.name || "Unknown"}</td>
           <td>${subVal}</td>
           <td>${total}</td>
           <td>${boys} / ${girls}</td>
           <td>${ratio}</td>
+          <td><span class="color-swatch" style="background-color: ${color};"></span></td>
         </tr>
       `;
     }).join('');
@@ -531,12 +531,12 @@
         <table class="data-table">
           <thead>
             <tr>
-              <th>COLOR</th>
               <th>${entityHeader}</th>
               <th>${subHeader}</th>
               <th>PATIENTS</th>
               <th>BOYS / GIRLS</th>
               <th>SEX RATIO</th>
+              <th>COLOR</th>
             </tr>
           </thead>
           <tbody>
