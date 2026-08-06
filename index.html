@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sex Ratio Comparison</title>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 40px auto;
+      max-width: 900px;
+      color: #2D3748;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .data-table th {
+      text-align: left;
+      padding: 8px 12px;
+      font-weight: 700;
+      color: #2D3748;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid #EDF2F7;
+    }
+
+    .data-table td {
+      padding: 8px 12px;
+      color: #4A5568;
+    }
+
+    .data-table tr:nth-child(even) {
+      background-color: #F7FAFC;
+    }
+
+    #chart-container {
+      width: 100%;
+      height: 450px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Data Table -->
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>DISEASE</th>
+        <th>GENE</th>
+        <th>PATIENTS</th>
+        <th>BOYS / GIRLS</th>
+        <th>SEX RATIO</th>
+      </tr>
+    </thead>
+    <tbody id="table-body">
+      <!-- Populated dynamically -->
+    </tbody>
+  </table>
+
+  <!-- Chart Container -->
+  <div id="chart-container"></div>
+
+  <script>
+    // Helper to generate rounded SVG path for bars
+    function createRoundedBarPath(xCenter, yValue, width, radius) {
+      const x0 = xCenter - width / 2;
+      const x1 = xCenter + width / 2;
+      const y0 = 0;
+      const y1 = yValue;
+
+      return `M ${x0},${y0} 
+              L ${x0},${y1 - radius} 
+              Q ${x0},${y1} ${x0 + radius},${y1} 
+              L ${x1 - radius},${y1} 
+              Q ${x1},${y1} ${x1},${y1 - radius} 
+              L ${x1},${y0} 
+              Z`;
+    }
+
+    // Default palette for rendering matching styles
+    const palette = [
+      { fill: '#CCCCCC', stroke: '#1A202C' },
+      { fill: '#D2CDD0', stroke: '#1A202C' },
+      { fill: '#E4D5DA', stroke: '#6B213F' },
+      { fill: '#D5E4DA', stroke: '#216B3F' },
+      { fill: '#DAD5E4', stroke: '#3F216B' }
+    ];
+
+    // Fetch JSON data from local directory
+    fetch('data/hp_disease_stats.json')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        renderTable(data);
+        renderChart(data);
+      })
+      .catch(error => console.error('Error loading hp_disease_stats.json:', error));
+
+    function renderTable(data) {
+      const tableBody = document.getElementById('table-body');
+      tableBody.innerHTML = ''; // Clear existing rows
+
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+
+        // Handles calculating sex ratio if not explicitly provided in JSON
+        const ratio = row.sexRatio ?? row.ratio ?? (row.boys && row.girls ? (row.boys / row.girls) : 0);
+        const boysGirlsStr = row.boysGirls ?? (row.boys !== undefined && row.girls !== undefined ? `${row.boys} / ${row.girls}` : '-');
+
+        tr.innerHTML = `
+          <td>${row.disease ?? row.name ?? '-'}</td>
+          <td>${row.gene ?? '-'}</td>
+          <td>${row.patients ?? '-'}</td>
+          <td>${boysGirlsStr}</td>
+          <td>${typeof ratio === 'number' ? ratio.toFixed(2) : '-'}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function renderChart(data) {
+      const barWidth = 0.55;
+      const cornerRadius = 0.05;
+
+      const maxRatio = Math.max(...data.map(d => d.sexRatio ?? d.ratio ?? 1));
+
+      const shapes = data.map((item, index) => {
+        const ratio = item.sexRatio ?? item.ratio ?? (item.boys && item.girls ? (item.boys / item.girls) : 0);
+        const style = palette[index % palette.length];
+
+        return {
+          type: 'path',
+          path: createRoundedBarPath(index, ratio, barWidth, cornerRadius),
+          fillcolor: item.color || style.fill,
+          line: {
+            color: item.stroke || style.stroke,
+            width: 1.5
+          }
+        };
+      });
+
+      // Add horizontal base line
+      shapes.push({
+        type: 'line',
+        x0: -0.5,
+        x1: data.length - 0.5,
+        y0: 0,
+        y1: 0,
+        line: { color: '#2D3748', width: 1.5 }
+      });
+
+      // Bar top numeric values
+      const annotations = data.map((item, index) => {
+        const ratio = item.sexRatio ?? item.ratio ?? (item.boys && item.girls ? (item.boys / item.girls) : 0);
+        return {
+          x: index,
+          y: ratio - (maxRatio * 0.05),
+          text: ratio.toFixed(2),
+          showarrow: false,
+          font: { size: 14, color: '#2D3748' }
+        };
+      });
+
+      const layout = {
+        xaxis: {
+          tickvals: data.map((_, i) => i),
+          ticktext: data.map(d => d.disease ?? d.name),
+          tickangle: 45,
+          showgrid: false,
+          zeroline: false,
+          tickfont: { size: 13, color: '#2D3748' }
+        },
+        yaxis: {
+          range: [0, maxRatio * 1.15],
+          showgrid: false,
+          zeroline: false,
+          showticklabels: false
+        },
+        shapes: shapes,
+        annotations: annotations,
+        margin: { t: 20, b: 60, l: 40, r: 40 },
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)'
+      };
+
+      Plotly.newPlot('chart-container', [], layout, { responsive: true, displayModeBar: false });
+    }
+  </script>
+
+</body>
+</html>
