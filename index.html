@@ -3,519 +3,332 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PYTHEAS - Disease Statistics</title>
-    <!-- Chart.js and Plotly.js libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.plot.ly/plotly-2.27.0.min.min.js"></script>
+    <title>PYTHEAS - AI Interface</title>
+    <!-- Plotly.js for Data Visualizations -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <style>
         :root {
-            --primary-blue: #0056b3;
-            --secondary-blue: #004085;
-            --light-blue: #e6f0fa;
-            --border-blue: #b8daff;
-            --text-dark: #212529;
-            --text-muted: #6c757d;
-            --bg-white: #ffffff;
-            --card-bg: #f8f9fa;
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --text-color: #1f1f1f;
+            --text-subtle: #444746;
+            --accent-blue: #0b57d0;
+            --input-bg: #ffffff;
+            --user-msg-bg: #f0f4f9;
+            --border-color: #e1e3e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: var(--bg-white);
-            color: var(--text-dark);
-            margin: 0;
-            padding: 0;
-            line-height: 1.5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
         }
 
+        /* Top Header with Larger Logo */
         header {
-            background-color: var(--bg-white);
-            border-bottom: 2px solid var(--primary-blue);
-            padding: 1rem 2rem;
+            padding: 1.5rem 2rem;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-        }
-
-        .header-logo {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+            gap: 1.25rem;
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .header-logo img {
-            height: 48px;
+            height: 80px; /* Increased size */
             width: auto;
+            display: block;
         }
 
         .header-logo h1 {
-            color: var(--primary-blue);
-            margin: 0;
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-
-        .controls {
-            margin-bottom: 2rem;
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .controls select {
-            padding: 0.5rem 1rem;
-            font-size: 1rem;
-            border: 1px solid var(--border-blue);
-            border-radius: 4px;
-            background-color: var(--bg-white);
-            color: var(--primary-blue);
+            font-size: 1.8rem;
             font-weight: 600;
-            cursor: pointer;
+            color: var(--accent-blue);
+            letter-spacing: -0.5px;
         }
 
-        .controls select:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.25);
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        /* Dialogue Sequence Container */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
             gap: 1.5rem;
-            margin-bottom: 2rem;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
         }
 
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+        .message {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-width: 100%;
+            animation: fadeIn 0.3s ease-in-out;
         }
 
-        .card {
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background-color: var(--user-msg-bg);
+            padding: 0.85rem 1.25rem;
+            border-radius: 18px 18px 4px 18px;
+            max-width: 80%;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .message.ai {
+            align-self: flex-start;
+            width: 100%;
             background-color: var(--card-bg);
-            border: 1px solid var(--border-blue);
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 1.25rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
-        .card-header {
-            color: var(--primary-blue);
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-top: 0;
-            margin-bottom: 1rem;
-            border-bottom: 1px solid var(--border-blue);
-            padding-bottom: 0.5rem;
-        }
-
-        .stat-badge {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary-blue);
+        .ai-header {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent-blue);
             margin-bottom: 0.5rem;
         }
 
-        .chart-container {
-            position: relative;
-            min-height: 300px;
+        .chart-box {
             width: 100%;
-        }
-
-        .plotly-container {
-            min-height: 350px;
-            width: 100%;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
+            min-height: 400px;
             margin-top: 1rem;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
         }
 
-        th, td {
-            text-align: left;
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--border-blue);
+        /* Bottom Fixed Input Box */
+        .input-wrapper {
+            padding: 1.5rem 2rem;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
         }
 
-        th {
-            background-color: var(--light-blue);
-            color: var(--primary-blue);
-            font-weight: 600;
+        .input-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
         }
 
-        tr:hover {
-            background-color: #f1f7ff;
+        .input-container input {
+            width: 100%;
+            padding: 1.2rem 3.5rem 1.2rem 1.5rem;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 28px;
+            color: var(--text-color);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
 
-        a {
-            color: var(--primary-blue);
-            text-decoration: none;
+        .input-container input:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 2px 8px rgba(11, 87, 208, 0.15);
         }
 
-        a:hover {
-            text-decoration: underline;
+        .input-container button {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--accent-blue);
+            border: none;
+            color: #ffffff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .badge {
-            display: inline-block;
-            padding: 0.25em 0.4em;
-            font-size: 75%;
-            font-weight: 700;
-            line-height: 1;
-            text-align: center;
-            white-space: nowrap;
-            vertical-align: baseline;
-            border-radius: 0.25rem;
-            color: #fff;
-            background-color: var(--primary-blue);
+        .input-container button:hover {
+            opacity: 0.9;
         }
-
-        .badge-lof { background-color: #dc3545; }
-        .badge-missense { background-color: #0d6efd; }
-        .badge-synonymous { background-color: #198754; }
-        .badge-other { background-color: #6c757d; }
-
-        .hidden { display: none; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="header-logo">
+        <div class="header-logo" style="display: flex; align-items: center; gap: 1rem;">
             <img src="data/PYTHEAS_Logo.svg" alt="PYTHEAS Logo" onerror="this.onerror=null; this.src='https://pytheasdb.com/static/images/PYTHEAS_Logo.svg';">
-            <h1>PYTHEAS Disease Statistics</h1>
+            <h1>PYTHEAS AI</h1>
         </div>
     </header>
 
-    <div class="container">
-        <!-- Controls -->
-        <div class="controls">
-            <label for="geneSelect"><strong>Select Gene / Disease:</strong></label>
-            <select id="geneSelect"></select>
+    <div class="chat-container" id="chatContainer">
+        <!-- Initial Welcome Dialogue -->
+        <div class="message ai">
+            <div class="ai-header">PYTHEAS AI</div>
+            <p>Welcome. Ask any question about statistical distributions, disease demographics, or symptoms (e.g., <em>"Show me sex-ratio for disease stats"</em> or <em>"Plot symptoms distribution"</em>).</p>
         </div>
+    </div>
 
-        <!-- Overview Cards -->
-        <div class="grid-3">
-            <div class="card">
-                <h3 class="card-header">Total Patients</h3>
-                <div class="stat-badge" id="totalPatients">0</div>
-                <div id="genderDistribution">Girls: 0 | Boys: 0</div>
-            </div>
-            <div class="card">
-                <h3 class="card-header">Data Completeness</h3>
-                <div class="stat-badge" id="symptomCount">0</div>
-                <div id="variableCompleteness">Symptoms Reported</div>
-            </div>
-            <div class="card">
-                <h3 class="card-header">Consanguinity</h3>
-                <div class="stat-badge" id="consanguinityRatio">0%</div>
-                <div id="consanguinityDetails">Yes: 0 | No: 0 | Missing: 0</div>
-            </div>
-        </div>
-
-        <!-- Charts Grid 1 -->
-        <div class="grid-2">
-            <div class="card">
-                <h3 class="card-header">Zygosity Overview</h3>
-                <div class="chart-container">
-                    <canvas id="zygosityChart"></canvas>
-                </div>
-            </div>
-            <div class="card">
-                <h3 class="card-header">Protein Variant Types</h3>
-                <div class="chart-container">
-                    <canvas id="protVarChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Survival / Kaplan-Meier Plots -->
-        <div class="grid-2">
-            <div class="card">
-                <h3 class="card-header">Age at First Symptom (Cumulative)</h3>
-                <div id="ageSymptomPlot" class="plotly-container"></div>
-            </div>
-            <div class="card">
-                <h3 class="card-header">Survival Analysis</h3>
-                <div id="survivalPlot" class="plotly-container"></div>
-            </div>
-        </div>
-
-        <!-- Animal Model Orthologs -->
-        <div class="card" style="margin-bottom: 2rem;">
-            <h3 class="card-header">Animal Model Orthologs</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Species</th>
-                        <th>Gene Identifier</th>
-                        <th>UniProt Code</th>
-                    </tr>
-                </thead>
-                <tbody id="animalTableBody"></tbody>
-            </table>
-        </div>
-
-        <!-- Variants Table -->
-        <div class="card">
-            <h3 class="card-header">Variants & Publications</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>cVariant</th>
-                        <th>pVariant</th>
-                        <th>Prefix</th>
-                        <th>Type</th>
-                        <th>References</th>
-                    </tr>
-                </thead>
-                <tbody id="variantTableBody"></tbody>
-            </table>
+    <div class="input-wrapper">
+        <div class="input-container">
+            <input type="text" id="userInput" placeholder="Ask a question or enter keywords like 'sex-ratio', 'symptom'..." onkeydown="if(event.key === 'Enter') processQuery()">
+            <button onclick="processQuery()">&#8594;</button>
         </div>
     </div>
 
     <script>
-        let dbData = [];
-        let zygosityChartInstance = null;
-        let protVarChartInstance = null;
+        let chartCounter = 0;
 
-        // Colors for UI Theme
-        const primaryBlue = '#0056b3';
-        const lightBlue = '#66b0ff';
-        const darkBlue = '#002752';
-        const accentBlue = '#3392ff';
-        const mutedGray = '#a6b5c5';
+        // Light Mode Plotly Layout Configuration
+        const lightModePlotlyLayout = {
+            paper_bgcolor: '#ffffff',
+            plot_bgcolor: '#ffffff',
+            font: { color: '#1f1f1f' },
+            xaxis: { gridcolor: '#f0f0f0', zerolinecolor: '#e0e0e0' },
+            yaxis: { gridcolor: '#f0f0f0', zerolinecolor: '#e0e0e0' },
+            margin: { t: 40, r: 20, l: 50, b: 50 }
+        };
 
-        // Load and parse JSON
-        fetch('hp_disease_stats.json')
-            .then(response => response.json())
-            .then(data => {
-                dbData = data;
-                initApp();
-            })
-            .catch(error => {
-                console.error("Error loading hp_disease_stats.json:", error);
-            });
+        async function processQuery() {
+            const inputField = document.getElementById('userInput');
+            const query = inputField.value.trim();
+            if (!query) return;
 
-        function initApp() {
-            const select = document.getElementById('geneSelect');
-            select.innerHTML = '';
-            dbData.forEach((item, index) => {
-                const opt = document.createElement('option');
-                opt.value = index;
-                opt.textContent = `${item.gene} (${item.name})`;
-                select.appendChild(opt);
-            });
+            // Render User Message
+            appendMessage(query, 'user');
+            inputField.value = '';
 
-            select.addEventListener('change', (e) => {
-                renderGeneData(dbData[e.target.value]);
-            });
+            // Route and process the request dynamically
+            const lowerQuery = query.toLowerCase();
 
-            if (dbData.length > 0) {
-                renderGeneData(dbData[0]);
+            if (lowerQuery.includes('sex-ratio') || lowerQuery.includes('sex') || lowerQuery.includes('gender') || lowerQuery.includes('disease')) {
+                await handleDiseaseQuery(query);
+            } else if (lowerQuery.includes('symptom') || lowerQuery.includes('hp_symptom')) {
+                await handleSymptomQuery(query);
+            } else {
+                appendMessage("I couldn't match specific statistics keywords. Try asking for <strong>'sex-ratio'</strong> or <strong>'symptoms'</strong>.", 'ai');
             }
         }
 
-        function renderGeneData(data) {
-            // Update Text Summary
-            document.getElementById('totalPatients').innerText = data.patients.total || 0;
-            document.getElementById('genderDistribution').innerText = `Girls: ${data.patients.girls || 0} | Boys: ${data.patients.boys || 0}`;
-
-            document.getElementById('symptomCount').innerText = data.symptom_count || 0;
-            document.getElementById('variableCompleteness').innerText = `Present: ${data.variables.present || 0} | Missing: ${data.variables.missing || 0}`;
-
-            const consYes = data.consanguinous.yes || 0;
-            const consNo = data.consanguinous.no || 0;
-            const consTotal = consYes + consNo;
-            const consPct = consTotal > 0 ? ((consYes / consTotal) * 100).toFixed(1) : 0;
-            document.getElementById('consanguinityRatio').innerText = `${consPct}%`;
-            document.getElementById('consanguinityDetails').innerText = `Yes: ${consYes} | No: ${consNo} | Missing: ${data.consanguinous.missing || 0}`;
-
-            // Render Charts
-            renderZygosityChart(data.zygosity);
-            renderProtVarChart(data.protvartypes);
-            renderAgeSymptomPlot(data.age_at_first_symp);
-            renderSurvivalPlot(data.survival);
-
-            // Render Tables
-            renderAnimalTable(data.animals);
-            renderVariantTable(data.variants);
-        }
-
-        function renderZygosityChart(zygosity) {
-            const ctx = document.getElementById('zygosityChart').getContext('2d');
-            if (zygosityChartInstance) zygosityChartInstance.destroy();
-
-            zygosityChartInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Homozygous', 'Compound Heterozygous', 'Heterozygous', 'Unknown'],
-                    datasets: [{
-                        data: [zygosity.homo, zygosity.compound, zygosity.hetero, zygosity.unknown],
-                        backgroundColor: [primaryBlue, lightBlue, accentBlue, mutedGray]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom' } }
-                }
-            });
-        }
-
-        function renderProtVarChart(protVar) {
-            const ctx = document.getElementById('protVarChart').getContext('2d');
-            if (protVarChartInstance) protVarChartInstance.destroy();
-
-            protVarChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['LoF/LoF', 'LoF/Mis', 'Mis/Mis', 'LoF/Het', 'Mis/Het', 'Unknown'],
-                    datasets: [{
-                        label: 'Patients',
-                        data: [
-                            protVar.LoF_LoF, 
-                            protVar.LoF_Mis, 
-                            protVar.Mis_Mis, 
-                            protVar.LoF_Het, 
-                            protVar.Mis_Het, 
-                            protVar.Unknown
-                        ],
-                        backgroundColor: primaryBlue
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true }
-                    },
-                    plugins: { legend: { display: false } }
-                }
-            });
-        }
-
-        function renderAgeSymptomPlot(ageData) {
-            const traces = [];
-            const keys = ['all', 'boys', 'girls', 'LoF_LoF', 'LoF_Mis', 'Mis_Mis'];
-            const colors = [primaryBlue, '#17a2b8', '#e83e8c', '#dc3545', '#fd7e14', '#28a745'];
-
-            keys.forEach((key, i) => {
-                if (ageData[key] && ageData[key].surv_x && ageData[key].surv_x.length > 0) {
-                    traces.push({
-                        x: ageData[key].surv_x,
-                        y: ageData[key].surv_y,
-                        mode: 'lines',
-                        name: ageData[key].name,
-                        line: { shape: 'hv', color: colors[i % colors.length] }
-                    });
-                }
-            });
-
-            const layout = {
-                margin: { t: 10, r: 10, l: 40, b: 40 },
-                xaxis: { title: 'Age (months)' },
-                yaxis: { title: 'Cumulative Proportion' },
-                legend: { orientation: 'h', y: -0.2 }
-            };
-
-            Plotly.newPlot('ageSymptomPlot', traces, layout, {responsive: true});
-        }
-
-        function renderSurvivalPlot(survData) {
-            const traces = [];
-            const keys = ['all', 'boys', 'girls', 'LoF_LoF', 'LoF_Mis', 'Mis_Mis'];
-            const colors = [primaryBlue, '#17a2b8', '#e83e8c', '#dc3545', '#fd7e14', '#28a745'];
-
-            keys.forEach((key, i) => {
-                if (survData[key] && survData[key].surv_x && survData[key].surv_x.length > 0) {
-                    traces.push({
-                        x: survData[key].surv_x,
-                        y: survData[key].surv_y,
-                        mode: 'lines',
-                        name: survData[key].name,
-                        line: { shape: 'hv', color: colors[i % colors.length] }
-                    });
-                }
-            });
-
-            const layout = {
-                margin: { t: 10, r: 10, l: 40, b: 40 },
-                xaxis: { title: 'Time (years)' },
-                yaxis: { title: 'Survival Probability', range: [0, 1.05] },
-                legend: { orientation: 'h', y: -0.2 }
-            };
-
-            Plotly.newPlot('survivalPlot', traces, layout, {responsive: true});
-        }
-
-        function renderAnimalTable(animals) {
-            const tbody = document.getElementById('animalTableBody');
-            tbody.innerHTML = '';
-            if (!animals || animals.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3">No animal model data available.</td></tr>';
-                return;
+        function appendMessage(text, sender) {
+            const container = document.getElementById('chatContainer');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${sender}`;
+            
+            if (sender === 'ai') {
+                msgDiv.innerHTML = `<div class="ai-header">PYTHEAS AI</div><div>${text}</div>`;
+            } else {
+                msgDiv.innerHTML = text;
             }
 
-            animals.forEach(anim => {
-                const tr = document.createElement('tr');
-                const geneCell = anim.link 
-                    ? `<a href="${anim.link}" target="_blank">${anim.gene}</a>`
-                    : anim.gene;
-
-                const uniprotCell = (anim.uniprot && anim.uniprot.code) 
-                    ? (anim.uniprot.link 
-                        ? `<a href="${anim.uniprot.link}" target="_blank">${anim.uniprot.code}</a>` 
-                        : anim.uniprot.code)
-                    : '-';
-
-                tr.innerHTML = `
-                    <td><em>${anim.species}</em></td>
-                    <td>${geneCell}</td>
-                    <td>${uniprotCell}</td>
-                `;
-                tbody.appendChild(tr);
-            });
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+            return msgDiv;
         }
 
-        function renderVariantTable(variants) {
-            const tbody = document.getElementById('variantTableBody');
-            tbody.innerHTML = '';
-            if (!variants || variants.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5">No variant data available.</td></tr>';
-                return;
+        // Query Routing Handler 1: Disease Stats & Sex-Ratio
+        async function handleDiseaseQuery(query) {
+            const responseElement = appendMessage("Querying <code>data/hp_disease_stats.json</code> for sex-ratio breakdown...", 'ai');
+            
+            try {
+                const res = await fetch('data/hp_disease_stats.json');
+                const data = await res.json();
+
+                let totalGirls = 0;
+                let totalBoys = 0;
+                const genes = [];
+                const girlsArr = [];
+                const boysArr = [];
+
+                data.forEach(item => {
+                    const g = item.patients?.girls || 0;
+                    const b = item.patients?.boys || 0;
+                    totalGirls += g;
+                    totalBoys += b;
+
+                    if (item.gene) {
+                        genes.push(item.gene);
+                        girlsArr.push(g);
+                        boysArr.push(b);
+                    }
+                });
+
+                chartCounter++;
+                const chartId = `chart_${chartCounter}`;
+                responseElement.innerHTML += `<div id="${chartId}" class="chart-box"></div>`;
+
+                const traces = [
+                    { x: genes, y: girlsArr, name: 'Girls', type: 'bar', marker: { color: '#e83e8c' } },
+                    { x: genes, y: boysArr, name: 'Boys', type: 'bar', marker: { color: '#0b57d0' } }
+                ];
+
+                const layout = {
+                    ...lightModePlotlyLayout,
+                    title: 'Sex-Ratio Distribution by Gene',
+                    barmode: 'group'
+                };
+
+                Plotly.newPlot(chartId, traces, layout, { responsive: true });
+
+            } catch (err) {
+                responseElement.innerHTML += `<br><span style="color:#d93025;">Failed to fetch or parse <code>data/hp_disease_stats.json</code>. Ensure the JSON path exists.</span>`;
             }
+        }
 
-            variants.forEach(v => {
-                const tr = document.createElement('tr');
-                
-                let badgeClass = 'badge-other';
-                if (v.type === 'missense') badgeClass = 'badge-missense';
-                else if (v.type === 'LoF') badgeClass = 'badge-lof';
-                else if (v.type === 'synonymous') badgeClass = 'badge-synonymous';
+        // Query Routing Handler 2: Symptom Stats
+        async function handleSymptomQuery(query) {
+            const responseElement = appendMessage("Querying <code>data/hp_symptom_stats.json</code> for symptom distributions...", 'ai');
+            
+            try {
+                const res = await fetch('data/hp_symptom_stats.json');
+                const data = await res.json();
 
-                const doiLinks = (v.DOIs || []).map((doi, idx) => {
-                    return `<a href="${doi}" target="_blank">[Ref ${idx + 1}]</a>`;
-                }).join(' ');
+                const categories = data.map(d => d.name || d.symptom || 'Unknown');
+                const counts = data.map(d => d.count || d.value || 0);
 
-                tr.innerHTML = `
-                    <td><strong>${v.cvariant || '-'}</strong></td>
-                    <td>${v.pvariant || '-'}</td>
-                    <td><small>${v.prefix || '-'}</small></td>
-                    <td><span class="badge ${badgeClass}">${v.type || 'other'}</span></td>
-                    <td>${doiLinks || '-'}</td>
-                `;
-                tbody.appendChild(tr);
-            });
+                chartCounter++;
+                const chartId = `chart_${chartCounter}`;
+                responseElement.innerHTML += `<div id="${chartId}" class="chart-box"></div>`;
+
+                const traces = [{
+                    x: categories,
+                    y: counts,
+                    type: 'bar',
+                    marker: { color: '#0b57d0' }
+                }];
+
+                const layout = {
+                    ...lightModePlotlyLayout,
+                    title: 'Top Reported Symptoms Frequency'
+                };
+
+                Plotly.newPlot(chartId, traces, layout, { responsive: true });
+
+            } catch (err) {
+                responseElement.innerHTML += `<br><span style="color:#d93025;">Failed to fetch or parse <code>data/hp_symptom_stats.json</code>. Ensure the JSON path exists.</span>`;
+            }
         }
     </script>
 </body>
