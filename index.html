@@ -315,14 +315,10 @@
   </footer>
 
 <script>
-  // Command History State Variables
   let queryHistory = [];
   let historyIndex = -1;
   let currentDraft = "";
 
-  /**
-   * D3.js Category Palettes
-   */
   const D3_CATEGORY10 = [
     "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
     "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"
@@ -343,10 +339,8 @@
   }
 
   let diseasesIndex = {};
-  let phenotypesIndex = [];
   let chartCounter = 0;
 
-  // Map PFIC types 1 to 10 directly to gene symbols
   const PFIC_SUBTYPE_MAP = {
     "pfic1": "ATP8B1",
     "pfic2": "ABCB11",
@@ -372,33 +366,70 @@
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   }
 
-  async function initData() {
-    try {
-      const resDiseases = await fetch('data/diseases_index.json');
-      if (resDiseases.ok) {
-        diseasesIndex = await resDiseases.json();
-      }
-    } catch (e) {
-      console.warn("Could not load data/diseases_index.json", e);
+  // Fetch JSON with automatic support for .json.gz (Gzip)
+  async function fetchGzipOrJson(url) {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+    
+    // Server handled automatic gzip content-encoding
+    const encoding = response.headers.get('Content-Encoding');
+    if (encoding === 'gzip' || encoding === 'deflate') {
+      return await response.json();
     }
 
+    // Client-side stream decompression for static .gz files
+    if (url.endsWith('.gz') && typeof DecompressionStream !== 'undefined') {
+      const decompressedStream = response.body.pipeThrough(new DecompressionStream('gzip'));
+      const text = await new Response(decompressedStream).text();
+      return JSON.parse(text);
+    }
+
+    return await response.json();
+  }
+
+  async function initData() {
     try {
-      const resPhenotypes = await fetch('data/phenotypes_index.json');
-      if (resPhenotypes.ok) {
-        phenotypesIndex = await resPhenotypes.json();
+      try {
+        diseasesIndex = await fetchGzipOrJson('data/diseases_index.json.gz');
+      } catch (e) {
+        diseasesIndex = await fetchGzipOrJson('data/diseases_index.json');
       }
     } catch (e) {
-      console.warn("Could not load data/phenotypes_index.json", e);
+      console.warn("Could not load diseases index", e);
     }
+  }
+
+  function normalizeQueryTypos(norm) {
+    return norm
+      .replace(/\bp[fi]+c\s*(\d+)\b/gi, 'pfic$1')
+      .replace(/\bpfic\s*10\b/gi, 'pfic10');
+  }
+
+  function getLevenshteinDistance(a, b) {
+    if (a.length === 0) return b.length;
+    if (b.length === 0) return a.length;
+    const matrix = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+    for (let j = 1; j <= b.length; j++) matrix[0][j] = j;
+
+    for (let i = 1; i <= a.length; i++) {
+      for (let j = 1; j <= b.length; j++) {
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j - 1] + cost
+        );
+      }
+    }
+    return matrix[a.length][b.length];
   }
 
   function parseAndRoute(query) {
     const origNorm = query.toLowerCase().trim();
-    let norm = origNorm.replace(/\bpfic\s+(\d+)\b/gi, 'pfic$1');
+    let norm = normalizeQueryTypos(origNorm.replace(/\bpfic\s+(\d+)\b/gi, 'pfic$1'));
 
     const tokens = norm.split(/[\s,;]+/).filter(Boolean);
 
-    // Lab Parameter
     const labMap = {
       "ast": "AST", "asat": "AST", "alt": "ALT", "alat": "ALT",
       "sba": "SBA", "cb": "CB", "tb": "TB", "ptinr": "PTINR",
@@ -414,7 +445,6 @@
       }
     }
 
-    // Subgroup Routing
     let subgroupCategory = 'all'; 
     let subgroupKey = 'all';
 
@@ -429,28 +459,27 @@
     } else if (norm.includes('heterozygous')) {
       subgroupCategory = 'zygosity'; subgroupKey = 'heterozygous';
     } else if (norm.includes('missense')) {
-      subgroupCategory = 'variant_type'; subgroupKey = 'missense';
+      subgroupCategory = 'variant'; subgroupKey = 'missense';
     } else if (norm.includes('frameshift') || norm.includes('fs')) {
-      subgroupCategory = 'variant_type'; subgroupKey = 'frameshift';
+      subgroupCategory = 'variant'; subgroupKey = 'frameshift';
     } else if (norm.includes('nonsense')) {
-      subgroupCategory = 'variant_type'; subgroupKey = 'nonsense';
+      subgroupCategory = 'variant'; subgroupKey = 'nonsense';
     } else if (norm.includes('newborn period') || norm.includes('0–2 months') || norm.includes('0-2 months')) {
-      subgroupCategory = 'age_of_onset_category'; subgroupKey = 'newborn period (0–2 months)';
+      subgroupCategory = 'onset'; subgroupKey = 'newborn period (0–2 months)';
     } else if (norm.includes('infancy') || norm.includes('3–11 months') || norm.includes('3-11 months')) {
-      subgroupCategory = 'age_of_onset_category'; subgroupKey = 'infancy (3–11 months)';
+      subgroupCategory = 'onset'; subgroupKey = 'infancy (3–11 months)';
     } else if (norm.includes('toddler') || norm.includes('1–3 years') || norm.includes('1-3 years')) {
-      subgroupCategory = 'age_of_onset_category'; subgroupKey = 'toddler (1–3 years)';
+      subgroupCategory = 'onset'; subgroupKey = 'toddler (1–3 years)';
     } else if (norm.includes('preschooler') || norm.includes('3–5 years') || norm.includes('3-5 years')) {
-      subgroupCategory = 'age_of_onset_category'; subgroupKey = 'preschooler (3–5 years)';
+      subgroupCategory = 'onset'; subgroupKey = 'preschooler (3–5 years)';
     } else if (norm.includes('middle childhood') || norm.includes('6–11 years') || norm.includes('6-11 years')) {
-      subgroupCategory = 'age_of_onset_category'; subgroupKey = 'middle childhood (6–11 years)';
+      subgroupCategory = 'onset'; subgroupKey = 'middle childhood (6–11 years)';
     } else if (norm.includes('adolescence') || norm.includes('12–19 years') || norm.includes('12-19 years')) {
-      subgroupCategory = 'age_of_onset_category'; subgroupKey = 'adolescence (12–19 years)';
+      subgroupCategory = 'onset'; subgroupKey = 'adolescence (12–19 years)';
     } else if (norm.includes('adult') || norm.includes('> 19 years')) {
-      subgroupCategory = 'age_of_onset_category'; subgroupKey = 'adult (> 19 years)';
+      subgroupCategory = 'onset'; subgroupKey = 'adult (> 19 years)';
     }
 
-    // Target Variable Identification
     let variable = 'sex_ratio';
     const hasBirthTerm = norm.includes('birth') || norm.includes('birthweight') || norm.includes('birth weight');
     const hasLongitudinalTerm = norm.includes('longitudinal') || norm.includes('trend') || norm.includes('trajectory');
@@ -485,21 +514,21 @@
       if (!detectedLab) detectedLab = 'SBA';
     }
 
-    // Match Diseases and Subtypes
+    let autoCorrections = [];
     let matchedDiseases = [];
-    
-    // Check PFIC subtypes individually
+
+    // Process top-level Base Diseases (keys without colons, e.g. "PFIC", "MVID")
+    const baseDiseaseKeys = Object.keys(diseasesIndex).filter(k => !k.includes(':'));
+
     Object.keys(PFIC_SUBTYPE_MAP).forEach(pficKey => {
-      const regex = new RegExp(`\\b${pficKey}\\b`, 'i');
-      if (regex.test(norm)) {
-        const geneSymbol = PFIC_SUBTYPE_MAP[pficKey];
-        const disName = pficKey.toUpperCase();
-        
-        let disObj = diseasesIndex[disName] || diseasesIndex["PFIC"] || Object.values(diseasesIndex)[0];
-        
-        if (disObj) {
+      const geneSymbol = PFIC_SUBTYPE_MAP[pficKey];
+      const exactRegex = new RegExp(`\\b(${pficKey}|${geneSymbol})\\b`, 'i');
+
+      if (exactRegex.test(norm)) {
+        let disObj = diseasesIndex["PFIC"];
+        if (disObj && !matchedDiseases.some(m => m.disease_name === "PFIC" && m.matchedGene === geneSymbol)) {
           matchedDiseases.push({
-            disease_name: disName,
+            disease_name: "PFIC",
             data: disObj,
             matchedGene: geneSymbol
           });
@@ -507,58 +536,71 @@
       }
     });
 
-    // If no specific PFIC subtype was extracted, check standard disease keys
-    if (matchedDiseases.length === 0) {
-      Object.keys(diseasesIndex).forEach(disName => {
-        const disObj = diseasesIndex[disName];
-        const disNameNorm = disName.toLowerCase();
-        
-        const geneSubgroups = disObj.subgroups?.gene ? Object.keys(disObj.subgroups.gene) : [];
-        let foundGeneMatch = null;
+    baseDiseaseKeys.forEach(disName => {
+      const disObj = diseasesIndex[disName];
+      const disNameNorm = disName.toLowerCase();
+      
+      if (disNameNorm === 'pfic' && matchedDiseases.length > 0) return;
 
-        for (const token of tokens) {
-          const matchedKey = geneSubgroups.find(g => g.toLowerCase() === token);
-          if (matchedKey) {
-            foundGeneMatch = matchedKey;
-            break;
-          }
+      const exactRegex = new RegExp(`\\b${disNameNorm}\\b`, 'i');
+
+      // Check available gene keys in the flat diseasesIndex
+      const availableGeneKeys = Object.keys(diseasesIndex)
+        .filter(k => k.startsWith(`${disName}:gene:`))
+        .map(k => k.split(':gene:')[1]);
+
+      let foundGeneMatch = null;
+      for (const token of tokens) {
+        const matchedKey = availableGeneKeys.find(g => g.toLowerCase() === token);
+        if (matchedKey) {
+          foundGeneMatch = matchedKey;
+          break;
         }
+      }
 
-        if (norm.includes(disNameNorm) || foundGeneMatch) {
+      const matchedToken = tokens.find(token => 
+        token.length >= 4 && 
+        !token.startsWith('pfic') && 
+        getLevenshteinDistance(token, disNameNorm) <= 1
+      );
+
+      if (exactRegex.test(norm) || foundGeneMatch || matchedToken) {
+        const alreadyMatched = matchedDiseases.some(m => 
+          m.disease_name.toLowerCase() === disNameNorm && m.matchedGene === foundGeneMatch
+        );
+
+        if (!alreadyMatched) {
           matchedDiseases.push({
             disease_name: disName,
             data: disObj,
-            matchedGene: foundGeneMatch
+            matchedGene: foundGeneMatch || null
           });
-        }
-      });
-    }
 
+          if (matchedToken && matchedToken.toLowerCase() !== disNameNorm) {
+            autoCorrections.push({ original: matchedToken, corrected: disName });
+          }
+        }
+      }
+    }); 
+  
     let detectedTreatment = "";
     matchedDiseases.forEach(m => {
-      const txs = m.data.treatment_frequencies || {};
+      const txs = m.data.treatments || {};
       Object.keys(txs).forEach(tName => {
         if (norm.includes(tName.toLowerCase())) detectedTreatment = tName;
       });
     });
 
-    let matchedPhenotypes = (Array.isArray(phenotypesIndex) ? phenotypesIndex : []).filter(item => {
-      if (!item) return false;
-      const pName = String(item.name || "").toLowerCase();
-      const hpoId = String(item.hpo_id || "").toLowerCase();
-      return (pName && norm.includes(pName)) || (hpoId && norm.includes(hpoId));
-    });
-
-    const isMatched = (matchedDiseases.length > 0 || matchedPhenotypes.length > 0);
+    const isMatched = matchedDiseases.length > 0;
 
     return { 
       variable, 
       subgroupCategory,
       subgroupKey,
       targetDiseases: matchedDiseases, 
-      targetPhenotypes: matchedPhenotypes, 
       detectedLab, 
       detectedTreatment,
+      autoCorrections,
       isMatched
     };
   }
@@ -568,7 +610,6 @@
     const query = input.value.trim();
     if (!query) return;
 
-    // Track non-duplicate commands in history
     if (queryHistory.length === 0 || queryHistory[queryHistory.length - 1] !== query) {
       queryHistory.push(query);
     }
@@ -625,6 +666,14 @@
 
     const tableHtml = renderSummaryTable(parsed);
 
+    let correctionNoticeHtml = "";
+    if (parsed.autoCorrections && parsed.autoCorrections.length > 0) {
+      const correctionsStr = parsed.autoCorrections
+        .map(c => `<strong>${escapeHtml(c.corrected)}</strong> (corrected from <em>"${escapeHtml(c.original)}"</em>)`)
+        .join(', ');
+      correctionNoticeHtml = `<div style="font-size: 12px; color: #6b7280; background-color: #f3f4f6; padding: 6px 12px; border-radius: 6px;">Showing results for ${correctionsStr}.</div>`;
+    }
+
     const labels = {
       survival: `Overall Survival`,
       sex_ratio: `Sex Ratio Analysis`,
@@ -647,6 +696,7 @@
           <img src="data/PYTHEAS_Logo.svg" alt="Pytheas" class="small-logo" onerror="this.src='https://via.placeholder.com/24x24?text=P'" />
           <span class="ai-card-title">Pytheas Result — ${labels[parsed.variable] || "Analysis"}</span>
         </div>
+        ${correctionNoticeHtml}
         ${tableHtml}
         <div id="${chartId}" class="chart-container"></div>
       </div>
@@ -660,7 +710,7 @@
       case 'variant_types':
       case 'zygosity':
       case 'treatments':
-        renderStackedBarChart(chartId, parsed);
+        renderGroupedBarChart(chartId, parsed);
         break;
       case 'birth_weight':
       case 'birth_height':
@@ -674,10 +724,6 @@
       case 'symptom_age_onset':
         renderInverseSurvivalPlot(chartId, parsed, parsed.subgroupCategory, parsed.subgroupKey);
         break;
-      case 'symptom_prevalence':
-      case 'absent_symptom_prevalence':
-        renderPhenotypeBarChart(chartId, parsed.targetPhenotypes, parsed.variable);
-        break;
       case 'longitudinal':
         renderLongitudinalChart(chartId, parsed.targetDiseases, parsed.detectedLab, parsed.subgroupCategory, parsed.subgroupKey);
         break;
@@ -689,74 +735,41 @@
     stream.scrollTop = stream.scrollHeight;
   }
 
+  // Lookup data in the flat dictionary index structure
   function getCohortData(diseaseMatch, subgroupCategory, subgroupKey) {
-    const disObj = diseaseMatch.data;
-    
-    if (diseaseMatch.matchedGene && disObj.subgroups?.gene?.[diseaseMatch.matchedGene]) {
-      return disObj.subgroups.gene[diseaseMatch.matchedGene];
+    let key = diseaseMatch.disease_name;
+
+    if (diseaseMatch.matchedGene) {
+      key = `${key}:gene:${diseaseMatch.matchedGene}`;
     }
-    
-    if (subgroupCategory === 'all' || subgroupKey === 'all' || !disObj.subgroups) {
-      return disObj;
+
+    if (subgroupCategory !== 'all' && subgroupKey !== 'all') {
+      const subKey = `${key}:${subgroupCategory}:${subgroupKey}`;
+      if (diseasesIndex[subKey]) {
+        return diseasesIndex[subKey];
+      }
     }
-    
-    const catObj = disObj.subgroups[subgroupCategory];
-    if (catObj && catObj[subgroupKey]) {
-      return catObj[subgroupKey];
-    }
-    
-    return disObj;
+
+    return diseasesIndex[key] || diseaseMatch.data;
   }
 
   function renderSummaryTable(parsed) {
-    const { variable, targetDiseases, targetPhenotypes, subgroupCategory, subgroupKey, detectedLab, detectedTreatment } = parsed;
-
-    if (variable === 'symptom_prevalence' || variable === 'absent_symptom_prevalence') {
-      const totalCount = targetPhenotypes.length;
-      let rowsHtml = targetPhenotypes.map((item, index) => {
-        const color = getD3Color(index, totalCount);
-        const count = item.total_cases || 0;
-
-        return `
-          <tr>
-            <td>${item.name || "Unknown"}</td>
-            <td>${item.hpo_id || "-"}</td>
-            <td>${count}</td>
-            <td><span class="color-swatch" style="background-color: ${color};"></span></td>
-          </tr>
-        `;
-      }).join('');
-
-      return `
-        <div class="data-table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>PHENOTYPE</th>
-                <th>HPO ID</th>
-                <th>TOTAL CASES</th>
-                <th>COLOR</th>
-              </tr>
-            </thead>
-            <tbody>${rowsHtml}</tbody>
-          </table>
-        </div>
-      `;
-    }
-
+    const { variable, targetDiseases=[], subgroupCategory, subgroupKey, detectedLab } = parsed;
     const isOnsetVar = (variable === 'age_first_symptoms' || variable === 'age_onset_inverse_survival');
     const totalCount = targetDiseases.length;
+
     let rowsHtml = targetDiseases.map((item, index) => {
       const color = getD3Color(index, totalCount);
       const name = item.disease_name;
       const cohort = getCohortData(item, subgroupCategory, subgroupKey);
-      const pCount = cohort?.patient_count ?? 0;
+      const pCount = cohort?.total_patients ?? 0;
       let geneLabel = item.matchedGene || "All Genes";
       let detailVal = "-";
       let medianRangeVal = "-";
+      let sexRatioVal = "-";
 
       if (isOnsetVar) {
-        const stats = cohort?.first_symptom_onset_months || {};
+        const stats = cohort?.data_availability?.first_symptom_months || {};
         const avail = stats?.available_count ?? pCount;
         detailVal = `${avail}/${pCount}`;
         if (stats.median !== undefined && stats.median !== null) {
@@ -768,27 +781,31 @@
           medianRangeVal = "N/A";
         }
       } else if (variable === 'sex_ratio') {
-        const boys = cohort?.phenotype_frequencies?.counts?.['M'] ?? 0;
-        const girls = cohort?.phenotype_frequencies?.counts?.['F'] ?? 0;
-        detailVal = `${boys + girls}/${pCount}`;
+        const boys = cohort?.demographics?.boys ?? 0;
+        const girls = cohort?.demographics?.girls ?? 0;
+        const totalWithSex = boys + girls;
+        const ratioVal = girls > 0 ? (boys / girls).toFixed(2) : (boys > 0 ? 'N/A' : '0.00');
+        
+        detailVal = `${totalWithSex}/${pCount}`;
+        sexRatioVal = `${ratioVal} (${boys}M / ${girls}F)`;
       } else if (variable === 'survival') {
-        const surv = cohort?.survival?.kaplan_meier || {};
+        const surv = cohort?.survival_km || {};
         const avail = surv.available_count ?? pCount;
         detailVal = `${avail}/${pCount}`;
       } else if (variable === 'variant_types') {
-        const gf = cohort?.genotype_frequencies || {};
-        const avail = gf.available_count ?? pCount;
+        const vt = cohort?.genetics?.variant_types || {};
+        const avail = vt.available_count ?? pCount;
         detailVal = `${avail}/${pCount}`;
       } else if (variable === 'zygosity') {
-        const pf = cohort?.phenotype_frequencies || {};
-        const avail = pf.available_count ?? pCount;
+        const zyg = cohort?.genetics?.zygosity || {};
+        const avail = zyg.available_count ?? pCount;
         detailVal = `${avail}/${pCount}`;
       } else if (variable === 'birth_weight') {
-        const bw = cohort?.birth_measurements?.weight_grams || {};
+        const bw = cohort?.data_availability?.birthweight_grams || {};
         const avail = bw?.available_count ?? pCount;
         detailVal = `${avail}/${pCount}`;
       } else if (variable === 'birth_height') {
-        const bh = cohort?.birth_measurements?.height || {};
+        const bh = cohort?.data_availability?.birthheight || {};
         const avail = bh?.available_count ?? pCount;
         detailVal = `${avail}/${pCount}`;
       } else if (variable === 'longitudinal') {
@@ -814,6 +831,19 @@
         `;
       }
 
+      if (variable === 'sex_ratio') {
+        return `
+          <tr>
+            <td>${name}</td>
+            <td class="gene-name">${geneLabel}</td>
+            <td>${pCount}</td>
+            <td>${detailVal}</td>
+            <td>${sexRatioVal}</td>
+            <td><span class="color-swatch" style="background-color: ${color};"></span></td>
+          </tr>
+        `;
+      }
+
       return `
         <tr>
           <td>${name}</td>
@@ -825,18 +855,7 @@
       `;
     }).join('');
 
-    const tableHeaders = isOnsetVar ? `
-      <thead>
-        <tr>
-          <th>DISEASE</th>
-          <th>GENE SUBGROUP</th>
-          <th>PATIENTS</th>
-          <th>MEDIAN ONSET [MIN - MAX]</th>
-          <th>DATA COVERAGE</th>
-          <th>COLOR</th>
-        </tr>
-      </thead>
-    ` : `
+    let tableHeaders = `
       <thead>
         <tr>
           <th>DISEASE</th>
@@ -847,6 +866,34 @@
         </tr>
       </thead>
     `;
+    
+    if (isOnsetVar) {
+      tableHeaders = `
+        <thead>
+          <tr>
+            <th>DISEASE</th>
+            <th>GENE SUBGROUP</th>
+            <th>PATIENTS</th>
+            <th>MEDIAN ONSET [MIN - MAX]</th>
+            <th>DATA COVERAGE</th>
+            <th>COLOR</th>
+          </tr>
+        </thead>
+      `;
+    } else if (variable === 'sex_ratio') {
+      tableHeaders = `
+        <thead>
+          <tr>
+            <th>DISEASE</th>
+            <th>GENE SUBGROUP</th>
+            <th>PATIENTS</th>
+            <th>DATA COVERAGE</th>
+            <th>SEX RATIO</th>
+            <th>COLOR</th>
+          </tr>
+        </thead>
+      `;
+    }
 
     return `
       <div class="data-table-container">
@@ -870,13 +917,18 @@
     targetDiseases.forEach(item => {
       const cohort = getCohortData(item, subgroupCategory, subgroupKey);
       xLabels.push(item.disease_name + (item.matchedGene ? ` (${item.matchedGene})` : ''));
+      
       let val = 0;
       if (variable === 'birth_weight') {
-        val = cohort?.birth_measurements?.weight_grams?.median || 0;
+        val = cohort?.data_availability?.birthweight_grams?.median || 0;
       } else if (variable === 'birth_height') {
-        val = cohort?.birth_measurements?.height?.median || 0;
+        val = cohort?.data_availability?.birthheight?.median || 0;
+      } else if (variable === 'sex_ratio') {
+        const boys = cohort?.demographics?.boys ?? 0;
+        const girls = cohort?.demographics?.girls ?? 0;
+        val = girls > 0 ? parseFloat((boys / girls).toFixed(2)) : 0;  
       } else {
-        val = cohort?.patient_count || 0;
+        val = cohort?.total_patients || 0;
       }
       yValues.push(val);
     });
@@ -913,7 +965,7 @@
 
       annotations.push({
         x: index, y: val, yshift: -22,
-        text: Number.isInteger(val) ? `${val}` : `${val.toFixed(2)}`,
+        text: variable === 'sex_ratio' ? `${val.toFixed(2)}` : (Number.isInteger(val) ? `${val}` : `${val.toFixed(2)}`),
         showarrow: false, font: { color: '#4b5563', size: 12, weight: 500 }
       });
     });
@@ -932,19 +984,24 @@
       paper_bgcolor: '#ffffff', plot_bgcolor: '#ffffff',
       shapes: shapes, annotations: annotations,
       xaxis: { showgrid: false, range: [-0.6, numBars - 0.4] },
-      yaxis: { showgrid: false, showticklabels: false, range: [0, maxVal * 1.15] }
+      yaxis: { 
+        showgrid: false, 
+        showticklabels: true, 
+        title: variable === 'sex_ratio' ? 'Sex Ratio' : '',
+        range: [0, maxVal * 1.15] 
+      }
     };
 
     Plotly.newPlot(containerId, [dummyTrace], layout, { responsive: true, displayModeBar: false });
   }
-
+    
   function renderSurvivalPlot(containerId, targets, subgroupCategory, subgroupKey) {
     const traces = [];
     const maxXVals = [];
 
     targets.forEach((item, index) => {
       const cohort = getCohortData(item, subgroupCategory, subgroupKey);
-      const km = cohort?.survival?.kaplan_meier;
+      const km = cohort?.survival_km;
       if (km && km.timeline && km.survival_probability && km.timeline.length > 0) {
         maxXVals.push(Math.max(...km.timeline));
         traces.push({
@@ -967,8 +1024,8 @@
     Plotly.newPlot(containerId, traces, layout, { responsive: true, displayModeBar: false });
   }
 
-  function renderStackedBarChart(containerId, parsed) {
-    const { variable, targetDiseases, detectedTreatment, subgroupCategory, subgroupKey } = parsed;
+  function renderGroupedBarChart(containerId, parsed) {
+    const { variable, targetDiseases = [], detectedTreatment, subgroupCategory, subgroupKey } = parsed;
     let categories = [];
 
     if (variable === 'variant_types') {
@@ -979,47 +1036,58 @@
       categories = ["Response / Benefit", "Transient / Limited", "No Response / Worse", "Unknown"];
     }
 
-    const categoryColors = ["#1f77b4", "#2ca02c", "#ff7f0e", "#9467bd", "#d62728", "#8c564b"];
+    const traces = targetDiseases.map((d, dIdx) => {
+      const cohort = getCohortData(d, subgroupCategory, subgroupKey);
+      const label = d.disease_name + (d.matchedGene ? ` (${d.matchedGene})` : '');
+      const color = getD3Color(dIdx, targetDiseases.length);
 
-    const traces = categories.map((cat, cIdx) => ({
-      x: targetDiseases.map(d => d.disease_name + (d.matchedGene ? ` (${d.matchedGene})` : '')),
-      y: targetDiseases.map(d => {
-        const cohort = getCohortData(d, subgroupCategory, subgroupKey);
+      const yValues = categories.map(cat => {
         if (variable === 'variant_types') {
-          return cohort?.genotype_frequencies?.counts?.[cat] || 0;
+          return cohort?.genetics?.variant_types?.counts?.[cat] || 0;
         } else if (variable === 'zygosity') {
-          return cohort?.phenotype_frequencies?.counts?.[cat] || 0;
+          return cohort?.genetics?.zygosity?.counts?.[cat] || 0;
         } else if (variable === 'treatments') {
-          const txs = cohort?.treatment_frequencies || {};
+          const txs = cohort?.treatments || {};
           if (detectedTreatment && txs[detectedTreatment]) {
-            return txs[detectedTreatment].efficacy?.[cat] || 0;
+            return txs[detectedTreatment]?.[cat] || 0;
           }
           let sum = 0;
           Object.values(txs).forEach(tx => {
-            sum += tx.efficacy?.[cat] || 0;
+            sum += tx?.[cat] || 0;
           });
           return sum;
         }
         return 0;
-      }),
-      name: cat, type: 'bar',
-      marker: { color: categoryColors[cIdx % categoryColors.length] }
-    }));
+      });
+
+      return {
+        x: categories,
+        y: yValues,
+        name: label,
+        type: 'bar',
+        marker: { color: color }
+      };
+    });
 
     const layout = {
-      barmode: 'stack', showlegend: false,
-      margin: { t: 20, l: 40, r: 20, b: 40 },
-      paper_bgcolor: '#ffffff', plot_bgcolor: '#ffffff',
-      xaxis: { showgrid: false }, yaxis: { title: 'Counts', showgrid: true }
+      barmode: 'group',
+      showlegend: true,
+      legend: { orientation: 'h', y: 1.15, x: 0.5, xanchor: 'center' },
+      margin: { t: 40, l: 40, r: 20, b: 40 },
+      paper_bgcolor: '#ffffff',
+      plot_bgcolor: '#ffffff',
+      xaxis: { showgrid: false },
+      yaxis: { title: 'Counts', showgrid: true }
     };
+
     Plotly.newPlot(containerId, traces, layout, { responsive: true, displayModeBar: false });
   }
 
   function renderBoxOrRangeChart(containerId, parsed) {
-    const { targetDiseases, subgroupCategory, subgroupKey } = parsed;
+    const { targetDiseases=[], subgroupCategory, subgroupKey } = parsed;
     const traces = targetDiseases.map((d, idx) => {
       const cohort = getCohortData(d, subgroupCategory, subgroupKey);
-      const stats = cohort?.first_symptom_onset_months || {};
+      const stats = cohort?.data_availability?.first_symptom_months || {};
       const min = stats.min ?? 0;
       const med = stats.median ?? 0;
       const max = stats.max ?? 0;
@@ -1046,9 +1114,8 @@
 
     targetDiseases.forEach((d, idx) => {
       const cohort = getCohortData(d, subgroupCategory, subgroupKey);
-      const km = cohort?.first_symptom_onset_months?.inverse_survival_kaplan_meier;
+      const km = cohort?.inverse_survival_km;
       if (km && km.timeline && km.survival_probability) {
-        // Invert Kaplan-Meier values: 1 - S(t) to display cumulative incidence
         const cumulativeIncidence = km.survival_probability.map(p => 1 - p);
 
         traces.push({
@@ -1112,23 +1179,14 @@
     Plotly.newPlot(containerId, traces, layout, { responsive: true, displayModeBar: false });
   }
 
-  function renderPhenotypeBarChart(containerId, targets, variable) {
-    const names = targets.map(p => p.name || p.hpo_id);
-    const counts = targets.map(p => p.total_cases || 0);
-    const colors = targets.map((_, idx) => getD3Color(idx, targets.length));
-
-    const layout = {
-      showlegend: false,
-      margin: { t: 20, l: 40, r: 20, b: 60 },
-      paper_bgcolor: '#ffffff', plot_bgcolor: '#ffffff',
-      xaxis: { showgrid: false, tickangle: -25 },
-      yaxis: { title: 'Cases', showgrid: true }
-    };
-    Plotly.newPlot(containerId, [{ x: names, y: counts, type: 'bar', marker: { color: colors } }], layout, { responsive: true, displayModeBar: false });
-  }
-
   function escapeHtml(text) {
-    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    if (!text) return '';
+    return String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   }
 
   window.onload = async () => {
@@ -1142,7 +1200,6 @@
       } else if (e.key === 'ArrowUp') {
         if (queryHistory.length === 0) return;
 
-        // Store active draft before stepping into history
         if (historyIndex === queryHistory.length) {
           currentDraft = queryInput.value;
         }
@@ -1151,7 +1208,6 @@
           historyIndex--;
           queryInput.value = queryHistory[historyIndex];
 
-          // Move cursor to end of text
           setTimeout(() => {
             queryInput.selectionStart = queryInput.selectionEnd = queryInput.value.length;
           }, 0);
@@ -1164,7 +1220,6 @@
           historyIndex++;
           queryInput.value = queryHistory[historyIndex];
         } else if (historyIndex === queryHistory.length - 1) {
-          // Restore unsubmitted draft when returning to newest level
           historyIndex = queryHistory.length;
           queryInput.value = currentDraft;
         }

@@ -1,0 +1,4767 @@
+"MYO5B": {
+          "patient_count": 112,
+          "survival": {
+            "available_count": 108,
+            "missing_count": 0,
+            "median": 4.2,
+            "min": 0.04,
+            "max": 32.0,
+            "status_counts": {
+              "alive": 90,
+              "dead": 20
+            },
+            "kaplan_meier": {
+              "available_count": 108,
+              "missing_count": 0,
+              "timeline": [
+                0.0,
+                0.04,
+                0.15,
+                0.33,
+                0.42,
+                0.5,
+                0.52,
+                0.58,
+                0.67,
+                0.8,
+                0.83,
+                1.0,
+                1.17,
+                1.5,
+                1.6,
+                1.92,
+                2.0,
+                2.1,
+                2.3,
+                2.33,
+                2.42,
+                2.5,
+                2.6,
+                2.92,
+                3.0,
+                3.33,
+                3.5,
+                3.58,
+                3.83,
+                4.0,
+                4.4,
+                4.5,
+                4.67,
+                4.8,
+                5.0,
+                5.1,
+                5.3,
+                5.5,
+                6.0,
+                6.25,
+                6.9,
+                7.0,
+                7.08,
+                7.4,
+                8.0,
+                8.33,
+                8.5,
+                9.0,
+                9.5,
+                10.0,
+                10.17,
+                10.25,
+                10.4,
+                10.8,
+                11.0,
+                11.92,
+                12.0,
+                12.5,
+                13.0,
+                13.5,
+                13.92,
+                14.0,
+                14.2,
+                14.5,
+                15.0,
+                15.92,
+                16.0,
+                16.4,
+                17.0,
+                19.0,
+                29.0,
+                32.0
+              ],
+              "survival_probability": [
+                1.0,
+                1.0,
+                0.9907,
+                0.9907,
+                0.9812,
+                0.9529,
+                0.9529,
+                0.9433,
+                0.9433,
+                0.9433,
+                0.9333,
+                0.9333,
+                0.9333,
+                0.9228,
+                0.9018,
+                0.9018,
+                0.8911,
+                0.8911,
+                0.8911,
+                0.8911,
+                0.8911,
+                0.8911,
+                0.8783,
+                0.8783,
+                0.8652,
+                0.8652,
+                0.8508,
+                0.8508,
+                0.8508,
+                0.8508,
+                0.8508,
+                0.8508,
+                0.8508,
+                0.8508,
+                0.8338,
+                0.8338,
+                0.8153,
+                0.7963,
+                0.7963,
+                0.7963,
+                0.7963,
+                0.7963,
+                0.7963,
+                0.7963,
+                0.7963,
+                0.7963,
+                0.7963,
+                0.7963,
+                0.7963,
+                0.7963,
+                0.7963,
+                0.7631,
+                0.7631,
+                0.7631,
+                0.7631,
+                0.7631,
+                0.7631,
+                0.7207,
+                0.7207,
+                0.7207,
+                0.7207,
+                0.7207,
+                0.7207,
+                0.7207,
+                0.6487,
+                0.6487,
+                0.6487,
+                0.6487,
+                0.6487,
+                0.6487,
+                0.6487,
+                0.6487
+              ]
+            }
+          },
+          "first_symptom_onset_months": {
+            "available_count": 99,
+            "missing_count": 0,
+            "median": 0.2,
+            "min": 0.0,
+            "max": 191.0,
+            "inverse_survival_kaplan_meier": {
+              "available_count": 99,
+              "missing_count": 0,
+              "timeline": [
+                0.0,
+                0.0,
+                0.01,
+                0.03,
+                0.04,
+                0.05,
+                0.1,
+                0.13,
+                0.2,
+                0.3,
+                0.5,
+                1.0,
+                1.2,
+                1.5,
+                1.6,
+                2.0,
+                3.0,
+                3.5,
+                5.0,
+                6.0,
+                7.0,
+                8.0,
+                9.0,
+                10.0,
+                11.0,
+                14.0,
+                15.0,
+                15.6,
+                19.0,
+                20.0,
+                23.0,
+                36.0,
+                143.0,
+                170.0,
+                191.0
+              ],
+              "survival_probability": [
+                1.0,
+                0.9596,
+                0.899,
+                0.8687,
+                0.8485,
+                0.8384,
+                0.5152,
+                0.5051,
+                0.4949,
+                0.4747,
+                0.4545,
+                0.4343,
+                0.4242,
+                0.404,
+                0.3939,
+                0.3434,
+                0.2929,
+                0.2828,
+                0.2727,
+                0.2525,
+                0.202,
+                0.1616,
+                0.1515,
+                0.1414,
+                0.1212,
+                0.1111,
+                0.0808,
+                0.0707,
+                0.0606,
+                0.0505,
+                0.0404,
+                0.0303,
+                0.0202,
+                0.0101,
+                0.0
+              ]
+            }
+          },
+          "symptom_frequencies": {
+            "HP:0001396": {
+              "name": "Cholestasis",
+              "count": 113,
+              "onset_stats": {
+                "available_count": 21,
+                "missing_count": 0,
+                "median": 0.5,
+                "min": 0.01,
+                "max": 7.0
+              }
+            },
+            "HP:0001508": {
+              "name": "Failure to thrive",
+              "count": 67,
+              "onset_stats": {
+                "available_count": 1,
+                "missing_count": 0,
+                "median": 1.08,
+                "min": 1.08,
+                "max": 1.08
+              }
+            },
+            "HP:0033994": {
+              "name": "Dependency on parenteral nutrition",
+              "count": 54,
+              "onset_stats": {
+                "available_count": 2,
+                "missing_count": 0,
+                "median": 1.52,
+                "min": 0.04,
+                "max": 3.0
+              }
+            },
+            "HP:0000843": {
+              "name": "Hyperparathyroidism",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0000121": {
+              "name": "Nephrocalcinosis",
+              "count": 3,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0004322": {
+              "name": "Short stature",
+              "count": 7,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0000010": {
+              "name": "Recurrent urinary tract infections",
+              "count": 2,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0000750": {
+              "name": "Delayed speech and language development",
+              "count": 2,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0000252": {
+              "name": "Microcephaly",
+              "count": 2,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0033995": {
+              "name": "Microvillus inclusions",
+              "count": 54,
+              "onset_stats": {
+                "available_count": 1,
+                "missing_count": 0,
+                "median": 3.0,
+                "min": 3.0,
+                "max": 3.0
+              }
+            },
+            "HP:0002028": {
+              "name": "Chronic diarrhea",
+              "count": 57,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0011473": {
+              "name": "Villous atrophy",
+              "count": 54,
+              "onset_stats": {
+                "available_count": 1,
+                "missing_count": 0,
+                "median": 3.0,
+                "min": 3.0,
+                "max": 3.0
+              }
+            },
+            "HP:0100806": {
+              "name": "Sepsis",
+              "count": 5,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0100626": {
+              "name": "Chronic hepatic failure",
+              "count": 5,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0200084": {
+              "name": "Giant cell hepatitis",
+              "count": 13,
+              "onset_stats": {
+                "available_count": 2,
+                "missing_count": 0,
+                "median": 0.55,
+                "min": 0.1,
+                "max": 1.0
+              }
+            },
+            "HP:0000952": {
+              "name": "Jaundice",
+              "count": 46,
+              "onset_stats": {
+                "available_count": 19,
+                "missing_count": 0,
+                "median": 0.42,
+                "min": 0.01,
+                "max": 8.33
+              }
+            },
+            "HP:0000989": {
+              "name": "Pruritus",
+              "count": 69,
+              "onset_stats": {
+                "available_count": 26,
+                "missing_count": 0,
+                "median": 1.46,
+                "min": 0.33,
+                "max": 8.33
+              }
+            },
+            "HP:0001510": {
+              "name": "Growth delay",
+              "count": 13,
+              "onset_stats": {
+                "available_count": 7,
+                "missing_count": 0,
+                "median": 3.83,
+                "min": 1.08,
+                "max": 8.33
+              }
+            },
+            "HP:0001395": {
+              "name": "Hepatic fibrosis",
+              "count": 21,
+              "onset_stats": {
+                "available_count": 3,
+                "missing_count": 0,
+                "median": 1.5,
+                "min": 1.0,
+                "max": 2.0
+              }
+            },
+            "HP:0006580": {
+              "name": "Portal fibrosis",
+              "count": 17,
+              "onset_stats": {
+                "available_count": 4,
+                "missing_count": 0,
+                "median": 1.17,
+                "min": 1.0,
+                "max": 2.5
+              }
+            },
+            "HP:0011985": {
+              "name": "Acholic stools",
+              "count": 8,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0002904": {
+              "name": "Hyperbilirubinemia",
+              "count": 63,
+              "onset_stats": {
+                "available_count": 2,
+                "missing_count": 0,
+                "median": 4.5,
+                "min": 0.66,
+                "max": 8.33
+              }
+            },
+            "HP:0012202": {
+              "name": "Increased serum bile acid concentration",
+              "count": 61,
+              "onset_stats": {
+                "available_count": 27,
+                "missing_count": 0,
+                "median": 1.0,
+                "min": 0.04,
+                "max": 8.33
+              }
+            },
+            "HP:0034901": {
+              "name": "Increased circulating vitamin E concentration",
+              "count": 2,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0031964": {
+              "name": "Elevated circulating alanine aminotransferase concentration",
+              "count": 55,
+              "onset_stats": {
+                "available_count": 23,
+                "missing_count": 0,
+                "median": 1.0,
+                "min": 0.08,
+                "max": 8.33
+              }
+            },
+            "HP:0031956": {
+              "name": "Elevated circulating aspartate aminotransferase concentration",
+              "count": 59,
+              "onset_stats": {
+                "available_count": 26,
+                "missing_count": 0,
+                "median": 1.0,
+                "min": 0.08,
+                "max": 8.33
+              }
+            },
+            "HP:0100512": {
+              "name": "Decreased circulating vitamin D concentration",
+              "count": 3,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0002013": {
+              "name": "Vomiting",
+              "count": 4,
+              "onset_stats": {
+                "available_count": 2,
+                "missing_count": 0,
+                "median": 1.5,
+                "min": 0.0,
+                "max": 3.0
+              }
+            },
+            "HP:0011472": {
+              "name": "Abnormal small intestinal villus morphology",
+              "count": 2,
+              "onset_stats": {
+                "available_count": 1,
+                "missing_count": 0,
+                "median": 3.0,
+                "min": 3.0,
+                "max": 3.0
+              }
+            },
+            "HP:0001738": {
+              "name": "Exocrine pancreatic insufficiency",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0001928": {
+              "name": "Abnormality of coagulation",
+              "count": 3,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0006571": {
+              "name": "Reduced number of intrahepatic bile ducts",
+              "count": 3,
+              "onset_stats": {
+                "available_count": 1,
+                "missing_count": 0,
+                "median": 2.5,
+                "min": 2.5,
+                "max": 2.5
+              }
+            },
+            "HP:0003155": {
+              "name": "Elevated circulating alkaline phosphatase concentration",
+              "count": 9,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0002240": {
+              "name": "Hepatomegaly",
+              "count": 36,
+              "onset_stats": {
+                "available_count": 5,
+                "missing_count": 0,
+                "median": 0.17,
+                "min": 0.08,
+                "max": 3.33
+              }
+            },
+            "HP:0003073": {
+              "name": "Hypoalbuminemia",
+              "count": 18,
+              "onset_stats": {
+                "available_count": 8,
+                "missing_count": 0,
+                "median": 1.5,
+                "min": 0.25,
+                "max": 7.08
+              }
+            },
+            "HP:0003075": {
+              "name": "Hypoproteinemia",
+              "count": 7,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0002908": {
+              "name": "Conjugated hyperbilirubinemia",
+              "count": 59,
+              "onset_stats": {
+                "available_count": 24,
+                "missing_count": 0,
+                "median": 1.0,
+                "min": 0.04,
+                "max": 8.33
+              }
+            },
+            "HP:0001744": {
+              "name": "Splenomegaly",
+              "count": 10,
+              "onset_stats": {
+                "available_count": 4,
+                "missing_count": 0,
+                "median": 0.34,
+                "min": 0.08,
+                "max": 3.33
+              }
+            },
+            "HP:0011476": {
+              "name": "Profound sensorineural hearing impairment",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0001081": {
+              "name": "Cholelithiasis",
+              "count": 4,
+              "onset_stats": {
+                "available_count": 1,
+                "missing_count": 0,
+                "median": 0.58,
+                "min": 0.58,
+                "max": 0.58
+              }
+            },
+            "HP:0030948": {
+              "name": "Elevated gamma-glutamyltransferase level",
+              "count": 6,
+              "onset_stats": {
+                "available_count": 3,
+                "missing_count": 0,
+                "median": 0.2,
+                "min": 0.04,
+                "max": 0.33
+              }
+            },
+            "HP:0003124": {
+              "name": "Hypercholesterolemia",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0002493": {
+              "name": "Upper motor neuron dysfunction",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:6000701": {
+              "name": "Elevated urinary bile acid level",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0001994": {
+              "name": "Renal Fanconi syndrome",
+              "count": 2,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0002748": {
+              "name": "Rickets",
+              "count": 3,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0000939": {
+              "name": "Osteoporosis",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0001622": {
+              "name": "Premature birth",
+              "count": 9,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0001263": {
+              "name": "Global developmental delay",
+              "count": 2,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0005363": {
+              "name": "Humoral immunodeficiency",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0000316": {
+              "name": "Hypertelorism",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0000377": {
+              "name": "Abnormal pinna morphology",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0001591": {
+              "name": "Bell-shaped thorax",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0000954": {
+              "name": "Single transverse palmar crease",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0001944": {
+              "name": "Dehydration",
+              "count": 6,
+              "onset_stats": {
+                "available_count": 2,
+                "missing_count": 0,
+                "median": 1.51,
+                "min": 0.02,
+                "max": 3.0
+              }
+            },
+            "HP:0001561": {
+              "name": "Polyhydramnios",
+              "count": 2,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0003159": {
+              "name": "Hyperoxaluria",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0000787": {
+              "name": "Kidney stone",
+              "count": 2,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0000074": {
+              "name": "Ureteropelvic junction obstruction",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0004315": {
+              "name": "Decreased circulating IgG concentration",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0008672": {
+              "name": "Calcium oxalate nephrolithiasis",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0000083": {
+              "name": "Renal insufficiency",
+              "count": 2,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0012211": {
+              "name": "Abnormal renal physiology",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0000077": {
+              "name": "Abnormality of the kidney",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0000790": {
+              "name": "Hematuria",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0003560": {
+              "name": "Muscular dystrophy",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0002756": {
+              "name": "Pathologic fracture",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0002580": {
+              "name": "Volvulus",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0033165": {
+              "name": "Necrotizing enterocolitis",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0002150": {
+              "name": "Hypercalciuria",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0005263": {
+              "name": "Gastritis",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0000821": {
+              "name": "Hypothyroidism",
+              "count": 3,
+              "onset_stats": {
+                "available_count": 1,
+                "missing_count": 0,
+                "median": 0.01,
+                "min": 0.01,
+                "max": 0.01
+              }
+            },
+            "HP:0000256": {
+              "name": "Macrocephaly",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0004349": {
+              "name": "Reduced bone mineral density",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0001399": {
+              "name": "Hepatic failure",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0002020": {
+              "name": "Gastroesophageal reflux",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0000964": {
+              "name": "Eczematoid dermatitis",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0001733": {
+              "name": "Pancreatitis",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0000126": {
+              "name": "Hydronephrosis",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0004904": {
+              "name": "Maturity-onset diabetes of the young",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0001405": {
+              "name": "Periportal fibrosis",
+              "count": 7,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0012852": {
+              "name": "Hepatic bridging fibrosis",
+              "count": 5,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0001394": {
+              "name": "Cirrhosis",
+              "count": 4,
+              "onset_stats": {
+                "available_count": 1,
+                "missing_count": 0,
+                "median": 7.0,
+                "min": 7.0,
+                "max": 7.0
+              }
+            },
+            "HP:0012758": {
+              "name": "Neurodevelopmental delay",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0032794": {
+              "name": "Myoclonic seizure",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0001942": {
+              "name": "Metabolic acidosis",
+              "count": 4,
+              "onset_stats": {
+                "available_count": 1,
+                "missing_count": 0,
+                "median": 0.02,
+                "min": 0.02,
+                "max": 0.02
+              }
+            },
+            "HP:0008151": {
+              "name": "Prolonged prothrombin time",
+              "count": 7,
+              "onset_stats": {
+                "available_count": 1,
+                "missing_count": 0,
+                "median": 0.11,
+                "min": 0.11,
+                "max": 0.11
+              }
+            },
+            "HP:0003270": {
+              "name": "Abdominal distention",
+              "count": 4,
+              "onset_stats": {
+                "available_count": 1,
+                "missing_count": 0,
+                "median": 0.02,
+                "min": 0.02,
+                "max": 0.02
+              }
+            },
+            "HP:0002570": {
+              "name": "Steatorrhea",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0011892": {
+              "name": "Decreased circulating vitamin K concentration",
+              "count": 2,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0002170": {
+              "name": "Intracranial hemorrhage",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0000093": {
+              "name": "Proteinuria",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0001407": {
+              "name": "Hepatic cysts",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0007957": {
+              "name": "Corneal opacity",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0001409": {
+              "name": "Portal hypertension",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0001903": {
+              "name": "Anemia",
+              "count": 2,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0002254": {
+              "name": "Intermittent diarrhea",
+              "count": 4,
+              "onset_stats": {
+                "available_count": 3,
+                "missing_count": 0,
+                "median": 3.0,
+                "min": 0.0,
+                "max": 7.0
+              }
+            },
+            "HP:0004396": {
+              "name": "Poor appetite",
+              "count": 2,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0033589": {
+              "name": "Flatulence",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0001249": {
+              "name": "Intellectual disability",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0001406": {
+              "name": "Intrahepatic cholestasis",
+              "count": 10,
+              "onset_stats": {
+                "available_count": 8,
+                "missing_count": 0,
+                "median": 1.29,
+                "min": 0.1,
+                "max": 2.5
+              }
+            },
+            "HP:0100529": {
+              "name": "Abnormal circulating phosphate ion concentration",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0004363": {
+              "name": "Abnormal circulating calcium concentration",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0004921": {
+              "name": "Abnormal circulating magnesium concentration",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0002041": {
+              "name": "Intractable diarrhea",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:6000337": {
+              "name": "Thinned small intestinal mucosa",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0005208": {
+              "name": "Secretory diarrhea",
+              "count": 2,
+              "onset_stats": {
+                "available_count": 1,
+                "missing_count": 0,
+                "median": 0.02,
+                "min": 0.02,
+                "max": 0.02
+              }
+            },
+            "HP:0031970": {
+              "name": "Abnormal blood urea nitrogen concentration",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:4000140": {
+              "name": "Fetal bowel dilatation",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0011042": {
+              "name": "Abnormal circulating potassium concentration",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0025156": {
+              "name": "Dependency on intravenous nutrition",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0001945": {
+              "name": "Fever",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0001943": {
+              "name": "Hypoglycemia",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0003111": {
+              "name": "Abnormal circulating electrolyte concentration",
+              "count": 4,
+              "onset_stats": {
+                "available_count": 3,
+                "missing_count": 0,
+                "median": 3.0,
+                "min": 0.02,
+                "max": 3.0
+              }
+            },
+            "HP:0011968": {
+              "name": "Feeding difficulties",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0033196": {
+              "name": "Portal inflammation",
+              "count": 7,
+              "onset_stats": {
+                "available_count": 7,
+                "missing_count": 0,
+                "median": 1.33,
+                "min": 1.0,
+                "max": 2.5
+              }
+            },
+            "HP:0001408": {
+              "name": "Bile duct proliferation",
+              "count": 4,
+              "onset_stats": {
+                "available_count": 4,
+                "missing_count": 0,
+                "median": 1.54,
+                "min": 1.0,
+                "max": 2.5
+              }
+            },
+            "HP:0001631": {
+              "name": "Atrial septal defect",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0033193": {
+              "name": "Ballooning hepatocyte degeneration",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 1,
+                "missing_count": 0,
+                "median": 2.5,
+                "min": 2.5,
+                "max": 2.5
+              }
+            },
+            "HP:0002014": {
+              "name": "Diarrhea",
+              "count": 2,
+              "onset_stats": {
+                "available_count": 2,
+                "missing_count": 0,
+                "median": 1.3,
+                "min": 0.1,
+                "max": 2.5
+              }
+            },
+            "HP:0001520": {
+              "name": "Large for gestational age",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 0,
+                "missing_count": 0,
+                "median": null,
+                "min": null,
+                "max": null
+              }
+            },
+            "HP:0033996": {
+              "name": "Microvillar PAS-positive secretory granules",
+              "count": 1,
+              "onset_stats": {
+                "available_count": 1,
+                "missing_count": 0,
+                "median": 3.0,
+                "min": 3.0,
+                "max": 3.0
+              }
+            }
+          },
+          "absent_symptom_frequencies": {
+            "HP:0001622": {
+              "name": "Premature birth",
+              "count": 52
+            },
+            "HP:0033994": {
+              "name": "Dependency on parenteral nutrition",
+              "count": 34
+            },
+            "HP:0001396": {
+              "name": "Cholestasis",
+              "count": 20
+            },
+            "HP:0033995": {
+              "name": "Microvillus inclusions",
+              "count": 12
+            },
+            "HP:0011473": {
+              "name": "Villous atrophy",
+              "count": 12
+            },
+            "HP:0002028": {
+              "name": "Chronic diarrhea",
+              "count": 13
+            },
+            "HP:0030948": {
+              "name": "Elevated gamma-glutamyltransferase level",
+              "count": 84
+            },
+            "HP:0003073": {
+              "name": "Hypoalbuminemia",
+              "count": 48
+            },
+            "HP:0031964": {
+              "name": "Elevated circulating alanine aminotransferase concentration",
+              "count": 30
+            },
+            "HP:0034901": {
+              "name": "Increased circulating vitamin E concentration",
+              "count": 2
+            },
+            "HP:0004905": {
+              "name": "Reduced circulating vitamin A concentration",
+              "count": 3
+            },
+            "HP:0100512": {
+              "name": "Decreased circulating vitamin D concentration",
+              "count": 2
+            },
+            "HP:0002904": {
+              "name": "Hyperbilirubinemia",
+              "count": 9
+            },
+            "HP:0001508": {
+              "name": "Failure to thrive",
+              "count": 5
+            },
+            "HP:0008151": {
+              "name": "Prolonged prothrombin time",
+              "count": 20
+            },
+            "HP:0001928": {
+              "name": "Abnormality of coagulation",
+              "count": 1
+            },
+            "HP:0012202": {
+              "name": "Increased serum bile acid concentration",
+              "count": 11
+            },
+            "HP:0001744": {
+              "name": "Splenomegaly",
+              "count": 10
+            },
+            "HP:0031956": {
+              "name": "Elevated circulating aspartate aminotransferase concentration",
+              "count": 25
+            },
+            "HP:0003075": {
+              "name": "Hypoproteinemia",
+              "count": 9
+            },
+            "HP:0003155": {
+              "name": "Elevated circulating alkaline phosphatase concentration",
+              "count": 4
+            },
+            "HP:0002240": {
+              "name": "Hepatomegaly",
+              "count": 6
+            },
+            "HP:0001510": {
+              "name": "Growth delay",
+              "count": 6
+            },
+            "HP:0002908": {
+              "name": "Conjugated hyperbilirubinemia",
+              "count": 18
+            },
+            "HP:0000989": {
+              "name": "Pruritus",
+              "count": 20
+            },
+            "HP:0000952": {
+              "name": "Jaundice",
+              "count": 20
+            },
+            "HP:0006254": {
+              "name": "Elevated circulating alpha-fetoprotein concentration",
+              "count": 3
+            },
+            "HP:0003124": {
+              "name": "Hypercholesterolemia",
+              "count": 2
+            },
+            "HP:0100514": {
+              "name": "Abnormal circulating vitamin E concentration",
+              "count": 1
+            },
+            "HP:0001408": {
+              "name": "Bile duct proliferation",
+              "count": 4
+            },
+            "HP:0003107": {
+              "name": "Abnormal circulating cholesterol concentration",
+              "count": 2
+            },
+            "HP:0001994": {
+              "name": "Renal Fanconi syndrome",
+              "count": 2
+            },
+            "HP:0012212": {
+              "name": "Abnormal glomerular filtration rate",
+              "count": 1
+            },
+            "HP:0004322": {
+              "name": "Short stature",
+              "count": 2
+            },
+            "HP:0001395": {
+              "name": "Hepatic fibrosis",
+              "count": 3
+            },
+            "HP:0005230": {
+              "name": "Biliary tract obstruction",
+              "count": 8
+            },
+            "HP:0011873": {
+              "name": "Abnormal platelet count",
+              "count": 1
+            },
+            "HP:0001397": {
+              "name": "Hepatic steatosis",
+              "count": 2
+            },
+            "HP:0020062": {
+              "name": "Decreased hemoglobin concentration",
+              "count": 1
+            },
+            "HP:0002926": {
+              "name": "Abnormality of thyroid physiology",
+              "count": 1
+            },
+            "HP:0006571": {
+              "name": "Reduced number of intrahepatic bile ducts",
+              "count": 1
+            },
+            "HP:0200084": {
+              "name": "Giant cell hepatitis",
+              "count": 1
+            },
+            "HP:6000701": {
+              "name": "Elevated urinary bile acid level",
+              "count": 1
+            },
+            "HP:0003355": {
+              "name": "Aminoaciduria",
+              "count": 2
+            },
+            "HP:0011985": {
+              "name": "Acholic stools",
+              "count": 1
+            },
+            "HP:0001263": {
+              "name": "Global developmental delay",
+              "count": 1
+            },
+            "HP:0001903": {
+              "name": "Anemia",
+              "count": 2
+            },
+            "HP:0010931": {
+              "name": "Abnormal circulating sodium concentration",
+              "count": 1
+            },
+            "HP:0011422": {
+              "name": "Abnormal circulating chloride concentration",
+              "count": 1
+            },
+            "HP:0005214": {
+              "name": "Intestinal obstruction",
+              "count": 1
+            },
+            "HP:0031826": {
+              "name": "Abnormal reflex",
+              "count": 1
+            },
+            "HP:0003808": {
+              "name": "Abnormal muscle tone",
+              "count": 1
+            },
+            "HP:0003112": {
+              "name": "Abnormal circulating amino acid concentration",
+              "count": 1
+            },
+            "HP:0002086": {
+              "name": "Abnormality of the respiratory system",
+              "count": 1
+            },
+            "HP:0030680": {
+              "name": "Abnormal cardiovascular system morphology",
+              "count": 1
+            },
+            "HP:0001324": {
+              "name": "Muscle weakness",
+              "count": 1
+            },
+            "HP:0001081": {
+              "name": "Cholelithiasis",
+              "count": 1
+            },
+            "HP:0012211": {
+              "name": "Abnormal renal physiology",
+              "count": 1
+            },
+            "HP:0012718": {
+              "name": "Abnormal gastrointestinal tract morphology",
+              "count": 10
+            },
+            "HP:0001520": {
+              "name": "Large for gestational age",
+              "count": 10
+            },
+            "HP:0001518": {
+              "name": "Small for gestational age",
+              "count": 10
+            },
+            "HP:0002014": {
+              "name": "Diarrhea",
+              "count": 2
+            }
+          },
+          "genotype_frequencies": {
+            "counts": {
+              "missense": 105,
+              "LoF": 80,
+              "other": 27,
+              "synonymous": 7,
+              "": 4,
+              "WT": 1
+            },
+            "available_count": 224,
+            "missing_count": 0
+          },
+          "phenotype_frequencies": {
+            "counts": {
+              "homozygous": 46,
+              "compound": 54,
+              "heterozygous": 7,
+              "unknown": 5
+            },
+            "available_count": 112,
+            "missing_count": 0
+          },
+          "birth_measurements": {
+            "weight_grams": {
+              "available_count": 10,
+              "missing_count": 102,
+              "median": 3140.0,
+              "min": 2350.0,
+              "max": 3790.0
+            },
+            "weight_sds": {
+              "available_count": 10,
+              "missing_count": 102,
+              "median": 0.36,
+              "min": -2.1,
+              "max": 1.04
+            },
+            "height": {
+              "available_count": 0,
+              "missing_count": 112,
+              "median": null,
+              "min": null,
+              "max": null
+            }
+          },
+          "treatment_frequencies": {
+            "special diet": {
+              "total_count": 2,
+              "efficacy": {
+                "Response / Benefit": 2,
+                "Transient / Limited": 0,
+                "No Response / Worse": 0,
+                "Unknown": 0
+              }
+            },
+            "UDCA": {
+              "total_count": 18,
+              "efficacy": {
+                "Response / Benefit": 4,
+                "Transient / Limited": 0,
+                "No Response / Worse": 0,
+                "Unknown": 14
+              }
+            },
+            "vitamin D": {
+              "total_count": 2,
+              "efficacy": {
+                "Response / Benefit": 2,
+                "Transient / Limited": 0,
+                "No Response / Worse": 0,
+                "Unknown": 0
+              }
+            },
+            "vitamin K": {
+              "total_count": 2,
+              "efficacy": {
+                "Response / Benefit": 0,
+                "Transient / Limited": 0,
+                "No Response / Worse": 0,
+                "Unknown": 2
+              }
+            },
+            "enteral nutrition": {
+              "total_count": 1,
+              "efficacy": {
+                "Response / Benefit": 1,
+                "Transient / Limited": 0,
+                "No Response / Worse": 0,
+                "Unknown": 0
+              }
+            },
+            "TPN": {
+              "total_count": 3,
+              "efficacy": {
+                "Response / Benefit": 1,
+                "Transient / Limited": 0,
+                "No Response / Worse": 1,
+                "Unknown": 1
+              }
+            },
+            "rifampicin": {
+              "total_count": 7,
+              "efficacy": {
+                "Response / Benefit": 0,
+                "Transient / Limited": 0,
+                "No Response / Worse": 0,
+                "Unknown": 7
+              }
+            },
+            "colestyramine": {
+              "total_count": 13,
+              "efficacy": {
+                "Response / Benefit": 0,
+                "Transient / Limited": 0,
+                "No Response / Worse": 0,
+                "Unknown": 13
+              }
+            },
+            "phenobarbitone": {
+              "total_count": 6,
+              "efficacy": {
+                "Response / Benefit": 1,
+                "Transient / Limited": 0,
+                "No Response / Worse": 0,
+                "Unknown": 5
+              }
+            },
+            "fat-soluble vitamins": {
+              "total_count": 13,
+              "efficacy": {
+                "Response / Benefit": 1,
+                "Transient / Limited": 0,
+                "No Response / Worse": 0,
+                "Unknown": 12
+              }
+            },
+            "prednisone": {
+              "total_count": 1,
+              "efficacy": {
+                "Response / Benefit": 0,
+                "Transient / Limited": 0,
+                "No Response / Worse": 1,
+                "Unknown": 0
+              }
+            },
+            "azathioprine": {
+              "total_count": 1,
+              "efficacy": {
+                "Response / Benefit": 0,
+                "Transient / Limited": 0,
+                "No Response / Worse": 1,
+                "Unknown": 0
+              }
+            },
+            "Antidiarrheals": {
+              "total_count": 1,
+              "efficacy": {
+                "Response / Benefit": 0,
+                "Transient / Limited": 0,
+                "No Response / Worse": 0,
+                "Unknown": 1
+              }
+            }
+          },
+          "longitudinal_trends": {
+            "ALT": {
+              "unit": "IU/L",
+              "patient_coverage": {
+                "total_disease_patients": 112,
+                "patients_with_data": 17,
+                "patients_missing": 95,
+                "total_observations": 32
+              },
+              "by_patient_age": {
+                "trend_x": [
+                  0.04,
+                  0.2,
+                  0.23,
+                  0.25,
+                  0.25,
+                  0.33,
+                  0.33,
+                  0.33,
+                  0.42,
+                  0.58,
+                  0.58,
+                  0.66,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.58,
+                  1.92,
+                  2.0,
+                  2.0,
+                  2.33,
+                  2.42,
+                  2.42,
+                  2.92,
+                  3.0,
+                  3.33,
+                  3.58,
+                  3.58,
+                  3.83,
+                  4.67,
+                  7.08,
+                  8.33
+                ],
+                "trend_y": [
+                  52.13,
+                  55.17,
+                  55.74,
+                  56.12,
+                  56.12,
+                  57.63,
+                  57.63,
+                  57.63,
+                  59.31,
+                  62.21,
+                  62.21,
+                  63.56,
+                  67.72,
+                  67.72,
+                  67.72,
+                  67.72,
+                  57.61,
+                  50.17,
+                  48.74,
+                  48.74,
+                  45.28,
+                  44.49,
+                  44.49,
+                  39.9,
+                  39.54,
+                  38.48,
+                  37.98,
+                  37.98,
+                  37.67,
+                  37.86,
+                  62.26,
+                  71.71
+                ],
+                "scatter": [
+                  {
+                    "x": 0.04,
+                    "y": 14.0
+                  },
+                  {
+                    "x": 0.2,
+                    "y": 85.0
+                  },
+                  {
+                    "x": 0.23,
+                    "y": 299.0
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 479.0
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 77.0
+                  },
+                  {
+                    "x": 0.33,
+                    "y": 517.0
+                  },
+                  {
+                    "x": 0.33,
+                    "y": 40.3
+                  },
+                  {
+                    "x": 0.33,
+                    "y": 72.0
+                  },
+                  {
+                    "x": 0.42,
+                    "y": 52.0
+                  },
+                  {
+                    "x": 0.58,
+                    "y": 42.0
+                  },
+                  {
+                    "x": 0.58,
+                    "y": 103.0
+                  },
+                  {
+                    "x": 0.66,
+                    "y": 29.0
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 96.0
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 35.0
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 78.0
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 73.0
+                  },
+                  {
+                    "x": 1.58,
+                    "y": 156.0
+                  },
+                  {
+                    "x": 1.92,
+                    "y": 69.0
+                  },
+                  {
+                    "x": 2.0,
+                    "y": 171.0
+                  },
+                  {
+                    "x": 2.0,
+                    "y": 30.0
+                  },
+                  {
+                    "x": 2.33,
+                    "y": 37.0
+                  },
+                  {
+                    "x": 2.42,
+                    "y": 35.3
+                  },
+                  {
+                    "x": 2.42,
+                    "y": 25.4
+                  },
+                  {
+                    "x": 2.92,
+                    "y": 25.0
+                  },
+                  {
+                    "x": 3.0,
+                    "y": 36.0
+                  },
+                  {
+                    "x": 3.33,
+                    "y": 40.0
+                  },
+                  {
+                    "x": 3.58,
+                    "y": 54.0
+                  },
+                  {
+                    "x": 3.58,
+                    "y": 41.0
+                  },
+                  {
+                    "x": 3.83,
+                    "y": 31.0
+                  },
+                  {
+                    "x": 4.67,
+                    "y": 41.0
+                  },
+                  {
+                    "x": 7.08,
+                    "y": 33.0
+                  },
+                  {
+                    "x": 8.33,
+                    "y": 96.0
+                  }
+                ]
+              },
+              "by_symptom_followup": {
+                "trend_x": [
+                  0.04,
+                  0.19,
+                  0.22,
+                  0.25,
+                  0.25,
+                  0.3,
+                  0.32,
+                  0.32,
+                  0.42,
+                  0.54,
+                  0.55,
+                  0.65,
+                  0.95,
+                  0.96,
+                  0.97,
+                  0.99,
+                  1.45,
+                  1.88,
+                  1.99,
+                  2.0,
+                  2.32,
+                  2.41,
+                  2.41,
+                  2.89,
+                  2.99,
+                  3.2,
+                  3.55,
+                  3.58,
+                  3.78,
+                  4.63,
+                  7.08,
+                  8.32
+                ],
+                "trend_y": [
+                  51.69,
+                  54.85,
+                  55.48,
+                  56.11,
+                  56.11,
+                  57.16,
+                  57.58,
+                  57.58,
+                  59.66,
+                  62.09,
+                  62.28,
+                  64.18,
+                  68.52,
+                  68.62,
+                  68.71,
+                  68.89,
+                  62.16,
+                  51.21,
+                  49.3,
+                  49.14,
+                  45.39,
+                  44.49,
+                  44.49,
+                  39.91,
+                  39.44,
+                  38.66,
+                  37.81,
+                  37.76,
+                  37.49,
+                  37.74,
+                  62.46,
+                  71.8
+                ],
+                "scatter": [
+                  {
+                    "x": 0.04,
+                    "y": 14.0
+                  },
+                  {
+                    "x": 0.19,
+                    "y": 85.0
+                  },
+                  {
+                    "x": 0.22,
+                    "y": 299.0
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 479.0
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 77.0
+                  },
+                  {
+                    "x": 0.3,
+                    "y": 72.0
+                  },
+                  {
+                    "x": 0.32,
+                    "y": 517.0
+                  },
+                  {
+                    "x": 0.32,
+                    "y": 40.3
+                  },
+                  {
+                    "x": 0.42,
+                    "y": 52.0
+                  },
+                  {
+                    "x": 0.54,
+                    "y": 42.0
+                  },
+                  {
+                    "x": 0.55,
+                    "y": 103.0
+                  },
+                  {
+                    "x": 0.65,
+                    "y": 29.0
+                  },
+                  {
+                    "x": 0.95,
+                    "y": 35.0
+                  },
+                  {
+                    "x": 0.96,
+                    "y": 73.0
+                  },
+                  {
+                    "x": 0.97,
+                    "y": 78.0
+                  },
+                  {
+                    "x": 0.99,
+                    "y": 96.0
+                  },
+                  {
+                    "x": 1.45,
+                    "y": 156.0
+                  },
+                  {
+                    "x": 1.88,
+                    "y": 69.0
+                  },
+                  {
+                    "x": 1.99,
+                    "y": 30.0
+                  },
+                  {
+                    "x": 2.0,
+                    "y": 171.0
+                  },
+                  {
+                    "x": 2.32,
+                    "y": 37.0
+                  },
+                  {
+                    "x": 2.41,
+                    "y": 35.3
+                  },
+                  {
+                    "x": 2.41,
+                    "y": 25.4
+                  },
+                  {
+                    "x": 2.89,
+                    "y": 25.0
+                  },
+                  {
+                    "x": 2.99,
+                    "y": 36.0
+                  },
+                  {
+                    "x": 3.2,
+                    "y": 40.0
+                  },
+                  {
+                    "x": 3.55,
+                    "y": 41.0
+                  },
+                  {
+                    "x": 3.58,
+                    "y": 54.0
+                  },
+                  {
+                    "x": 3.78,
+                    "y": 31.0
+                  },
+                  {
+                    "x": 4.63,
+                    "y": 41.0
+                  },
+                  {
+                    "x": 7.08,
+                    "y": 33.0
+                  },
+                  {
+                    "x": 8.32,
+                    "y": 96.0
+                  }
+                ]
+              }
+            },
+            "AST": {
+              "unit": "IU/L",
+              "patient_coverage": {
+                "total_disease_patients": 112,
+                "patients_with_data": 17,
+                "patients_missing": 95,
+                "total_observations": 32
+              },
+              "by_patient_age": {
+                "trend_x": [
+                  0.04,
+                  0.2,
+                  0.23,
+                  0.25,
+                  0.25,
+                  0.33,
+                  0.33,
+                  0.33,
+                  0.42,
+                  0.58,
+                  0.58,
+                  0.66,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.58,
+                  1.92,
+                  2.0,
+                  2.0,
+                  2.33,
+                  2.42,
+                  2.42,
+                  2.92,
+                  3.0,
+                  3.33,
+                  3.58,
+                  3.58,
+                  3.83,
+                  4.67,
+                  7.08,
+                  8.33
+                ],
+                "trend_y": [
+                  89.49,
+                  90.29,
+                  90.46,
+                  90.58,
+                  90.58,
+                  91.06,
+                  91.06,
+                  91.06,
+                  91.61,
+                  92.52,
+                  92.52,
+                  92.9,
+                  93.66,
+                  93.66,
+                  93.66,
+                  93.66,
+                  86.04,
+                  76.7,
+                  74.36,
+                  74.36,
+                  68.09,
+                  66.63,
+                  66.63,
+                  58.31,
+                  57.28,
+                  53.26,
+                  50.43,
+                  50.43,
+                  47.79,
+                  47.8,
+                  67.55,
+                  74.06
+                ],
+                "scatter": [
+                  {
+                    "x": 0.04,
+                    "y": 29.0
+                  },
+                  {
+                    "x": 0.2,
+                    "y": 117.0
+                  },
+                  {
+                    "x": 0.23,
+                    "y": 186.0
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 187.0
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 114.0
+                  },
+                  {
+                    "x": 0.33,
+                    "y": 572.0
+                  },
+                  {
+                    "x": 0.33,
+                    "y": 61.7
+                  },
+                  {
+                    "x": 0.33,
+                    "y": 66.0
+                  },
+                  {
+                    "x": 0.42,
+                    "y": 70.0
+                  },
+                  {
+                    "x": 0.58,
+                    "y": 67.0
+                  },
+                  {
+                    "x": 0.58,
+                    "y": 92.0
+                  },
+                  {
+                    "x": 0.66,
+                    "y": 68.0
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 123.0
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 71.0
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 95.0
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 124.0
+                  },
+                  {
+                    "x": 1.58,
+                    "y": 114.0
+                  },
+                  {
+                    "x": 1.92,
+                    "y": 70.0
+                  },
+                  {
+                    "x": 2.0,
+                    "y": 126.0
+                  },
+                  {
+                    "x": 2.0,
+                    "y": 42.0
+                  },
+                  {
+                    "x": 2.33,
+                    "y": 68.0
+                  },
+                  {
+                    "x": 2.42,
+                    "y": 65.2
+                  },
+                  {
+                    "x": 2.42,
+                    "y": 43.5
+                  },
+                  {
+                    "x": 2.92,
+                    "y": 38.0
+                  },
+                  {
+                    "x": 3.0,
+                    "y": 37.0
+                  },
+                  {
+                    "x": 3.33,
+                    "y": 60.0
+                  },
+                  {
+                    "x": 3.58,
+                    "y": 59.0
+                  },
+                  {
+                    "x": 3.58,
+                    "y": 58.0
+                  },
+                  {
+                    "x": 3.83,
+                    "y": 47.0
+                  },
+                  {
+                    "x": 4.67,
+                    "y": 45.0
+                  },
+                  {
+                    "x": 7.08,
+                    "y": 46.0
+                  },
+                  {
+                    "x": 8.33,
+                    "y": 97.0
+                  }
+                ]
+              },
+              "by_symptom_followup": {
+                "trend_x": [
+                  0.04,
+                  0.19,
+                  0.22,
+                  0.25,
+                  0.25,
+                  0.3,
+                  0.32,
+                  0.32,
+                  0.42,
+                  0.54,
+                  0.55,
+                  0.65,
+                  0.95,
+                  0.96,
+                  0.97,
+                  0.99,
+                  1.45,
+                  1.88,
+                  1.99,
+                  2.0,
+                  2.32,
+                  2.41,
+                  2.41,
+                  2.89,
+                  2.99,
+                  3.2,
+                  3.55,
+                  3.58,
+                  3.78,
+                  4.63,
+                  7.08,
+                  8.32
+                ],
+                "trend_y": [
+                  89.03,
+                  89.99,
+                  90.2,
+                  90.41,
+                  90.41,
+                  90.76,
+                  90.91,
+                  90.91,
+                  91.62,
+                  92.42,
+                  92.48,
+                  93.03,
+                  93.81,
+                  93.81,
+                  93.82,
+                  93.83,
+                  89.09,
+                  77.09,
+                  74.08,
+                  73.82,
+                  67.57,
+                  66.06,
+                  66.06,
+                  58.1,
+                  56.81,
+                  54.23,
+                  50.22,
+                  49.9,
+                  47.79,
+                  47.56,
+                  67.75,
+                  74.25
+                ],
+                "scatter": [
+                  {
+                    "x": 0.04,
+                    "y": 29.0
+                  },
+                  {
+                    "x": 0.19,
+                    "y": 117.0
+                  },
+                  {
+                    "x": 0.22,
+                    "y": 186.0
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 187.0
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 114.0
+                  },
+                  {
+                    "x": 0.3,
+                    "y": 66.0
+                  },
+                  {
+                    "x": 0.32,
+                    "y": 572.0
+                  },
+                  {
+                    "x": 0.32,
+                    "y": 61.7
+                  },
+                  {
+                    "x": 0.42,
+                    "y": 70.0
+                  },
+                  {
+                    "x": 0.54,
+                    "y": 67.0
+                  },
+                  {
+                    "x": 0.55,
+                    "y": 92.0
+                  },
+                  {
+                    "x": 0.65,
+                    "y": 68.0
+                  },
+                  {
+                    "x": 0.95,
+                    "y": 71.0
+                  },
+                  {
+                    "x": 0.96,
+                    "y": 124.0
+                  },
+                  {
+                    "x": 0.97,
+                    "y": 95.0
+                  },
+                  {
+                    "x": 0.99,
+                    "y": 123.0
+                  },
+                  {
+                    "x": 1.45,
+                    "y": 114.0
+                  },
+                  {
+                    "x": 1.88,
+                    "y": 70.0
+                  },
+                  {
+                    "x": 1.99,
+                    "y": 42.0
+                  },
+                  {
+                    "x": 2.0,
+                    "y": 126.0
+                  },
+                  {
+                    "x": 2.32,
+                    "y": 68.0
+                  },
+                  {
+                    "x": 2.41,
+                    "y": 65.2
+                  },
+                  {
+                    "x": 2.41,
+                    "y": 43.5
+                  },
+                  {
+                    "x": 2.89,
+                    "y": 38.0
+                  },
+                  {
+                    "x": 2.99,
+                    "y": 37.0
+                  },
+                  {
+                    "x": 3.2,
+                    "y": 60.0
+                  },
+                  {
+                    "x": 3.55,
+                    "y": 58.0
+                  },
+                  {
+                    "x": 3.58,
+                    "y": 59.0
+                  },
+                  {
+                    "x": 3.78,
+                    "y": 47.0
+                  },
+                  {
+                    "x": 4.63,
+                    "y": 45.0
+                  },
+                  {
+                    "x": 7.08,
+                    "y": 46.0
+                  },
+                  {
+                    "x": 8.32,
+                    "y": 97.0
+                  }
+                ]
+              }
+            },
+            "CB": {
+              "unit": "umol/l",
+              "patient_coverage": {
+                "total_disease_patients": 112,
+                "patients_with_data": 17,
+                "patients_missing": 95,
+                "total_observations": 32
+              },
+              "by_patient_age": {
+                "trend_x": [
+                  0.04,
+                  0.2,
+                  0.23,
+                  0.25,
+                  0.25,
+                  0.33,
+                  0.33,
+                  0.33,
+                  0.42,
+                  0.58,
+                  0.58,
+                  0.66,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.58,
+                  1.92,
+                  2.0,
+                  2.0,
+                  2.33,
+                  2.42,
+                  2.42,
+                  2.92,
+                  3.0,
+                  3.33,
+                  3.58,
+                  3.58,
+                  3.83,
+                  4.67,
+                  7.08,
+                  8.33
+                ],
+                "trend_y": [
+                  63.57,
+                  71.58,
+                  73.06,
+                  74.04,
+                  74.04,
+                  77.94,
+                  77.94,
+                  77.94,
+                  82.25,
+                  89.67,
+                  89.67,
+                  93.2,
+                  105.92,
+                  105.92,
+                  105.92,
+                  105.92,
+                  100.43,
+                  87.96,
+                  84.49,
+                  84.49,
+                  71.27,
+                  67.19,
+                  67.19,
+                  44.98,
+                  41.86,
+                  29.73,
+                  20.84,
+                  20.84,
+                  12.01,
+                  25.69,
+                  42.59,
+                  48.61
+                ],
+                "scatter": [
+                  {
+                    "x": 0.04,
+                    "y": 53.0
+                  },
+                  {
+                    "x": 0.2,
+                    "y": 67.0
+                  },
+                  {
+                    "x": 0.23,
+                    "y": 196.2
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 26.0
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 32.9
+                  },
+                  {
+                    "x": 0.33,
+                    "y": 79.2
+                  },
+                  {
+                    "x": 0.33,
+                    "y": 231.4
+                  },
+                  {
+                    "x": 0.33,
+                    "y": 173.0
+                  },
+                  {
+                    "x": 0.42,
+                    "y": 98.0
+                  },
+                  {
+                    "x": 0.58,
+                    "y": 87.0
+                  },
+                  {
+                    "x": 0.58,
+                    "y": 93.0
+                  },
+                  {
+                    "x": 0.66,
+                    "y": 31.3
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 198.0
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 143.0
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 116.0
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 24.0
+                  },
+                  {
+                    "x": 1.58,
+                    "y": 157.8
+                  },
+                  {
+                    "x": 1.92,
+                    "y": 94.0
+                  },
+                  {
+                    "x": 2.0,
+                    "y": 163.8
+                  },
+                  {
+                    "x": 2.0,
+                    "y": 2.0
+                  },
+                  {
+                    "x": 2.33,
+                    "y": 84.6
+                  },
+                  {
+                    "x": 2.42,
+                    "y": 88.6
+                  },
+                  {
+                    "x": 2.42,
+                    "y": 2.1
+                  },
+                  {
+                    "x": 2.92,
+                    "y": 47.0
+                  },
+                  {
+                    "x": 3.0,
+                    "y": 1.0
+                  },
+                  {
+                    "x": 3.33,
+                    "y": 77.0
+                  },
+                  {
+                    "x": 3.58,
+                    "y": 5.7
+                  },
+                  {
+                    "x": 3.58,
+                    "y": 3.0
+                  },
+                  {
+                    "x": 3.83,
+                    "y": 3.0
+                  },
+                  {
+                    "x": 4.67,
+                    "y": 6.0
+                  },
+                  {
+                    "x": 7.08,
+                    "y": 89.0
+                  },
+                  {
+                    "x": 8.33,
+                    "y": 35.5
+                  }
+                ]
+              },
+              "by_symptom_followup": {
+                "trend_x": [
+                  0.04,
+                  0.19,
+                  0.22,
+                  0.25,
+                  0.25,
+                  0.3,
+                  0.32,
+                  0.32,
+                  0.42,
+                  0.54,
+                  0.55,
+                  0.65,
+                  0.95,
+                  0.96,
+                  0.97,
+                  0.99,
+                  1.45,
+                  1.88,
+                  1.99,
+                  2.0,
+                  2.32,
+                  2.41,
+                  2.41,
+                  2.89,
+                  2.99,
+                  3.2,
+                  3.55,
+                  3.58,
+                  3.78,
+                  4.63,
+                  7.08,
+                  8.32
+                ],
+                "trend_y": [
+                  64.95,
+                  72.53,
+                  74.03,
+                  75.52,
+                  75.52,
+                  77.99,
+                  78.97,
+                  78.97,
+                  83.81,
+                  89.44,
+                  89.9,
+                  94.36,
+                  105.68,
+                  105.99,
+                  106.29,
+                  106.89,
+                  105.05,
+                  88.64,
+                  84.33,
+                  83.91,
+                  70.73,
+                  66.48,
+                  66.48,
+                  44.64,
+                  40.71,
+                  32.86,
+                  20.18,
+                  19.1,
+                  11.9,
+                  24.49,
+                  42.88,
+                  49.06
+                ],
+                "scatter": [
+                  {
+                    "x": 0.04,
+                    "y": 53.0
+                  },
+                  {
+                    "x": 0.19,
+                    "y": 67.0
+                  },
+                  {
+                    "x": 0.22,
+                    "y": 196.2
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 26.0
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 32.9
+                  },
+                  {
+                    "x": 0.3,
+                    "y": 173.0
+                  },
+                  {
+                    "x": 0.32,
+                    "y": 79.2
+                  },
+                  {
+                    "x": 0.32,
+                    "y": 231.4
+                  },
+                  {
+                    "x": 0.42,
+                    "y": 98.0
+                  },
+                  {
+                    "x": 0.54,
+                    "y": 87.0
+                  },
+                  {
+                    "x": 0.55,
+                    "y": 93.0
+                  },
+                  {
+                    "x": 0.65,
+                    "y": 31.3
+                  },
+                  {
+                    "x": 0.95,
+                    "y": 143.0
+                  },
+                  {
+                    "x": 0.96,
+                    "y": 24.0
+                  },
+                  {
+                    "x": 0.97,
+                    "y": 116.0
+                  },
+                  {
+                    "x": 0.99,
+                    "y": 198.0
+                  },
+                  {
+                    "x": 1.45,
+                    "y": 157.8
+                  },
+                  {
+                    "x": 1.88,
+                    "y": 94.0
+                  },
+                  {
+                    "x": 1.99,
+                    "y": 2.0
+                  },
+                  {
+                    "x": 2.0,
+                    "y": 163.8
+                  },
+                  {
+                    "x": 2.32,
+                    "y": 84.6
+                  },
+                  {
+                    "x": 2.41,
+                    "y": 88.6
+                  },
+                  {
+                    "x": 2.41,
+                    "y": 2.1
+                  },
+                  {
+                    "x": 2.89,
+                    "y": 47.0
+                  },
+                  {
+                    "x": 2.99,
+                    "y": 1.0
+                  },
+                  {
+                    "x": 3.2,
+                    "y": 77.0
+                  },
+                  {
+                    "x": 3.55,
+                    "y": 3.0
+                  },
+                  {
+                    "x": 3.58,
+                    "y": 5.7
+                  },
+                  {
+                    "x": 3.78,
+                    "y": 3.0
+                  },
+                  {
+                    "x": 4.63,
+                    "y": 6.0
+                  },
+                  {
+                    "x": 7.08,
+                    "y": 89.0
+                  },
+                  {
+                    "x": 8.32,
+                    "y": 35.5
+                  }
+                ]
+              }
+            },
+            "GGT": {
+              "unit": "IU/L",
+              "patient_coverage": {
+                "total_disease_patients": 112,
+                "patients_with_data": 17,
+                "patients_missing": 95,
+                "total_observations": 32
+              },
+              "by_patient_age": {
+                "trend_x": [
+                  0.04,
+                  0.2,
+                  0.23,
+                  0.25,
+                  0.25,
+                  0.33,
+                  0.33,
+                  0.33,
+                  0.42,
+                  0.58,
+                  0.58,
+                  0.66,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.58,
+                  1.92,
+                  2.0,
+                  2.0,
+                  2.33,
+                  2.42,
+                  2.42,
+                  2.92,
+                  3.0,
+                  3.33,
+                  3.58,
+                  3.58,
+                  3.83,
+                  4.67,
+                  7.08,
+                  8.33
+                ],
+                "trend_y": [
+                  47.63,
+                  42.25,
+                  41.27,
+                  40.62,
+                  40.62,
+                  38.08,
+                  38.08,
+                  38.08,
+                  35.31,
+                  30.62,
+                  30.62,
+                  28.39,
+                  19.83,
+                  19.83,
+                  19.83,
+                  19.83,
+                  13.05,
+                  12.21,
+                  12.13,
+                  12.13,
+                  11.79,
+                  11.8,
+                  11.8,
+                  11.9,
+                  11.9,
+                  11.85,
+                  11.8,
+                  11.8,
+                  11.76,
+                  11.82,
+                  13.18,
+                  13.72
+                ],
+                "scatter": [
+                  {
+                    "x": 0.04,
+                    "y": 136.0
+                  },
+                  {
+                    "x": 0.2,
+                    "y": 93.0
+                  },
+                  {
+                    "x": 0.23,
+                    "y": 54.0
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 47.0
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 47.0
+                  },
+                  {
+                    "x": 0.33,
+                    "y": 46.0
+                  },
+                  {
+                    "x": 0.33,
+                    "y": 27.9
+                  },
+                  {
+                    "x": 0.33,
+                    "y": 92.0
+                  },
+                  {
+                    "x": 0.42,
+                    "y": 10.0
+                  },
+                  {
+                    "x": 0.58,
+                    "y": 26.0
+                  },
+                  {
+                    "x": 0.58,
+                    "y": 26.0
+                  },
+                  {
+                    "x": 0.66,
+                    "y": 17.0
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 18.0
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 13.0
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 15.0
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 9.0
+                  },
+                  {
+                    "x": 1.58,
+                    "y": 13.0
+                  },
+                  {
+                    "x": 1.92,
+                    "y": 11.0
+                  },
+                  {
+                    "x": 2.0,
+                    "y": 11.0
+                  },
+                  {
+                    "x": 2.0,
+                    "y": 11.0
+                  },
+                  {
+                    "x": 2.33,
+                    "y": 8.0
+                  },
+                  {
+                    "x": 2.42,
+                    "y": 18.0
+                  },
+                  {
+                    "x": 2.42,
+                    "y": 7.8
+                  },
+                  {
+                    "x": 2.92,
+                    "y": 10.0
+                  },
+                  {
+                    "x": 3.0,
+                    "y": 17.0
+                  },
+                  {
+                    "x": 3.33,
+                    "y": 8.0
+                  },
+                  {
+                    "x": 3.58,
+                    "y": 12.0
+                  },
+                  {
+                    "x": 3.58,
+                    "y": 9.0
+                  },
+                  {
+                    "x": 3.83,
+                    "y": 20.0
+                  },
+                  {
+                    "x": 4.67,
+                    "y": 9.0
+                  },
+                  {
+                    "x": 7.08,
+                    "y": 12.0
+                  },
+                  {
+                    "x": 8.33,
+                    "y": 15.0
+                  }
+                ]
+              },
+              "by_symptom_followup": {
+                "trend_x": [
+                  0.04,
+                  0.19,
+                  0.22,
+                  0.25,
+                  0.25,
+                  0.3,
+                  0.32,
+                  0.32,
+                  0.42,
+                  0.54,
+                  0.55,
+                  0.65,
+                  0.95,
+                  0.96,
+                  0.97,
+                  0.99,
+                  1.45,
+                  1.88,
+                  1.99,
+                  2.0,
+                  2.32,
+                  2.41,
+                  2.41,
+                  2.89,
+                  2.99,
+                  3.2,
+                  3.55,
+                  3.58,
+                  3.78,
+                  4.63,
+                  7.08,
+                  8.32
+                ],
+                "trend_y": [
+                  46.96,
+                  41.87,
+                  40.88,
+                  39.9,
+                  39.9,
+                  38.3,
+                  37.66,
+                  37.66,
+                  34.56,
+                  31.0,
+                  30.71,
+                  27.88,
+                  20.19,
+                  19.96,
+                  19.73,
+                  19.27,
+                  13.29,
+                  12.2,
+                  12.06,
+                  12.05,
+                  11.75,
+                  11.77,
+                  11.77,
+                  11.91,
+                  11.92,
+                  11.9,
+                  11.84,
+                  11.84,
+                  11.82,
+                  11.87,
+                  13.21,
+                  13.73
+                ],
+                "scatter": [
+                  {
+                    "x": 0.04,
+                    "y": 136.0
+                  },
+                  {
+                    "x": 0.19,
+                    "y": 93.0
+                  },
+                  {
+                    "x": 0.22,
+                    "y": 54.0
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 47.0
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 47.0
+                  },
+                  {
+                    "x": 0.3,
+                    "y": 92.0
+                  },
+                  {
+                    "x": 0.32,
+                    "y": 46.0
+                  },
+                  {
+                    "x": 0.32,
+                    "y": 27.9
+                  },
+                  {
+                    "x": 0.42,
+                    "y": 10.0
+                  },
+                  {
+                    "x": 0.54,
+                    "y": 26.0
+                  },
+                  {
+                    "x": 0.55,
+                    "y": 26.0
+                  },
+                  {
+                    "x": 0.65,
+                    "y": 17.0
+                  },
+                  {
+                    "x": 0.95,
+                    "y": 13.0
+                  },
+                  {
+                    "x": 0.96,
+                    "y": 9.0
+                  },
+                  {
+                    "x": 0.97,
+                    "y": 15.0
+                  },
+                  {
+                    "x": 0.99,
+                    "y": 18.0
+                  },
+                  {
+                    "x": 1.45,
+                    "y": 13.0
+                  },
+                  {
+                    "x": 1.88,
+                    "y": 11.0
+                  },
+                  {
+                    "x": 1.99,
+                    "y": 11.0
+                  },
+                  {
+                    "x": 2.0,
+                    "y": 11.0
+                  },
+                  {
+                    "x": 2.32,
+                    "y": 8.0
+                  },
+                  {
+                    "x": 2.41,
+                    "y": 18.0
+                  },
+                  {
+                    "x": 2.41,
+                    "y": 7.8
+                  },
+                  {
+                    "x": 2.89,
+                    "y": 10.0
+                  },
+                  {
+                    "x": 2.99,
+                    "y": 17.0
+                  },
+                  {
+                    "x": 3.2,
+                    "y": 8.0
+                  },
+                  {
+                    "x": 3.55,
+                    "y": 9.0
+                  },
+                  {
+                    "x": 3.58,
+                    "y": 12.0
+                  },
+                  {
+                    "x": 3.78,
+                    "y": 20.0
+                  },
+                  {
+                    "x": 4.63,
+                    "y": 9.0
+                  },
+                  {
+                    "x": 7.08,
+                    "y": 12.0
+                  },
+                  {
+                    "x": 8.32,
+                    "y": 15.0
+                  }
+                ]
+              }
+            },
+            "SBA": {
+              "unit": "umol/l",
+              "patient_coverage": {
+                "total_disease_patients": 112,
+                "patients_with_data": 17,
+                "patients_missing": 95,
+                "total_observations": 31
+              },
+              "by_patient_age": {
+                "trend_x": [
+                  0.04,
+                  0.2,
+                  0.23,
+                  0.25,
+                  0.25,
+                  0.33,
+                  0.33,
+                  0.33,
+                  0.42,
+                  0.58,
+                  0.66,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.58,
+                  1.92,
+                  2.0,
+                  2.0,
+                  2.33,
+                  2.42,
+                  2.42,
+                  2.92,
+                  3.0,
+                  3.33,
+                  3.58,
+                  3.58,
+                  3.83,
+                  4.67,
+                  7.08,
+                  8.33
+                ],
+                "trend_y": [
+                  50.74,
+                  87.2,
+                  93.96,
+                  98.45,
+                  98.45,
+                  116.25,
+                  116.25,
+                  116.25,
+                  135.94,
+                  169.75,
+                  185.94,
+                  248.06,
+                  248.06,
+                  248.06,
+                  248.06,
+                  286.72,
+                  274.03,
+                  265.98,
+                  265.98,
+                  238.76,
+                  232.36,
+                  232.36,
+                  194.18,
+                  187.13,
+                  157.16,
+                  134.38,
+                  134.38,
+                  112.03,
+                  129.51,
+                  153.47,
+                  157.82
+                ],
+                "scatter": [
+                  {
+                    "x": 0.04,
+                    "y": 44.0
+                  },
+                  {
+                    "x": 0.2,
+                    "y": 67.0
+                  },
+                  {
+                    "x": 0.23,
+                    "y": 165.7
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 109.0
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 95.0
+                  },
+                  {
+                    "x": 0.33,
+                    "y": 101.8
+                  },
+                  {
+                    "x": 0.33,
+                    "y": 141.5
+                  },
+                  {
+                    "x": 0.33,
+                    "y": 68.0
+                  },
+                  {
+                    "x": 0.42,
+                    "y": 91.0
+                  },
+                  {
+                    "x": 0.58,
+                    "y": 130.0
+                  },
+                  {
+                    "x": 0.66,
+                    "y": 187.0
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 349.0
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 241.0
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 434.0
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 294.0
+                  },
+                  {
+                    "x": 1.58,
+                    "y": 436.7
+                  },
+                  {
+                    "x": 1.92,
+                    "y": 230.0
+                  },
+                  {
+                    "x": 2.0,
+                    "y": 381.0
+                  },
+                  {
+                    "x": 2.0,
+                    "y": 284.0
+                  },
+                  {
+                    "x": 2.33,
+                    "y": 290.2
+                  },
+                  {
+                    "x": 2.42,
+                    "y": 185.5
+                  },
+                  {
+                    "x": 2.42,
+                    "y": 3.9
+                  },
+                  {
+                    "x": 2.92,
+                    "y": 440.0
+                  },
+                  {
+                    "x": 3.0,
+                    "y": 5.0
+                  },
+                  {
+                    "x": 3.33,
+                    "y": 103.0
+                  },
+                  {
+                    "x": 3.58,
+                    "y": 113.0
+                  },
+                  {
+                    "x": 3.58,
+                    "y": 288.0
+                  },
+                  {
+                    "x": 3.83,
+                    "y": 158.0
+                  },
+                  {
+                    "x": 4.67,
+                    "y": 12.0
+                  },
+                  {
+                    "x": 7.08,
+                    "y": 243.0
+                  },
+                  {
+                    "x": 8.33,
+                    "y": 129.0
+                  }
+                ]
+              },
+              "by_symptom_followup": {
+                "trend_x": [
+                  0.04,
+                  0.19,
+                  0.22,
+                  0.25,
+                  0.25,
+                  0.3,
+                  0.32,
+                  0.32,
+                  0.42,
+                  0.54,
+                  0.65,
+                  0.95,
+                  0.96,
+                  0.97,
+                  0.99,
+                  1.45,
+                  1.88,
+                  1.99,
+                  2.0,
+                  2.32,
+                  2.41,
+                  2.41,
+                  2.89,
+                  2.99,
+                  3.2,
+                  3.55,
+                  3.58,
+                  3.78,
+                  4.63,
+                  7.08,
+                  8.32
+                ],
+                "trend_y": [
+                  51.1,
+                  86.57,
+                  93.58,
+                  100.55,
+                  100.55,
+                  112.08,
+                  116.66,
+                  116.66,
+                  139.24,
+                  165.48,
+                  188.49,
+                  244.8,
+                  246.5,
+                  248.19,
+                  251.53,
+                  290.92,
+                  273.41,
+                  262.44,
+                  261.34,
+                  235.78,
+                  229.45,
+                  229.45,
+                  192.54,
+                  183.74,
+                  164.74,
+                  132.89,
+                  130.19,
+                  112.41,
+                  128.69,
+                  153.77,
+                  158.09
+                ],
+                "scatter": [
+                  {
+                    "x": 0.04,
+                    "y": 44.0
+                  },
+                  {
+                    "x": 0.19,
+                    "y": 67.0
+                  },
+                  {
+                    "x": 0.22,
+                    "y": 165.7
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 109.0
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 95.0
+                  },
+                  {
+                    "x": 0.3,
+                    "y": 68.0
+                  },
+                  {
+                    "x": 0.32,
+                    "y": 101.8
+                  },
+                  {
+                    "x": 0.32,
+                    "y": 141.5
+                  },
+                  {
+                    "x": 0.42,
+                    "y": 91.0
+                  },
+                  {
+                    "x": 0.54,
+                    "y": 130.0
+                  },
+                  {
+                    "x": 0.65,
+                    "y": 187.0
+                  },
+                  {
+                    "x": 0.95,
+                    "y": 241.0
+                  },
+                  {
+                    "x": 0.96,
+                    "y": 294.0
+                  },
+                  {
+                    "x": 0.97,
+                    "y": 434.0
+                  },
+                  {
+                    "x": 0.99,
+                    "y": 349.0
+                  },
+                  {
+                    "x": 1.45,
+                    "y": 436.7
+                  },
+                  {
+                    "x": 1.88,
+                    "y": 230.0
+                  },
+                  {
+                    "x": 1.99,
+                    "y": 284.0
+                  },
+                  {
+                    "x": 2.0,
+                    "y": 381.0
+                  },
+                  {
+                    "x": 2.32,
+                    "y": 290.2
+                  },
+                  {
+                    "x": 2.41,
+                    "y": 185.5
+                  },
+                  {
+                    "x": 2.41,
+                    "y": 3.9
+                  },
+                  {
+                    "x": 2.89,
+                    "y": 440.0
+                  },
+                  {
+                    "x": 2.99,
+                    "y": 5.0
+                  },
+                  {
+                    "x": 3.2,
+                    "y": 103.0
+                  },
+                  {
+                    "x": 3.55,
+                    "y": 288.0
+                  },
+                  {
+                    "x": 3.58,
+                    "y": 113.0
+                  },
+                  {
+                    "x": 3.78,
+                    "y": 158.0
+                  },
+                  {
+                    "x": 4.63,
+                    "y": 12.0
+                  },
+                  {
+                    "x": 7.08,
+                    "y": 243.0
+                  },
+                  {
+                    "x": 8.32,
+                    "y": 129.0
+                  }
+                ]
+              }
+            },
+            "TB": {
+              "unit": "umol/l",
+              "patient_coverage": {
+                "total_disease_patients": 112,
+                "patients_with_data": 17,
+                "patients_missing": 95,
+                "total_observations": 32
+              },
+              "by_patient_age": {
+                "trend_x": [
+                  0.04,
+                  0.2,
+                  0.23,
+                  0.25,
+                  0.25,
+                  0.33,
+                  0.33,
+                  0.33,
+                  0.42,
+                  0.58,
+                  0.58,
+                  0.66,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.58,
+                  1.92,
+                  2.0,
+                  2.0,
+                  2.33,
+                  2.42,
+                  2.42,
+                  2.92,
+                  3.0,
+                  3.33,
+                  3.58,
+                  3.58,
+                  3.83,
+                  4.67,
+                  7.08,
+                  8.33
+                ],
+                "trend_y": [
+                  146.04,
+                  148.41,
+                  148.88,
+                  149.2,
+                  149.2,
+                  150.51,
+                  150.51,
+                  150.51,
+                  152.01,
+                  154.71,
+                  154.71,
+                  156.04,
+                  161.6,
+                  161.6,
+                  161.6,
+                  161.6,
+                  143.81,
+                  121.63,
+                  116.06,
+                  116.06,
+                  96.37,
+                  90.71,
+                  90.71,
+                  59.89,
+                  55.82,
+                  40.14,
+                  28.76,
+                  28.76,
+                  17.57,
+                  32.56,
+                  48.65,
+                  53.31
+                ],
+                "scatter": [
+                  {
+                    "x": 0.04,
+                    "y": 226.0
+                  },
+                  {
+                    "x": 0.2,
+                    "y": 114.0
+                  },
+                  {
+                    "x": 0.23,
+                    "y": 274.8
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 30.0
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 58.6
+                  },
+                  {
+                    "x": 0.33,
+                    "y": 112.6
+                  },
+                  {
+                    "x": 0.33,
+                    "y": 264.0
+                  },
+                  {
+                    "x": 0.33,
+                    "y": 199.0
+                  },
+                  {
+                    "x": 0.42,
+                    "y": 126.0
+                  },
+                  {
+                    "x": 0.58,
+                    "y": 93.0
+                  },
+                  {
+                    "x": 0.58,
+                    "y": 202.0
+                  },
+                  {
+                    "x": 0.66,
+                    "y": 44.6
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 273.0
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 246.0
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 157.0
+                  },
+                  {
+                    "x": 1.0,
+                    "y": 32.0
+                  },
+                  {
+                    "x": 1.58,
+                    "y": 227.7
+                  },
+                  {
+                    "x": 1.92,
+                    "y": 136.0
+                  },
+                  {
+                    "x": 2.0,
+                    "y": 215.3
+                  },
+                  {
+                    "x": 2.0,
+                    "y": 9.0
+                  },
+                  {
+                    "x": 2.33,
+                    "y": 94.8
+                  },
+                  {
+                    "x": 2.42,
+                    "y": 114.1
+                  },
+                  {
+                    "x": 2.42,
+                    "y": 5.0
+                  },
+                  {
+                    "x": 2.92,
+                    "y": 48.0
+                  },
+                  {
+                    "x": 3.0,
+                    "y": 6.0
+                  },
+                  {
+                    "x": 3.33,
+                    "y": 104.1
+                  },
+                  {
+                    "x": 3.58,
+                    "y": 8.5
+                  },
+                  {
+                    "x": 3.58,
+                    "y": 10.0
+                  },
+                  {
+                    "x": 3.83,
+                    "y": 9.0
+                  },
+                  {
+                    "x": 4.67,
+                    "y": 13.0
+                  },
+                  {
+                    "x": 7.08,
+                    "y": 93.0
+                  },
+                  {
+                    "x": 8.33,
+                    "y": 42.1
+                  }
+                ]
+              },
+              "by_symptom_followup": {
+                "trend_x": [
+                  0.04,
+                  0.19,
+                  0.22,
+                  0.25,
+                  0.25,
+                  0.3,
+                  0.32,
+                  0.32,
+                  0.42,
+                  0.54,
+                  0.55,
+                  0.65,
+                  0.95,
+                  0.96,
+                  0.97,
+                  0.99,
+                  1.45,
+                  1.88,
+                  1.99,
+                  2.0,
+                  2.32,
+                  2.41,
+                  2.41,
+                  2.89,
+                  2.99,
+                  3.2,
+                  3.55,
+                  3.58,
+                  3.78,
+                  4.63,
+                  7.08,
+                  8.32
+                ],
+                "trend_y": [
+                  146.18,
+                  148.66,
+                  149.18,
+                  149.71,
+                  149.71,
+                  150.61,
+                  150.97,
+                  150.97,
+                  152.78,
+                  154.95,
+                  155.12,
+                  156.86,
+                  161.68,
+                  161.85,
+                  162.01,
+                  162.34,
+                  152.04,
+                  122.9,
+                  115.87,
+                  115.22,
+                  95.54,
+                  89.63,
+                  89.63,
+                  59.42,
+                  54.27,
+                  44.06,
+                  27.77,
+                  26.4,
+                  17.26,
+                  31.01,
+                  48.84,
+                  53.76
+                ],
+                "scatter": [
+                  {
+                    "x": 0.04,
+                    "y": 226.0
+                  },
+                  {
+                    "x": 0.19,
+                    "y": 114.0
+                  },
+                  {
+                    "x": 0.22,
+                    "y": 274.8
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 30.0
+                  },
+                  {
+                    "x": 0.25,
+                    "y": 58.6
+                  },
+                  {
+                    "x": 0.3,
+                    "y": 199.0
+                  },
+                  {
+                    "x": 0.32,
+                    "y": 112.6
+                  },
+                  {
+                    "x": 0.32,
+                    "y": 264.0
+                  },
+                  {
+                    "x": 0.42,
+                    "y": 126.0
+                  },
+                  {
+                    "x": 0.54,
+                    "y": 93.0
+                  },
+                  {
+                    "x": 0.55,
+                    "y": 202.0
+                  },
+                  {
+                    "x": 0.65,
+                    "y": 44.6
+                  },
+                  {
+                    "x": 0.95,
+                    "y": 246.0
+                  },
+                  {
+                    "x": 0.96,
+                    "y": 32.0
+                  },
+                  {
+                    "x": 0.97,
+                    "y": 157.0
+                  },
+                  {
+                    "x": 0.99,
+                    "y": 273.0
+                  },
+                  {
+                    "x": 1.45,
+                    "y": 227.7
+                  },
+                  {
+                    "x": 1.88,
+                    "y": 136.0
+                  },
+                  {
+                    "x": 1.99,
+                    "y": 9.0
+                  },
+                  {
+                    "x": 2.0,
+                    "y": 215.3
+                  },
+                  {
+                    "x": 2.32,
+                    "y": 94.8
+                  },
+                  {
+                    "x": 2.41,
+                    "y": 114.1
+                  },
+                  {
+                    "x": 2.41,
+                    "y": 5.0
+                  },
+                  {
+                    "x": 2.89,
+                    "y": 48.0
+                  },
+                  {
+                    "x": 2.99,
+                    "y": 6.0
+                  },
+                  {
+                    "x": 3.2,
+                    "y": 104.1
+                  },
+                  {
+                    "x": 3.55,
+                    "y": 10.0
+                  },
+                  {
+                    "x": 3.58,
+                    "y": 8.5
+                  },
+                  {
+                    "x": 3.78,
+                    "y": 9.0
+                  },
+                  {
+                    "x": 4.63,
+                    "y": 13.0
+                  },
+                  {
+                    "x": 7.08,
+                    "y": 93.0
+                  },
+                  {
+                    "x": 8.32,
+                    "y": 42.1
+                  }
+                ]
+              }
+            },
+            "height": {
+              "unit": "cm",
+              "patient_coverage": {
+                "total_disease_patients": 112,
+                "patients_with_data": 11,
+                "patients_missing": 101,
+                "total_observations": 11
+              },
+              "by_patient_age": {
+                "trend_x": [
+                  1.92,
+                  2.0,
+                  2.33,
+                  2.42,
+                  2.42,
+                  2.92,
+                  3.58,
+                  3.83,
+                  4.67,
+                  7.0,
+                  8.33
+                ],
+                "trend_y": [
+                  82.15,
+                  82.79,
+                  85.72,
+                  86.59,
+                  86.59,
+                  90.93,
+                  93.74,
+                  95.05,
+                  99.61,
+                  112.7,
+                  119.87
+                ],
+                "scatter": [
+                  {
+                    "x": 1.92,
+                    "y": 85.0
+                  },
+                  {
+                    "x": 2.0,
+                    "y": 82.0
+                  },
+                  {
+                    "x": 2.33,
+                    "y": 83.0
+                  },
+                  {
+                    "x": 2.42,
+                    "y": 85.0
+                  },
+                  {
+                    "x": 2.42,
+                    "y": 96.5
+                  },
+                  {
+                    "x": 2.92,
+                    "y": 94.0
+                  },
+                  {
+                    "x": 3.58,
+                    "y": 92.0
+                  },
+                  {
+                    "x": 3.83,
+                    "y": 95.0
+                  },
+                  {
+                    "x": 4.67,
+                    "y": 100.0
+                  },
+                  {
+                    "x": 7.0,
+                    "y": 114.0
+                  },
+                  {
+                    "x": 8.33,
+                    "y": 119.0
+                  }
+                ]
+              },
+              "by_symptom_followup": {
+                "trend_x": [
+                  1.88,
+                  2.0,
+                  2.32,
+                  2.41,
+                  2.41,
+                  2.89,
+                  3.58,
+                  3.78,
+                  4.63,
+                  7.0,
+                  8.32
+                ],
+                "trend_y": [
+                  82.09,
+                  83.08,
+                  85.99,
+                  86.88,
+                  86.88,
+                  91.59,
+                  93.87,
+                  94.95,
+                  99.56,
+                  112.77,
+                  119.84
+                ],
+                "scatter": [
+                  {
+                    "x": 1.88,
+                    "y": 85.0
+                  },
+                  {
+                    "x": 2.0,
+                    "y": 82.0
+                  },
+                  {
+                    "x": 2.32,
+                    "y": 83.0
+                  },
+                  {
+                    "x": 2.41,
+                    "y": 85.0
+                  },
+                  {
+                    "x": 2.41,
+                    "y": 96.5
+                  },
+                  {
+                    "x": 2.89,
+                    "y": 94.0
+                  },
+                  {
+                    "x": 3.58,
+                    "y": 92.0
+                  },
+                  {
+                    "x": 3.78,
+                    "y": 95.0
+                  },
+                  {
+                    "x": 4.63,
+                    "y": 100.0
+                  },
+                  {
+                    "x": 7.0,
+                    "y": 114.0
+                  },
+                  {
+                    "x": 8.32,
+                    "y": 119.0
+                  }
+                ]
+              }
+            },
+            "weight": {
+              "unit": "kg",
+              "patient_coverage": {
+                "total_disease_patients": 112,
+                "patients_with_data": 11,
+                "patients_missing": 101,
+                "total_observations": 11
+              },
+              "by_patient_age": {
+                "trend_x": [
+                  1.92,
+                  2.0,
+                  2.33,
+                  2.42,
+                  2.42,
+                  2.92,
+                  3.58,
+                  3.83,
+                  4.67,
+                  7.0,
+                  8.33
+                ],
+                "trend_y": [
+                  10.25,
+                  10.54,
+                  11.8,
+                  12.17,
+                  12.17,
+                  13.42,
+                  13.8,
+                  13.84,
+                  14.14,
+                  17.92,
+                  19.81
+                ],
+                "scatter": [
+                  {
+                    "x": 1.92,
+                    "y": 11.4
+                  },
+                  {
+                    "x": 2.0,
+                    "y": 9.8
+                  },
+                  {
+                    "x": 2.33,
+                    "y": 10.8
+                  },
+                  {
+                    "x": 2.42,
+                    "y": 10.3
+                  },
+                  {
+                    "x": 2.42,
+                    "y": 14.6
+                  },
+                  {
+                    "x": 2.92,
+                    "y": 14.7
+                  },
+                  {
+                    "x": 3.58,
+                    "y": 12.3
+                  },
+                  {
+                    "x": 3.83,
+                    "y": 14.7
+                  },
+                  {
+                    "x": 4.67,
+                    "y": 14.1
+                  },
+                  {
+                    "x": 7.0,
+                    "y": 18.0
+                  },
+                  {
+                    "x": 8.33,
+                    "y": 19.8
+                  }
+                ]
+              },
+              "by_symptom_followup": {
+                "trend_x": [
+                  1.88,
+                  2.0,
+                  2.32,
+                  2.41,
+                  2.41,
+                  2.89,
+                  3.58,
+                  3.78,
+                  4.63,
+                  7.0,
+                  8.32
+                ],
+                "trend_y": [
+                  10.2,
+                  10.63,
+                  11.83,
+                  12.19,
+                  12.19,
+                  13.67,
+                  13.79,
+                  13.83,
+                  14.1,
+                  17.93,
+                  19.8
+                ],
+                "scatter": [
+                  {
+                    "x": 1.88,
+                    "y": 11.4
+                  },
+                  {
+                    "x": 2.0,
+                    "y": 9.8
+                  },
+                  {
+                    "x": 2.32,
+                    "y": 10.8
+                  },
+                  {
+                    "x": 2.41,
+                    "y": 10.3
+                  },
+                  {
+                    "x": 2.41,
+                    "y": 14.6
+                  },
+                  {
+                    "x": 2.89,
+                    "y": 14.7
+                  },
+                  {
+                    "x": 3.58,
+                    "y": 12.3
+                  },
+                  {
+                    "x": 3.78,
+                    "y": 14.7
+                  },
+                  {
+                    "x": 4.63,
+                    "y": 14.1
+                  },
+                  {
+                    "x": 7.0,
+                    "y": 18.0
+                  },
+                  {
+                    "x": 8.32,
+                    "y": 19.8
+                  }
+                ]
+              }
+            }
+          }
+        }
