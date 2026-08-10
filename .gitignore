@@ -1,0 +1,14 @@
+# Editor & System Swap Files
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Windows Alternate Data Streams
+*:Zone.Identifier
+
+# Dependencies & Logs (Adjust if applicable)
+node_modules/
+__pycache__/
+*.log
