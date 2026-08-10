@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pytheas AI Explorer</title>
+  <title>Pytheas DB</title>
   <!-- Plotly.js CDN -->
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
   <style>
@@ -24,20 +24,21 @@
 
     /* Fixed Centered Header */
     .top-header {
-      padding: 20px 24px;
+      padding: 12px 24px;
       display: flex;
       justify-content: center;
       align-items: center;
       background: #ffffff;
       border-bottom: 1px solid #e5e7eb;
       z-index: 10;
+      flex-shrink: 0;
     }
     .top-header a {
       display: inline-block;
       text-decoration: none;
     }
     .main-logo {
-      height: 72px;
+      height: 56px;
       width: auto;
     }
 
@@ -45,10 +46,10 @@
     .chat-stream {
       flex: 1;
       overflow-y: auto;
-      padding: 24px;
+      padding: 20px 24px;
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 20px;
       max-width: 900px;
       width: 100%;
       margin: 0 auto;
@@ -100,6 +101,22 @@
       font-weight: 500;
     }
 
+    /* Fallback Alert Box */
+    .fallback-box {
+      padding: 16px;
+      background-color: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      color: #991b1b;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .fallback-box a {
+      color: #2563eb;
+      text-decoration: underline;
+      font-weight: 500;
+    }
+
     /* Summary Table Styling */
     .data-table-container {
       width: 100%;
@@ -143,29 +160,29 @@
 
     .chart-container {
       width: 100%;
-      height: 400px;
+      height: 380px;
     }
 
-    /* Bottom Input Container */
+    /* Inline Input Container */
     .input-container {
-      padding: 16px 24px 24px 24px;
-      background: #ffffff;
+      width: 100%;
+      margin-top: 8px;
+      margin-bottom: 8px;
       display: flex;
       justify-content: center;
     }
     .chat-box {
       width: 100%;
-      max-width: 900px;
       position: relative;
       display: flex;
       align-items: center;
     }
     .chat-input {
       width: 100%;
-      padding: 14px 48px 14px 20px;
-      font-size: 16px;
+      padding: 12px 48px 12px 18px;
+      font-size: 15px;
       border: 1px solid #d1d5db;
-      border-radius: 28px;
+      border-radius: 24px;
       outline: none;
       background-color: #ffffff;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
@@ -177,7 +194,7 @@
     }
     .send-btn {
       position: absolute;
-      right: 12px;
+      right: 10px;
       background: none;
       border: none;
       cursor: pointer;
@@ -189,11 +206,52 @@
     }
     .send-btn svg {
       fill: #2563eb;
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
     }
     .send-btn:hover {
       background-color: #f3f4f6;
+    }
+
+    /* Compact Footer */
+    .site-footer {
+      flex-shrink: 0;
+      background-color: #f9fafb;
+      border-top: 1px solid #e5e7eb;
+      padding: 8px 16px;
+      font-size: 11px;
+      color: #6b7280;
+      text-align: center;
+      line-height: 1.4;
+    }
+    .footer-content {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .footer-section {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .footer-section strong {
+      color: #374151;
+    }
+    .footer-section a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+    .footer-section a:hover {
+      text-decoration: underline;
+    }
+    .sponsor-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
   </style>
 </head>
@@ -215,24 +273,53 @@
           <img src="data/PYTHEAS_Logo.svg" alt="Pytheas" class="small-logo" onerror="this.src='https://via.placeholder.com/24x24?text=P'" />
           <span class="ai-card-title">Pytheas Assistant</span>
         </div>
-        <p>Ask a query to explore metrics (e.g., <em>"survival PFIC1 PFIC2"</em> or <em>"survival PFIC1 PFIC2 boys"</em>).</p>
+        <p>Ask a query to explore metrics and static subgroups (e.g., <em>"survival ATP8B1 PFIC boys"</em>, <em>"birth weight PFIC1 homozygous"</em>, <em>"ALT newborn period"</em>, or <i>"longitudinal weight"</i>).</p>
+      </div>
+    </div>
+
+    <!-- Container for dynamic AI/User messages -->
+    <div id="messagesContainer" style="display: flex; flex-direction: column; gap: 20px; width: 100%;"></div>
+
+    <!-- Dialogue Input Box Below Response Window -->
+    <div class="input-container">
+      <div class="chat-box">
+        <input type="text" id="queryInput" class="chat-input" placeholder="Ask Pytheas a question..." />
+        <button class="send-btn" onclick="submitQuery()" aria-label="Send query">
+          <svg viewBox="0 0 24 24">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+          </svg>
+        </button>
       </div>
     </div>
   </main>
 
-  <!-- Sticky Dialogue Input Box -->
-  <div class="input-container">
-    <div class="chat-box">
-      <input type="text" id="queryInput" class="chat-input" placeholder="Ask Pytheas a question..." />
-      <button class="send-btn" onclick="submitQuery()" aria-label="Send query">
-        <svg viewBox="0 0 24 24">
-          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
-        </svg>
-      </button>
+  <!-- Compact Footer -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <strong>Contact:</strong>
+        <a href="mailto:contact.pytheasdb@gmail.com">contact.pytheasdb@gmail.com</a>
+      </div>
+      <div class="footer-section">
+        <strong>Please cite:</strong>
+        <a href="https://pubmed.ncbi.nlm.nih.gov/39628627/" target="_blank" rel="noopener">Percheron, Guerry &amp; Fabre (2026)</a>
+      </div>
+      <div class="footer-section">
+        <strong>Sponsors:</strong>
+        <div class="sponsor-links">
+          <a href="https://mirumpharma.com/" target="_blank" rel="noopener">Mirum</a>
+          <a href="https://www.ipsen.com/" target="_blank" rel="noopener">Ipsen</a>
+        </div>
+      </div>
     </div>
-  </div>
+  </footer>
 
 <script>
+  // Command History State Variables
+  let queryHistory = [];
+  let historyIndex = -1;
+  let currentDraft = "";
+
   /**
    * D3.js Category Palettes
    */
@@ -255,55 +342,23 @@
     return D3_CATEGORY20[index % D3_CATEGORY20.length];
   }
 
-  // Primary Datasets
-  const fallbackDiseaseData = [
-    { 
-      name: "PFIC1", 
-      gene: "ATP8B1", 
-      aliases: ["FIC1"], 
-      patients: { boys: 51, girls: 36, total: 117 },
-      survival: {
-        all: {
-          surv_x: [0, 0.2, 0.5, 1.0, 1.5, 2.0, 2.8, 3.5, 4.2, 5.0, 7.0, 10.0, 15.0, 17.5, 18.0],
-          surv_y: [1.0, 0.99, 0.98, 0.96, 0.95, 0.93, 0.91, 0.90, 0.88, 0.86, 0.85, 0.82, 0.82, 0.82, 0.82],
-          status: ["0", "0", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "0", "0", "0"]
-        },
-        boys: {
-          surv_x: [0, 1.0, 2.0, 5.0, 10.0, 14.0],
-          surv_y: [1.0, 0.95, 0.90, 0.85, 0.80, 0.80],
-          status: ["0", "1", "1", "1", "0", "0"]
-        }
-      }
-    },
-    { 
-      name: "PFIC2", 
-      gene: "ABCB11", 
-      aliases: ["BSEP"], 
-      patients: { boys: 124, girls: 89, total: 325 },
-      survival: {
-        all: {
-          surv_x: [0, 0.3, 0.8, 1.2, 2.1, 3.2, 4.0, 5.1, 5.6, 6.2, 6.8, 8.0, 10.1, 14.8, 18.0],
-          surv_y: [1.0, 0.98, 0.97, 0.95, 0.93, 0.91, 0.90, 0.87, 0.86, 0.85, 0.84, 0.83, 0.81, 0.90, 0.88],
-          status: ["0", "1", "1", "0", "1", "1", "0", "1"]
-        },
-        boys: {
-          surv_x: [0, 1.0, 3.0, 6.0, 12.0, 18.0],
-          surv_y: [1.0, 0.94, 0.89, 0.82, 0.78, 0.75],
-          status: ["0", "1", "1", "1"]
-        }
-      }
-    }
-  ];
-
-  const fallbackSymptomData = [
-    { name: "Jaundice", code: "HP:0000952", patients: { boys: 80, girls: 50 } },
-    { name: "Pruritus", code: "HP:0000989", patients: { boys: 70, girls: 70 } },
-    { name: "Hepatomegaly", code: "HP:0002240", patients: { boys: 40, girls: 30 } }
-  ];
-
-  let diseaseData = null;
-  let symptomData = null;
+  let diseasesIndex = {};
+  let phenotypesIndex = [];
   let chartCounter = 0;
+
+  // Map PFIC types 1 to 10 directly to gene symbols
+  const PFIC_SUBTYPE_MAP = {
+    "pfic1": "ATP8B1",
+    "pfic2": "ABCB11",
+    "pfic3": "ABCB4",
+    "pfic4": "TJP2",
+    "pfic5": "NR1H4",
+    "pfic6": "SLC51A",
+    "pfic7": "USP53",
+    "pfic8": "KIF12",
+    "pfic9": "ZFYVE19",
+    "pfic10": "MYO5B"
+  };
 
   function hexToRgba(hexStr, opacity) {
     let c = hexStr.replace('#', '');
@@ -317,89 +372,195 @@
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   }
 
-  function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  }
-
   async function initData() {
     try {
-      const resDisease = await fetch('data/hp_disease_stats.json');
-      if (!resDisease.ok) throw new Error();
-      diseaseData = await resDisease.json();
+      const resDiseases = await fetch('data/diseases_index.json');
+      if (resDiseases.ok) {
+        diseasesIndex = await resDiseases.json();
+      }
     } catch (e) {
-      diseaseData = fallbackDiseaseData;
+      console.warn("Could not load data/diseases_index.json", e);
     }
 
     try {
-      const resSymptom = await fetch('data/hp_symptom_stats.json');
-      if (!resSymptom.ok) throw new Error();
-      symptomData = await resSymptom.json();
+      const resPhenotypes = await fetch('data/phenotypes_index.json');
+      if (resPhenotypes.ok) {
+        phenotypesIndex = await resPhenotypes.json();
+      }
     } catch (e) {
-      symptomData = fallbackSymptomData;
+      console.warn("Could not load data/phenotypes_index.json", e);
     }
   }
 
   function parseAndRoute(query) {
-    const normalized = query.toLowerCase().trim();
-    
-    const isSurvivalIntent = normalized.includes('survival') || normalized.includes('kaplan') || normalized.includes('outcome') || normalized.includes('death');
+    const origNorm = query.toLowerCase().trim();
+    let norm = origNorm.replace(/\bpfic\s+(\d+)\b/gi, 'pfic$1');
 
-    let dataset = (diseaseData && diseaseData.length) ? diseaseData : fallbackDiseaseData;
-    let datasetLabel = "Disease Dataset";
-    let isSymptom = false;
+    const tokens = norm.split(/[\s,;]+/).filter(Boolean);
 
-    if (normalized.includes('symptom') || normalized.includes('hp:')) {
-      dataset = (symptomData && symptomData.length) ? symptomData : fallbackSymptomData;
-      datasetLabel = "Symptom Dataset";
-      isSymptom = true;
-    }
+    // Lab Parameter
+    const labMap = {
+      "ast": "AST", "asat": "AST", "alt": "ALT", "alat": "ALT",
+      "sba": "SBA", "cb": "CB", "tb": "TB", "ptinr": "PTINR",
+      "ggt": "GGT", "alp": "ALP", "alb": "ALB", "afp": "AFP",
+      "height": "height", "weight": "weight"
+    };
 
-    let matches = dataset.filter(item => {
-      if (!item) return false;
-
-      const nameMatch = item.name ? new RegExp(`\\b${escapeRegExp(String(item.name).toLowerCase())}\\b`, 'i').test(normalized) : false;
-      const geneMatch = item.gene ? new RegExp(`\\b${escapeRegExp(String(item.gene).toLowerCase())}\\b`, 'i').test(normalized) : false;
-      const codeMatch = item.code ? new RegExp(`\\b${escapeRegExp(String(item.code).toLowerCase())}\\b`, 'i').test(normalized) : false;
-      const aliasMatch = Array.isArray(item.aliases) && item.aliases.some(a => a && new RegExp(`\\b${escapeRegExp(String(a).toLowerCase())}\\b`, 'i').test(normalized));
-      
-      return nameMatch || geneMatch || codeMatch || aliasMatch;
-    });
-
-    if (matches.length === 0 && !isSurvivalIntent) {
-      const rangeMatch = normalized.match(/(?:ratio|sex ratio)?\s*(>|<|>=|<=|over|under)\s*(\d+(?:\.\d+)?)/i);
-      if (rangeMatch) {
-        const op = rangeMatch[1];
-        const val = parseFloat(rangeMatch[2]);
-        matches = dataset.filter(item => {
-          if (!item || !item.patients) return false;
-          const ratio = item.patients.girls > 0 ? (item.patients.boys / item.patients.girls) : 0;
-          if (op === '>' || op === 'over') return ratio > val;
-          if (op === '<' || op === 'under') return ratio < val;
-          if (op === '>=') return ratio >= val;
-          if (op === '<=') return ratio <= val;
-          return true;
-        });
+    let detectedLab = null;
+    for (const token of tokens) {
+      if (labMap[token]) {
+        detectedLab = labMap[token];
+        break;
       }
     }
 
-    const targets = matches.length > 0 ? matches : dataset;
-
+    // Subgroup Routing
+    let subgroupCategory = 'all'; 
     let subgroupKey = 'all';
-    if (isSurvivalIntent) {
-      const possibleSubgroups = ['boys', 'girls', 'lof_lof', 'mis_mis', 'lof_mis'];
-      for (const sg of possibleSubgroups) {
-        if (normalized.includes(sg.replace('_', ' ')) || normalized.includes(sg)) {
-          if (sg === 'boys') subgroupKey = 'boys';
-          else if (sg === 'girls') subgroupKey = 'girls';
-          else if (sg === 'lof_lof') subgroupKey = 'LoF_LoF';
-          else if (sg === 'mis_mis') subgroupKey = 'Mis_Mis';
-          else subgroupKey = sg;
-          break;
+
+    if (norm.includes('boy') || norm.includes('male') || norm.includes('m ')) {
+      subgroupCategory = 'sex'; subgroupKey = 'M';
+    } else if (norm.includes('girl') || norm.includes('female') || norm.includes('f ')) {
+      subgroupCategory = 'sex'; subgroupKey = 'F';
+    } else if (norm.includes('homozygous')) {
+      subgroupCategory = 'zygosity'; subgroupKey = 'homozygous';
+    } else if (norm.includes('compound heterozygous')) {
+      subgroupCategory = 'zygosity'; subgroupKey = 'compound heterozygous';
+    } else if (norm.includes('heterozygous')) {
+      subgroupCategory = 'zygosity'; subgroupKey = 'heterozygous';
+    } else if (norm.includes('missense')) {
+      subgroupCategory = 'variant_type'; subgroupKey = 'missense';
+    } else if (norm.includes('frameshift') || norm.includes('fs')) {
+      subgroupCategory = 'variant_type'; subgroupKey = 'frameshift';
+    } else if (norm.includes('nonsense')) {
+      subgroupCategory = 'variant_type'; subgroupKey = 'nonsense';
+    } else if (norm.includes('newborn period') || norm.includes('0–2 months') || norm.includes('0-2 months')) {
+      subgroupCategory = 'age_of_onset_category'; subgroupKey = 'newborn period (0–2 months)';
+    } else if (norm.includes('infancy') || norm.includes('3–11 months') || norm.includes('3-11 months')) {
+      subgroupCategory = 'age_of_onset_category'; subgroupKey = 'infancy (3–11 months)';
+    } else if (norm.includes('toddler') || norm.includes('1–3 years') || norm.includes('1-3 years')) {
+      subgroupCategory = 'age_of_onset_category'; subgroupKey = 'toddler (1–3 years)';
+    } else if (norm.includes('preschooler') || norm.includes('3–5 years') || norm.includes('3-5 years')) {
+      subgroupCategory = 'age_of_onset_category'; subgroupKey = 'preschooler (3–5 years)';
+    } else if (norm.includes('middle childhood') || norm.includes('6–11 years') || norm.includes('6-11 years')) {
+      subgroupCategory = 'age_of_onset_category'; subgroupKey = 'middle childhood (6–11 years)';
+    } else if (norm.includes('adolescence') || norm.includes('12–19 years') || norm.includes('12-19 years')) {
+      subgroupCategory = 'age_of_onset_category'; subgroupKey = 'adolescence (12–19 years)';
+    } else if (norm.includes('adult') || norm.includes('> 19 years')) {
+      subgroupCategory = 'age_of_onset_category'; subgroupKey = 'adult (> 19 years)';
+    }
+
+    // Target Variable Identification
+    let variable = 'sex_ratio';
+    const hasBirthTerm = norm.includes('birth') || norm.includes('birthweight') || norm.includes('birth weight');
+    const hasLongitudinalTerm = norm.includes('longitudinal') || norm.includes('trend') || norm.includes('trajectory');
+
+    if (detectedLab) {
+      if (detectedLab === 'weight' && hasBirthTerm) {
+        variable = 'birth_weight';
+        detectedLab = null;
+      } else {
+        variable = 'longitudinal';
+      }
+    } else if (norm.includes('survival') || norm.includes('kaplan')) {
+      variable = 'survival';
+    } else if (norm.includes('variant') || norm.includes('mutation')) {
+      variable = 'variant_types';
+    } else if (norm.includes('zygosity')) {
+      variable = 'zygosity';
+    } else if (norm.includes('onset') || norm.includes('first symptom') || norm.includes('symptom age') || norm.includes('inverse survival')) {
+      variable = 'age_onset_inverse_survival';
+    } else if (norm.includes('absent')) {
+      variable = 'absent_symptom_prevalence';
+    } else if (hasBirthTerm && (norm.includes('weight') || norm.includes('wt') || !norm.includes('height'))) {
+      variable = 'birth_weight';
+    } else if (hasBirthTerm && (norm.includes('height') || norm.includes('length'))) {
+      variable = 'birth_height';
+    } else if (norm.includes('symptom') || norm.includes('phenotype') || norm.includes('prevalence')) {
+      variable = 'symptom_prevalence';
+    } else if (norm.includes('treatment') || norm.includes('therapy') || norm.includes('drug') || norm.includes('efficacy')) {
+      variable = 'treatments';
+    } else if (hasLongitudinalTerm) {
+      variable = 'longitudinal';
+      if (!detectedLab) detectedLab = 'SBA';
+    }
+
+    // Match Diseases and Subtypes
+    let matchedDiseases = [];
+    
+    // Check PFIC subtypes individually
+    Object.keys(PFIC_SUBTYPE_MAP).forEach(pficKey => {
+      const regex = new RegExp(`\\b${pficKey}\\b`, 'i');
+      if (regex.test(norm)) {
+        const geneSymbol = PFIC_SUBTYPE_MAP[pficKey];
+        const disName = pficKey.toUpperCase();
+        
+        let disObj = diseasesIndex[disName] || diseasesIndex["PFIC"] || Object.values(diseasesIndex)[0];
+        
+        if (disObj) {
+          matchedDiseases.push({
+            disease_name: disName,
+            data: disObj,
+            matchedGene: geneSymbol
+          });
         }
       }
+    });
+
+    // If no specific PFIC subtype was extracted, check standard disease keys
+    if (matchedDiseases.length === 0) {
+      Object.keys(diseasesIndex).forEach(disName => {
+        const disObj = diseasesIndex[disName];
+        const disNameNorm = disName.toLowerCase();
+        
+        const geneSubgroups = disObj.subgroups?.gene ? Object.keys(disObj.subgroups.gene) : [];
+        let foundGeneMatch = null;
+
+        for (const token of tokens) {
+          const matchedKey = geneSubgroups.find(g => g.toLowerCase() === token);
+          if (matchedKey) {
+            foundGeneMatch = matchedKey;
+            break;
+          }
+        }
+
+        if (norm.includes(disNameNorm) || foundGeneMatch) {
+          matchedDiseases.push({
+            disease_name: disName,
+            data: disObj,
+            matchedGene: foundGeneMatch
+          });
+        }
+      });
     }
 
-    return { targets, datasetLabel, isSymptom, isSurvivalIntent, subgroupKey };
+    let detectedTreatment = "";
+    matchedDiseases.forEach(m => {
+      const txs = m.data.treatment_frequencies || {};
+      Object.keys(txs).forEach(tName => {
+        if (norm.includes(tName.toLowerCase())) detectedTreatment = tName;
+      });
+    });
+
+    let matchedPhenotypes = (Array.isArray(phenotypesIndex) ? phenotypesIndex : []).filter(item => {
+      if (!item) return false;
+      const pName = String(item.name || "").toLowerCase();
+      const hpoId = String(item.hpo_id || "").toLowerCase();
+      return (pName && norm.includes(pName)) || (hpoId && norm.includes(hpoId));
+    });
+
+    const isMatched = (matchedDiseases.length > 0 || matchedPhenotypes.length > 0);
+
+    return { 
+      variable, 
+      subgroupCategory,
+      subgroupKey,
+      targetDiseases: matchedDiseases, 
+      targetPhenotypes: matchedPhenotypes, 
+      detectedLab, 
+      detectedTreatment,
+      isMatched
+    };
   }
 
   function submitQuery() {
@@ -407,76 +568,160 @@
     const query = input.value.trim();
     if (!query) return;
 
+    // Track non-duplicate commands in history
+    if (queryHistory.length === 0 || queryHistory[queryHistory.length - 1] !== query) {
+      queryHistory.push(query);
+    }
+    historyIndex = queryHistory.length;
+    currentDraft = "";
+
     appendUserMessage(query);
     input.value = '';
 
-    const { targets, datasetLabel, isSymptom, isSurvivalIntent, subgroupKey } = parseAndRoute(query);
-    appendAiResponse(query, targets, datasetLabel, isSymptom, isSurvivalIntent, subgroupKey);
+    const parsed = parseAndRoute(query);
+    appendAiResponse(query, parsed);
   }
 
   function appendUserMessage(text) {
+    const container = document.getElementById('messagesContainer');
     const stream = document.getElementById('chatStream');
     const msgDiv = document.createElement('div');
     msgDiv.className = 'message user';
     msgDiv.innerHTML = `<div class="user-bubble">${escapeHtml(text)}</div>`;
-    stream.appendChild(msgDiv);
+    container.appendChild(msgDiv);
     stream.scrollTop = stream.scrollHeight;
   }
 
-  function appendAiResponse(query, targets, datasetLabel, isSymptom, isSurvivalIntent, subgroupKey) {
+  function appendAiResponse(query, parsed) {
+    const container = document.getElementById('messagesContainer');
     const stream = document.getElementById('chatStream');
     chartCounter++;
     const chartId = `plotly-chart-${chartCounter}`;
 
-    const tableHtml = renderSummaryTable(targets, isSymptom, isSurvivalIntent, subgroupKey);
-
     const msgDiv = document.createElement('div');
     msgDiv.className = 'message ai';
+
+    if (!parsed.isMatched) {
+      const emailSubject = encodeURIComponent(`Unmatched Query Request: ${query}`);
+      const emailBody = encodeURIComponent(`Hello Pytheas DB Team,\n\nI submitted the following query which could not be matched with accessible data:\n\n"${query}"\n\nPlease let me know if this data is available or can be added.\n\nThank you!`);
+      const mailtoUrl = `mailto:contact.pytheasdb@gmail.com?subject=${emailSubject}&body=${emailBody}`;
+
+      msgDiv.innerHTML = `
+        <div class="ai-card">
+          <div class="ai-card-header">
+            <img src="data/PYTHEAS_Logo.svg" alt="Pytheas" class="small-logo" onerror="this.src='https://via.placeholder.com/24x24?text=P'" />
+            <span class="ai-card-title">Pytheas Assistant</span>
+          </div>
+          <div class="fallback-box">
+            Sorry, the request could not be matched with any currently accessible data.<br/><br/>
+            You can <a href="${mailtoUrl}">click here to send an email request to contact.pytheasdb@gmail.com</a> for assistance.
+          </div>
+        </div>
+      `;
+      container.appendChild(msgDiv);
+      stream.scrollTop = stream.scrollHeight;
+      return;
+    }
+
+    const tableHtml = renderSummaryTable(parsed);
+
+    const labels = {
+      survival: `Overall Survival`,
+      sex_ratio: `Sex Ratio Analysis`,
+      variant_types: `Variant Type Distribution`,
+      zygosity: `Zygosity Proportions`,
+      age_first_symptoms: `Age of First Symptoms (Median / Range)`,
+      age_onset_inverse_survival: `Cumulative Age of First Symptoms Onset`,
+      symptom_age_onset: `Symptom-Specific Age-of-Onset`,
+      symptom_prevalence: `Symptom Prevalence`,
+      absent_symptom_prevalence: `Absent Symptom Prevalence`,
+      birth_weight: `Birth Weight Distribution`,
+      birth_height: `Birth Height Distribution`,
+      longitudinal: `Longitudinal LOESS Trend (${parsed.detectedLab || 'Lab Metric'})`,
+      treatments: `Treatment Efficacy (${parsed.detectedTreatment || "Aggregated"})`
+    };
+
     msgDiv.innerHTML = `
       <div class="ai-card">
         <div class="ai-card-header">
           <img src="data/PYTHEAS_Logo.svg" alt="Pytheas" class="small-logo" onerror="this.src='https://via.placeholder.com/24x24?text=P'" />
-          <span class="ai-card-title">Pytheas Result (${datasetLabel}${isSurvivalIntent ? ' - ' + subgroupKey : ''})</span>
+          <span class="ai-card-title">Pytheas Result — ${labels[parsed.variable] || "Analysis"}</span>
         </div>
         ${tableHtml}
         <div id="${chartId}" class="chart-container"></div>
       </div>
     `;
-    stream.appendChild(msgDiv);
-    stream.scrollTop = stream.scrollHeight;
+    container.appendChild(msgDiv);
 
-    if (isSurvivalIntent) {
-      renderSurvivalPlot(chartId, targets, subgroupKey);
-    } else {
-      renderBarChart(chartId, targets);
+    switch (parsed.variable) {
+      case 'survival':
+        renderSurvivalPlot(chartId, parsed.targetDiseases, parsed.subgroupCategory, parsed.subgroupKey);
+        break;
+      case 'variant_types':
+      case 'zygosity':
+      case 'treatments':
+        renderStackedBarChart(chartId, parsed);
+        break;
+      case 'birth_weight':
+      case 'birth_height':
+      case 'sex_ratio':
+        renderTopRoundedBarChart(chartId, parsed);
+        break;
+      case 'age_first_symptoms':
+        renderBoxOrRangeChart(chartId, parsed);
+        break;
+      case 'age_onset_inverse_survival':
+      case 'symptom_age_onset':
+        renderInverseSurvivalPlot(chartId, parsed, parsed.subgroupCategory, parsed.subgroupKey);
+        break;
+      case 'symptom_prevalence':
+      case 'absent_symptom_prevalence':
+        renderPhenotypeBarChart(chartId, parsed.targetPhenotypes, parsed.variable);
+        break;
+      case 'longitudinal':
+        renderLongitudinalChart(chartId, parsed.targetDiseases, parsed.detectedLab, parsed.subgroupCategory, parsed.subgroupKey);
+        break;
+      default:
+        renderTopRoundedBarChart(chartId, parsed);
+        break;
     }
+
+    stream.scrollTop = stream.scrollHeight;
   }
 
-  function renderSummaryTable(targets, isSymptom, isSurvivalIntent, subgroupKey) {
-    const totalCount = targets.length;
+  function getCohortData(diseaseMatch, subgroupCategory, subgroupKey) {
+    const disObj = diseaseMatch.data;
+    
+    if (diseaseMatch.matchedGene && disObj.subgroups?.gene?.[diseaseMatch.matchedGene]) {
+      return disObj.subgroups.gene[diseaseMatch.matchedGene];
+    }
+    
+    if (subgroupCategory === 'all' || subgroupKey === 'all' || !disObj.subgroups) {
+      return disObj;
+    }
+    
+    const catObj = disObj.subgroups[subgroupCategory];
+    if (catObj && catObj[subgroupKey]) {
+      return catObj[subgroupKey];
+    }
+    
+    return disObj;
+  }
 
-    if (isSurvivalIntent) {
-      let rowsHtml = targets.map((item, index) => {
-        const cohort = (item.survival && item.survival[subgroupKey]) ? item.survival[subgroupKey] : (item.survival ? item.survival.all : null);
+  function renderSummaryTable(parsed) {
+    const { variable, targetDiseases, targetPhenotypes, subgroupCategory, subgroupKey, detectedLab, detectedTreatment } = parsed;
+
+    if (variable === 'symptom_prevalence' || variable === 'absent_symptom_prevalence') {
+      const totalCount = targetPhenotypes.length;
+      let rowsHtml = targetPhenotypes.map((item, index) => {
         const color = getD3Color(index, totalCount);
-
-        let sampleSize = item.patients?.total || "-";
-        if (cohort && cohort.status) {
-          sampleSize = cohort.status.length;
-        }
-
-        let deaths = 0;
-        if (cohort && cohort.status) {
-          deaths = cohort.status.filter(s => String(s) === "1").length;
-        }
+        const count = item.total_cases || 0;
 
         return `
           <tr>
             <td>${item.name || "Unknown"}</td>
-            <td class="gene-name">${item.gene || "-"}</td>
-            <td>${subgroupKey}</td>
-            <td>${sampleSize}</td>
-            <td>${deaths}</td>
+            <td>${item.hpo_id || "-"}</td>
+            <td>${count}</td>
             <td><span class="color-swatch" style="background-color: ${color};"></span></td>
           </tr>
         `;
@@ -487,253 +732,399 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th>DISEASE</th>
-                <th>GENE</th>
-                <th>SUBGROUP</th>
-                <th>PATIENTS</th>
-                <th>DEATHS</th>
+                <th>PHENOTYPE</th>
+                <th>HPO ID</th>
+                <th>TOTAL CASES</th>
                 <th>COLOR</th>
               </tr>
             </thead>
-            <tbody>
-              ${rowsHtml}
-            </tbody>
+            <tbody>${rowsHtml}</tbody>
           </table>
         </div>
       `;
     }
 
-    const entityHeader = isSymptom ? "SYMPTOM" : "DISEASE";
-    const subHeader = isSymptom ? "CODE" : "GENE";
-
-    let rowsHtml = targets.map((item, index) => {
+    const isOnsetVar = (variable === 'age_first_symptoms' || variable === 'age_onset_inverse_survival');
+    const totalCount = targetDiseases.length;
+    let rowsHtml = targetDiseases.map((item, index) => {
       const color = getD3Color(index, totalCount);
-      const boys = item.patients?.boys || 0;
-      const girls = item.patients?.girls || 0;
-      const total = item.patients?.total || (boys + girls);
-      const ratio = girls > 0 ? (boys / girls).toFixed(2) : "0.00";
-      const subVal = isSymptom ? (item.code || "-") : (item.gene || "-");
+      const name = item.disease_name;
+      const cohort = getCohortData(item, subgroupCategory, subgroupKey);
+      const pCount = cohort?.patient_count ?? 0;
+      let geneLabel = item.matchedGene || "All Genes";
+      let detailVal = "-";
+      let medianRangeVal = "-";
+
+      if (isOnsetVar) {
+        const stats = cohort?.first_symptom_onset_months || {};
+        const avail = stats?.available_count ?? pCount;
+        detailVal = `${avail}/${pCount}`;
+        if (stats.median !== undefined && stats.median !== null) {
+          const med = stats.median;
+          const min = stats.min ?? 0;
+          const max = stats.max ?? 0;
+          medianRangeVal = `${med} m [${min} - ${max}]`;
+        } else {
+          medianRangeVal = "N/A";
+        }
+      } else if (variable === 'sex_ratio') {
+        const boys = cohort?.phenotype_frequencies?.counts?.['M'] ?? 0;
+        const girls = cohort?.phenotype_frequencies?.counts?.['F'] ?? 0;
+        detailVal = `${boys + girls}/${pCount}`;
+      } else if (variable === 'survival') {
+        const surv = cohort?.survival?.kaplan_meier || {};
+        const avail = surv.available_count ?? pCount;
+        detailVal = `${avail}/${pCount}`;
+      } else if (variable === 'variant_types') {
+        const gf = cohort?.genotype_frequencies || {};
+        const avail = gf.available_count ?? pCount;
+        detailVal = `${avail}/${pCount}`;
+      } else if (variable === 'zygosity') {
+        const pf = cohort?.phenotype_frequencies || {};
+        const avail = pf.available_count ?? pCount;
+        detailVal = `${avail}/${pCount}`;
+      } else if (variable === 'birth_weight') {
+        const bw = cohort?.birth_measurements?.weight_grams || {};
+        const avail = bw?.available_count ?? pCount;
+        detailVal = `${avail}/${pCount}`;
+      } else if (variable === 'birth_height') {
+        const bh = cohort?.birth_measurements?.height || {};
+        const avail = bh?.available_count ?? pCount;
+        detailVal = `${avail}/${pCount}`;
+      } else if (variable === 'longitudinal') {
+        const longObj = cohort?.longitudinal_trends?.[detectedLab];
+        const cov = longObj?.patient_coverage;
+        detailVal = cov ? `${cov.patients_with_data}/${cov.total_disease_patients}` : `0/${pCount}`;
+      } else if (variable === 'treatments') {
+        detailVal = `${pCount}/${pCount}`;
+      } else {
+        detailVal = `${pCount}/${pCount}`;
+      }
+
+      if (isOnsetVar) {
+        return `
+          <tr>
+            <td>${name}</td>
+            <td class="gene-name">${geneLabel}</td>
+            <td>${pCount}</td>
+            <td>${medianRangeVal}</td>
+            <td>${detailVal}</td>
+            <td><span class="color-swatch" style="background-color: ${color};"></span></td>
+          </tr>
+        `;
+      }
 
       return `
         <tr>
-          <td>${item.name || "Unknown"}</td>
-          <td>${subVal}</td>
-          <td>${total}</td>
-          <td>${boys} / ${girls}</td>
-          <td>${ratio}</td>
+          <td>${name}</td>
+          <td class="gene-name">${geneLabel}</td>
+          <td>${pCount}</td>
+          <td>${detailVal}</td>
           <td><span class="color-swatch" style="background-color: ${color};"></span></td>
         </tr>
       `;
     }).join('');
 
+    const tableHeaders = isOnsetVar ? `
+      <thead>
+        <tr>
+          <th>DISEASE</th>
+          <th>GENE SUBGROUP</th>
+          <th>PATIENTS</th>
+          <th>MEDIAN ONSET [MIN - MAX]</th>
+          <th>DATA COVERAGE</th>
+          <th>COLOR</th>
+        </tr>
+      </thead>
+    ` : `
+      <thead>
+        <tr>
+          <th>DISEASE</th>
+          <th>GENE SUBGROUP</th>
+          <th>PATIENTS</th>
+          <th>DATA COVERAGE</th>
+          <th>COLOR</th>
+        </tr>
+      </thead>
+    `;
+
     return `
       <div class="data-table-container">
         <table class="data-table">
-          <thead>
-            <tr>
-              <th>${entityHeader}</th>
-              <th>${subHeader}</th>
-              <th>PATIENTS</th>
-              <th>BOYS / GIRLS</th>
-              <th>SEX RATIO</th>
-              <th>COLOR</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rowsHtml}
-          </tbody>
+          ${tableHeaders}
+          <tbody>${rowsHtml}</tbody>
         </table>
       </div>
     `;
   }
 
-  function renderSurvivalPlot(containerId, targets, subgroupKey) {
-    const traces = [];
-    const maxXVals = [];
-    const totalTraces = targets.length;
-
-    targets.forEach((item, index) => {
-      let cohort = (item.survival && item.survival[subgroupKey]) ? item.survival[subgroupKey] : (item.survival ? item.survival.all : null);
-
-      let xVals = [0, 2, 5, 10, 15, 18];
-      let yVals = [1.0, 0.95, 0.90, 0.85, 0.82, 0.80];
-
-      if (cohort && cohort.surv_x && cohort.surv_y) {
-        xVals = cohort.surv_x;
-        yVals = cohort.surv_y;
-      } else if (item.survival && item.survival.years && item.survival.rates) {
-        xVals = item.survival.years;
-        yVals = item.survival.rates;
-      }
-
-      if (xVals && xVals.length > 0) {
-        maxXVals.push(Math.max(...xVals));
-      }
-
-      const color = getD3Color(index, totalTraces);
-
-      traces.push({
-        x: xVals,
-        y: yVals,
-        name: `${item.name} (${subgroupKey})`,
-        type: 'scatter',
-        mode: 'lines',
-        line: {
-          shape: 'hv',
-          color: color,
-          width: 2
-        },
-        hovertemplate: `<b>${item.name}</b> (${subgroupKey})<br>Years: %{x}<br>Survival: %{y:.2f}<extra></extra>`
-      });
-    });
-
-    const xMaxLimit = maxXVals.length > 0 ? Math.min(...maxXVals) : 18;
-
-    const layout = {
-      title: false,
-      showlegend: false,
-      margin: { t: 20, l: 40, r: 20, b: 45 },
-      paper_bgcolor: '#ffffff',
-      plot_bgcolor: '#ffffff',
-      xaxis: {
-        title: { text: 'Years of age', font: { size: 12, color: '#374151' } },
-        showgrid: false,
-        showline: true,
-        linecolor: '#1f1f1f',
-        linewidth: 1,
-        tickfont: { color: '#374151', size: 12 },
-        range: [0, xMaxLimit]
-      },
-      yaxis: {
-        showgrid: false,
-        showline: true,
-        linecolor: '#1f1f1f',
-        linewidth: 1,
-        tickfont: { color: '#374151', size: 12 },
-        dtick: 0.2,
-        range: [0, 1.05]
-      }
-    };
-
-    const config = { responsive: true, displayModeBar: false };
-    Plotly.newPlot(containerId, traces, layout, config);
-  }
-
-  function renderBarChart(containerId, targets) {
+  function renderTopRoundedBarChart(containerId, parsed) {
+    const { targetDiseases, variable, subgroupCategory, subgroupKey } = parsed;
     const xLabels = [];
     const yValues = [];
     const shapes = [];
     const annotations = [];
 
-    const numBars = targets.length;
-    const maxVal = Math.max(...targets.map(item => {
-      const boys = item.patients?.boys || 0;
-      const girls = item.patients?.girls || 0;
-      return girls > 0 ? (boys / girls) : 0;
-    }), 1.0);
+    const numBars = targetDiseases.length;
+    
+    targetDiseases.forEach(item => {
+      const cohort = getCohortData(item, subgroupCategory, subgroupKey);
+      xLabels.push(item.disease_name + (item.matchedGene ? ` (${item.matchedGene})` : ''));
+      let val = 0;
+      if (variable === 'birth_weight') {
+        val = cohort?.birth_measurements?.weight_grams?.median || 0;
+      } else if (variable === 'birth_height') {
+        val = cohort?.birth_measurements?.height?.median || 0;
+      } else {
+        val = cohort?.patient_count || 0;
+      }
+      yValues.push(val);
+    });
 
-    const cornerRadiusY = maxVal * 0.04; 
+    const maxVal = Math.max(...yValues, 1.0);
+    const cornerRadiusY = maxVal * 0.04;
 
-    targets.forEach((item, index) => {
-      const boys = item.patients?.boys || 0;
-      const girls = item.patients?.girls || 0;
-      const ratio = girls > 0 ? parseFloat((boys / girls).toFixed(2)) : 0;
-
-      const label = item.name || "Unknown";
-      xLabels.push(label);
-      yValues.push(ratio);
-
+    targetDiseases.forEach((item, index) => {
+      const val = yValues[index];
       const strokeColor = getD3Color(index, numBars);
       const fillColor = hexToRgba(strokeColor, 0.45);
 
       const xLeft = index - 0.28;
       const xRight = index + 0.28;
-      const rX = 0.04; 
+      const rX = 0.04;
 
       const barPath = `
         M ${xLeft},0
-        L ${xLeft},${ratio - cornerRadiusY}
-        Q ${xLeft},${ratio} ${xLeft + rX},${ratio}
-        L ${xRight - rX},${ratio}
-        Q ${xRight},${ratio} ${xRight},${ratio - cornerRadiusY}
+        L ${xLeft},${Math.max(0, val - cornerRadiusY)}
+        Q ${xLeft},${val} ${xLeft + rX},${val}
+        L ${xRight - rX},${val}
+        Q ${xRight},${val} ${xRight},${Math.max(0, val - cornerRadiusY)}
         L ${xRight},0
         Z
       `;
 
       shapes.push({
-        type: 'path',
-        path: barPath,
-        xref: 'x',
-        yref: 'y',
+        type: 'path', path: barPath,
+        xref: 'x', yref: 'y',
         fillcolor: fillColor,
         line: { color: strokeColor, width: 2 },
         layer: 'below'
       });
 
       annotations.push({
-        x: index,
-        y: ratio,
-        yshift: -22,
-        text: `${ratio.toFixed(2)}`,
-        showarrow: false,
-        font: {
-          color: '#4b5563',
-          size: 13,
-          weight: 500,
-          family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto'
-        }
+        x: index, y: val, yshift: -22,
+        text: Number.isInteger(val) ? `${val}` : `${val.toFixed(2)}`,
+        showarrow: false, font: { color: '#4b5563', size: 12, weight: 500 }
       });
     });
 
     shapes.push({
-      type: 'line',
-      xref: 'paper',
-      yref: 'y',
-      x0: 0,
-      x1: 1,
-      y0: 0,
-      y1: 0,
-      line: {
-        color: '#1f1f1f',
-        width: 2
-      },
-      layer: 'above'
+      type: 'line', xref: 'paper', yref: 'y',
+      x0: 0, x1: 1, y0: 0, y1: 0,
+      line: { color: '#1f1f1f', width: 2 }, layer: 'above'
     });
 
-    const dummyTrace = {
-      x: xLabels,
-      y: yValues,
-      type: 'scatter',
-      mode: 'markers',
-      marker: { opacity: 0 }
-    };
+    const dummyTrace = { x: xLabels, y: yValues, type: 'scatter', mode: 'markers', marker: { opacity: 0 } };
 
     const layout = {
-      title: false,
-      showlegend: false,
+      title: false, showlegend: false,
       margin: { t: 10, l: 30, r: 10, b: 40 },
-      paper_bgcolor: '#ffffff',
-      plot_bgcolor: '#ffffff',
-      shapes: shapes,
-      annotations: annotations,
-      xaxis: {
-        ticksuffix: " ",
-        automargin: true,
-        showgrid: false,
-        showline: false,
-        tickfont: { color: '#333333', size: 12 },
-        range: [-0.6, numBars - 0.4]
-      },
-      yaxis: {
-        showgrid: false,
-        showticklabels: false,
-        automargin: true,
-        range: [0, maxVal * 1.15]
-      }
+      paper_bgcolor: '#ffffff', plot_bgcolor: '#ffffff',
+      shapes: shapes, annotations: annotations,
+      xaxis: { showgrid: false, range: [-0.6, numBars - 0.4] },
+      yaxis: { showgrid: false, showticklabels: false, range: [0, maxVal * 1.15] }
     };
 
-    const config = { responsive: true, displayModeBar: false };
-    Plotly.newPlot(containerId, [dummyTrace], layout, config);
+    Plotly.newPlot(containerId, [dummyTrace], layout, { responsive: true, displayModeBar: false });
+  }
+
+  function renderSurvivalPlot(containerId, targets, subgroupCategory, subgroupKey) {
+    const traces = [];
+    const maxXVals = [];
+
+    targets.forEach((item, index) => {
+      const cohort = getCohortData(item, subgroupCategory, subgroupKey);
+      const km = cohort?.survival?.kaplan_meier;
+      if (km && km.timeline && km.survival_probability && km.timeline.length > 0) {
+        maxXVals.push(Math.max(...km.timeline));
+        traces.push({
+          x: km.timeline,
+          y: km.survival_probability,
+          name: `${item.disease_name}${item.matchedGene ? ` (${item.matchedGene})` : ''}`,
+          type: 'scatter', mode: 'lines',
+          line: { shape: 'hv', color: getD3Color(index, targets.length), width: 2 }
+        });
+      }
+    });
+
+    const layout = {
+      showlegend: false,
+      margin: { t: 20, l: 40, r: 20, b: 45 },
+      paper_bgcolor: '#ffffff', plot_bgcolor: '#ffffff',
+      xaxis: { title: 'Age (Years / Months)', showgrid: false, range: [0, maxXVals.length ? Math.max(...maxXVals) : 20] },
+      yaxis: { title: 'Overall Survival', showgrid: false, range: [0, 1.05] }
+    };
+    Plotly.newPlot(containerId, traces, layout, { responsive: true, displayModeBar: false });
+  }
+
+  function renderStackedBarChart(containerId, parsed) {
+    const { variable, targetDiseases, detectedTreatment, subgroupCategory, subgroupKey } = parsed;
+    let categories = [];
+
+    if (variable === 'variant_types') {
+      categories = ["missense", "frameshift", "nonsense", "splice_site", "deletion", "insertion"];
+    } else if (variable === 'zygosity') {
+      categories = ["homozygous", "compound heterozygous", "heterozygous"];
+    } else if (variable === 'treatments') {
+      categories = ["Response / Benefit", "Transient / Limited", "No Response / Worse", "Unknown"];
+    }
+
+    const categoryColors = ["#1f77b4", "#2ca02c", "#ff7f0e", "#9467bd", "#d62728", "#8c564b"];
+
+    const traces = categories.map((cat, cIdx) => ({
+      x: targetDiseases.map(d => d.disease_name + (d.matchedGene ? ` (${d.matchedGene})` : '')),
+      y: targetDiseases.map(d => {
+        const cohort = getCohortData(d, subgroupCategory, subgroupKey);
+        if (variable === 'variant_types') {
+          return cohort?.genotype_frequencies?.counts?.[cat] || 0;
+        } else if (variable === 'zygosity') {
+          return cohort?.phenotype_frequencies?.counts?.[cat] || 0;
+        } else if (variable === 'treatments') {
+          const txs = cohort?.treatment_frequencies || {};
+          if (detectedTreatment && txs[detectedTreatment]) {
+            return txs[detectedTreatment].efficacy?.[cat] || 0;
+          }
+          let sum = 0;
+          Object.values(txs).forEach(tx => {
+            sum += tx.efficacy?.[cat] || 0;
+          });
+          return sum;
+        }
+        return 0;
+      }),
+      name: cat, type: 'bar',
+      marker: { color: categoryColors[cIdx % categoryColors.length] }
+    }));
+
+    const layout = {
+      barmode: 'stack', showlegend: false,
+      margin: { t: 20, l: 40, r: 20, b: 40 },
+      paper_bgcolor: '#ffffff', plot_bgcolor: '#ffffff',
+      xaxis: { showgrid: false }, yaxis: { title: 'Counts', showgrid: true }
+    };
+    Plotly.newPlot(containerId, traces, layout, { responsive: true, displayModeBar: false });
+  }
+
+  function renderBoxOrRangeChart(containerId, parsed) {
+    const { targetDiseases, subgroupCategory, subgroupKey } = parsed;
+    const traces = targetDiseases.map((d, idx) => {
+      const cohort = getCohortData(d, subgroupCategory, subgroupKey);
+      const stats = cohort?.first_symptom_onset_months || {};
+      const min = stats.min ?? 0;
+      const med = stats.median ?? 0;
+      const max = stats.max ?? 0;
+
+      return {
+        x: [d.disease_name + (d.matchedGene ? ` (${d.matchedGene})` : '')],
+        y: [min, med, med, max],
+        type: 'box', name: d.disease_name,
+        marker: { color: getD3Color(idx, targetDiseases.length) }
+      };
+    });
+
+    const layout = {
+      showlegend: false, margin: { t: 20, l: 40, r: 20, b: 40 },
+      paper_bgcolor: '#ffffff', plot_bgcolor: '#ffffff',
+      yaxis: { title: 'Age (Months)', showgrid: true }
+    };
+    Plotly.newPlot(containerId, traces, layout, { responsive: true, displayModeBar: false });
+  }
+
+  function renderInverseSurvivalPlot(containerId, parsed, subgroupCategory, subgroupKey) {
+    const { targetDiseases } = parsed;
+    const traces = [];
+
+    targetDiseases.forEach((d, idx) => {
+      const cohort = getCohortData(d, subgroupCategory, subgroupKey);
+      const km = cohort?.first_symptom_onset_months?.inverse_survival_kaplan_meier;
+      if (km && km.timeline && km.survival_probability) {
+        // Invert Kaplan-Meier values: 1 - S(t) to display cumulative incidence
+        const cumulativeIncidence = km.survival_probability.map(p => 1 - p);
+
+        traces.push({
+          x: km.timeline,
+          y: cumulativeIncidence,
+          name: d.disease_name + (d.matchedGene ? ` (${d.matchedGene})` : ''),
+          mode: 'lines',
+          line: { shape: 'hv', color: getD3Color(idx, targetDiseases.length), width: 2 }
+        });
+      }
+    });
+
+    const layout = {
+      showlegend: false,
+      margin: { t: 20, l: 40, r: 20, b: 45 },
+      paper_bgcolor: '#ffffff',
+      plot_bgcolor: '#ffffff',
+      xaxis: { title: 'Age (Months)', showgrid: false },
+      yaxis: { title: 'Cumulative Symptom Onset (1 - KM)', showgrid: true, range: [0, 1.05] }
+    };
+
+    Plotly.newPlot(containerId, traces, layout, { responsive: true, displayModeBar: false });
+  }
+
+  function renderLongitudinalChart(containerId, targets, labVar, subgroupCategory, subgroupKey) {
+    const traces = [];
+    targets.forEach((d, idx) => {
+      const cohort = getCohortData(d, subgroupCategory, subgroupKey);
+      const longData = cohort?.longitudinal_trends ? cohort.longitudinal_trends[labVar] : null;
+      if (!longData) return;
+      
+      const model = longData.by_patient_age;
+      if (!model) return;
+
+      const color = getD3Color(idx, targets.length);
+      const label = d.disease_name + (d.matchedGene ? ` (${d.matchedGene})` : '');
+
+      if (model.scatter && Array.isArray(model.scatter)) {
+        const scatterX = model.scatter.map(pt => pt.x);
+        const scatterY = model.scatter.map(pt => pt.y);
+        traces.push({
+          x: scatterX, y: scatterY, name: `${label} (Obs)`,
+          mode: 'markers', type: 'scatter', marker: { color: color, opacity: 0.3, size: 6 }
+        });
+      }
+
+      if (model.trend_x && model.trend_y) {
+        traces.push({
+          x: model.trend_x, y: model.trend_y, name: `${label} (LOESS)`,
+          mode: 'lines', type: 'scatter', line: { color: color, width: 3 }
+        });
+      }
+    });
+
+    const layout = {
+      showlegend: false, margin: { t: 20, l: 50, r: 20, b: 40 },
+      paper_bgcolor: '#ffffff', plot_bgcolor: '#ffffff',
+      xaxis: { title: 'Age (Months)', showgrid: false },
+      yaxis: { title: `${labVar}`, showgrid: true }
+    };
+    Plotly.newPlot(containerId, traces, layout, { responsive: true, displayModeBar: false });
+  }
+
+  function renderPhenotypeBarChart(containerId, targets, variable) {
+    const names = targets.map(p => p.name || p.hpo_id);
+    const counts = targets.map(p => p.total_cases || 0);
+    const colors = targets.map((_, idx) => getD3Color(idx, targets.length));
+
+    const layout = {
+      showlegend: false,
+      margin: { t: 20, l: 40, r: 20, b: 60 },
+      paper_bgcolor: '#ffffff', plot_bgcolor: '#ffffff',
+      xaxis: { showgrid: false, tickangle: -25 },
+      yaxis: { title: 'Cases', showgrid: true }
+    };
+    Plotly.newPlot(containerId, [{ x: names, y: counts, type: 'bar', marker: { color: colors } }], layout, { responsive: true, displayModeBar: false });
   }
 
   function escapeHtml(text) {
@@ -742,8 +1133,43 @@
 
   window.onload = async () => {
     await initData();
-    document.getElementById('queryInput').addEventListener('keyup', (e) => {
-      if (e.key === 'Enter') submitQuery();
+
+    const queryInput = document.getElementById('queryInput');
+
+    queryInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        submitQuery();
+      } else if (e.key === 'ArrowUp') {
+        if (queryHistory.length === 0) return;
+
+        // Store active draft before stepping into history
+        if (historyIndex === queryHistory.length) {
+          currentDraft = queryInput.value;
+        }
+
+        if (historyIndex > 0) {
+          historyIndex--;
+          queryInput.value = queryHistory[historyIndex];
+
+          // Move cursor to end of text
+          setTimeout(() => {
+            queryInput.selectionStart = queryInput.selectionEnd = queryInput.value.length;
+          }, 0);
+        }
+        e.preventDefault();
+      } else if (e.key === 'ArrowDown') {
+        if (queryHistory.length === 0) return;
+
+        if (historyIndex < queryHistory.length - 1) {
+          historyIndex++;
+          queryInput.value = queryHistory[historyIndex];
+        } else if (historyIndex === queryHistory.length - 1) {
+          // Restore unsubmitted draft when returning to newest level
+          historyIndex = queryHistory.length;
+          queryInput.value = currentDraft;
+        }
+        e.preventDefault();
+      }
     });
   };
 </script>
