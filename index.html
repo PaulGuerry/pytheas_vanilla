@@ -753,9 +753,11 @@
     return diseasesIndex[key] || diseaseMatch.data;
   }
 
+
   function renderSummaryTable(parsed) {
     const { variable, targetDiseases=[], subgroupCategory, subgroupKey, detectedLab } = parsed;
     const isOnsetVar = (variable === 'age_first_symptoms' || variable === 'age_onset_inverse_survival');
+    const isSurvivalVar = (variable === 'survival');
     const totalCount = targetDiseases.length;
 
     let rowsHtml = targetDiseases.map((item, index) => {
@@ -788,10 +790,31 @@
         
         detailVal = `${totalWithSex}/${pCount}`;
         sexRatioVal = `${ratioVal} (${boys}M / ${girls}F)`;
-      } else if (variable === 'survival') {
+      } else if (isSurvivalVar) {
         const surv = cohort?.survival_km || {};
         const avail = surv.available_count ?? pCount;
         detailVal = `${avail}/${pCount}`;
+
+        // Extract milestone probabilities calculated by build_indexes.py
+        const milestones = surv.milestone_rates || {};
+        const formatRate = (rate) => rate !== null && rate !== undefined ? `${(rate * 100).toFixed(1)}%` : 'N/A';
+
+        const rate1yr = formatRate(milestones['1_year_12m']);
+        const rate5yr = formatRate(milestones['5_year_60m']);
+        const rate10yr = formatRate(milestones['10_year_120m']);
+
+        return `
+          <tr>
+            <td>${name}</td>
+            <td class="gene-name">${geneLabel}</td>
+            <td>${pCount}</td>
+            <td>${detailVal}</td>
+            <td>${rate1yr}</td>
+            <td>${rate5yr}</td>
+            <td>${rate10yr}</td>
+            <td><span class="color-swatch" style="background-color: ${color};"></span></td>
+          </tr>
+        `;
       } else if (variable === 'variant_types') {
         const vt = cohort?.genetics?.variant_types || {};
         const avail = vt.available_count ?? pCount;
@@ -867,7 +890,22 @@
       </thead>
     `;
     
-    if (isOnsetVar) {
+    if (isSurvivalVar) {
+      tableHeaders = `
+        <thead>
+          <tr>
+            <th>DISEASE</th>
+            <th>GENE SUBGROUP</th>
+            <th>PATIENTS</th>
+            <th>DATA COVERAGE</th>
+            <th>1-YR SURVIVAL</th>
+            <th>5-YR SURVIVAL</th>
+            <th>10-YR SURVIVAL</th>
+            <th>COLOR</th>
+          </tr>
+        </thead>
+      `;
+    } else if (isOnsetVar) {
       tableHeaders = `
         <thead>
           <tr>
@@ -905,7 +943,7 @@
     `;
   }
 
-  function renderTopRoundedBarChart(containerId, parsed) {
+    function renderTopRoundedBarChart(containerId, parsed) {
     const { targetDiseases, variable, subgroupCategory, subgroupKey } = parsed;
     const xLabels = [];
     const yValues = [];
@@ -994,7 +1032,7 @@
 
     Plotly.newPlot(containerId, [dummyTrace], layout, { responsive: true, displayModeBar: false });
   }
-    
+  
   function renderSurvivalPlot(containerId, targets, subgroupCategory, subgroupKey) {
     const traces = [];
     const maxXVals = [];
@@ -1004,13 +1042,29 @@
       const km = cohort?.survival_km;
       if (km && km.timeline && km.survival_probability && km.timeline.length > 0) {
         maxXVals.push(Math.max(...km.timeline));
+        const color = getD3Color(index, targets.length);
+
+        // Main survival line
         traces.push({
           x: km.timeline,
           y: km.survival_probability,
           name: `${item.disease_name}${item.matchedGene ? ` (${item.matchedGene})` : ''}`,
           type: 'scatter', mode: 'lines',
-          line: { shape: 'hv', color: getD3Color(index, targets.length), width: 2 }
+          line: { shape: 'hv', color: color, width: 2 }
         });
+
+        // 95% Confidence Interval bounds (if present)
+        if (km.ci_lower && km.ci_upper) {
+          traces.push({
+            x: [...km.timeline, ...km.timeline.slice().reverse()],
+            y: [...km.ci_upper, ...km.ci_lower.slice().reverse()],
+            fill: 'toself',
+            fillcolor: hexToRgba(color, 0.15),
+            line: { color: 'transparent' },
+            showlegend: false,
+            type: 'scatter'
+          });
+        }
       }
     });
 
@@ -1018,11 +1072,12 @@
       showlegend: false,
       margin: { t: 20, l: 40, r: 20, b: 45 },
       paper_bgcolor: '#ffffff', plot_bgcolor: '#ffffff',
-      xaxis: { title: 'Age (Years / Months)', showgrid: false, range: [0, maxXVals.length ? Math.max(...maxXVals) : 20] },
-      yaxis: { title: 'Overall Survival', showgrid: false, range: [0, 1.05] }
+      xaxis: { title: 'Age (Months)', showgrid: false, range: [0, maxXVals.length ? Math.max(...maxXVals) : 240] },
+      yaxis: { title: 'Overall Survival Rate', showgrid: false, range: [0, 1.05] }
     };
     Plotly.newPlot(containerId, traces, layout, { responsive: true, displayModeBar: false });
   }
+
 
   function renderGroupedBarChart(containerId, parsed) {
     const { variable, targetDiseases = [], detectedTreatment, subgroupCategory, subgroupKey } = parsed;
