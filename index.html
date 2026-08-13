@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pytheas DB</title>
   <!-- Plotly.js CDN -->
-  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -307,7 +307,7 @@
           <img src="data/PYTHEAS_Logo.svg" alt="Pytheas" class="small-logo" onerror="this.src='https://via.placeholder.com/24x24?text=P'" />
           <span class="ai-card-title" data-i18n="assistantTitle">Pytheas Assistant</span>
         </div>
-        <p id="welcomeMessage" data-i18n="welcomeMsg">Ask a query to explore metrics and static subgroups (e.g., <em>"survival ATP8B1 PFIC boys"</em>, <em>"birth weight PFIC1 homozygous"</em>, <em>"ALT newborn period"</em>, or <i>"longitudinal weight"</i>).</p>
+        <p id="welcomeMessage" data-i18n="welcomeMsg">Ask a query to explore metrics and static subgroups (e.g., <em>"survival ATP8B1 PFIC boys"</em>, <em>"CADD score PFIC1"</em>, <em>"ALT newborn period"</em>, or <i>"longitudinal weight"</i>).</p>
       </div>
     </div>
 
@@ -354,7 +354,7 @@
   const translations = {
     en: {
       assistantTitle: "Pytheas Assistant",
-      welcomeMsg: 'Ask a query to explore metrics and static subgroups (e.g., <em>"survival ATP8B1 PFIC boys"</em>, <em>"birth weight PFIC1 homozygous"</em>, <em>"ALT newborn period"</em>, or <i>"longitudinal weight"</i>).',
+      welcomeMsg: 'Ask a query to explore metrics and static subgroups (e.g., <em>"survival ATP8B1 PFIC boys"</em>, <em>"CADD score PFIC1"</em>, <em>"ALT newborn period"</em>, or <i>"longitudinal weight"</i>).',
       inputPlaceholder: "Ask Pytheas a question...",
       footerContact: "Contact:",
       footerCite: "Please cite:",
@@ -370,6 +370,7 @@
         patients: "PATIENTS",
         dataCoverage: "DATA COVERAGE",
         medianOnset: "MEDIAN ONSET [MIN - MAX]",
+        medianCadd: "MEDIAN CADD [MIN - MAX]",
         sexRatio: "SEX RATIO",
         surv1yr: "1-YR SURVIVAL",
         surv5yr: "5-YR SURVIVAL",
@@ -382,6 +383,7 @@
         sex_ratio: "Sex Ratio Analysis",
         variant_types: "Variant Type Distribution",
         zygosity: "Zygosity Proportions",
+        cadd_scores: "CADD Score Distribution & Categories",
         age_first_symptoms: "Age of First Symptoms (Median / Range)",
         age_onset_inverse_survival: "Cumulative Age of First Symptoms Onset",
         symptom_age_onset: "Symptom-Specific Age-of-Onset",
@@ -403,12 +405,13 @@
       categories: {
         variant: ["missense", "frameshift", "nonsense", "splice_site", "deletion", "insertion"],
         zygosity: ["homozygous", "compound heterozygous", "heterozygous"],
+        cadd: ["high (>=20)", "moderate (10-19.9)", "low (<10)"],
         treatments: ["Response / Benefit", "Transient / Limited", "No Response / Worse", "Unknown"]
       }
     },
     fr: {
       assistantTitle: "Assistant Pytheas",
-      welcomeMsg: 'Posez une question pour explorer les métriques et les sous-groupes (ex: <em>"survie ATP8B1 PFIC garçons"</em>, <em>"poids de naissance PFIC1 homozygote"</em>, <em>"ALT période néonatale"</em>, ou <i>"poids longitudinal"</i>).',
+      welcomeMsg: 'Posez une question pour explorer les métriques et les sous-groupes (ex: <em>"survie ATP8B1 PFIC garçons"</em>, <em>"score CADD PFIC1"</em>, <em>"ALT période néonatale"</em>, ou <i>"poids longitudinal"</i>).',
       inputPlaceholder: "Posez une question à Pytheas...",
       footerContact: "Contact :",
       footerCite: "Veuillez citer :",
@@ -424,6 +427,7 @@
         patients: "PATIENTS",
         dataCoverage: "COUVERTURE DES DONNÉES",
         medianOnset: "DÉBUT MÉDIAN [MIN - MAX]",
+        medianCadd: "CADD MÉDIAN [MIN - MAX]",
         sexRatio: "RATIO DES SEXES",
         surv1yr: "SURVIE À 1 AN",
         surv5yr: "SURVIE À 5 ANS",
@@ -436,6 +440,7 @@
         sex_ratio: "Analyse du ratio des sexes",
         variant_types: "Distribution des types de variants",
         zygosity: "Proportions de zygosité",
+        cadd_scores: "Distribution et catégories de scores CADD",
         age_first_symptoms: "Âge des premiers symptômes (Médiane / Étendue)",
         age_onset_inverse_survival: "Âge cumulé de début des premiers symptômes",
         symptom_age_onset: "Âge de début des symptômes spécifiques",
@@ -457,6 +462,7 @@
       categories: {
         variant: ["faux-sens", "décalage du cadre", "non-sens", "site d'épissage", "délétion", "insertion"],
         zygosity: ["homozygote", "hétérozygote composite", "hétérozygote"],
+        cadd: ["élevé (>=20)", "modéré (10-19.9)", "faible (<10)"],
         treatments: ["Réponse / Bénéfice", "Transitoire / Limité", "Pas de réponse / Pire", "Inconnu"]
       }
     }
@@ -592,207 +598,196 @@
     return matrix[a.length][b.length];
   }
 
-  function parseAndRoute(query) {
+  function extractVariableFromQuery(norm) {
+    if (/\b(survival|surv|km|kaplan)\b/i.test(norm)) return 'survival';
+    if (/\b(sex|gender|boy|boys|girl|girls|ratio)\b/i.test(norm)) return 'sex_ratio';
+    if (/\b(cadd|cadd_score|cadd_scores|cadd score|phred)\b/i.test(norm)) return 'cadd_scores';
+    if (/\b(variant|variants|mutation|mutations)\b/i.test(norm)) return 'variant_types';
+    if (/\b(zygosity|homozygous|heterozygous|compound)\b/i.test(norm)) return 'zygosity';
+    if (/\b(onset|first symptom|symptom age)\b/i.test(norm)) return 'age_first_symptoms';
+    if (/\b(birth weight|weight at birth|bw)\b/i.test(norm)) return 'birth_weight';
+    if (/\b(birth height|height at birth|length)\b/i.test(norm)) return 'birth_height';
+    if (/\b(longitudinal|trend|loess|sba|alt|ast)\b/i.test(norm)) return 'longitudinal';
+    if (/\b(treatment|treatments|therapy|drug|response)\b/i.test(norm)) return 'treatments';
+    
+    return 'survival'; // Default fallback metric
+  }
+
+  function getRandomComparisonTargets() {
+    const allKeys = Object.keys(diseasesIndex);
+    if (allKeys.length < 2) return allKeys;
+  
+    // Filter for primary disease keys or specific sub-keys if preferred
+    const validKeys = allKeys.filter(k => !k.includes(':gene:')); 
+    const pool = validKeys.length >= 2 ? validKeys : allKeys;
+  
+    const firstIdx = Math.floor(Math.random() * pool.length);
+    let secondIdx = Math.floor(Math.random() * pool.length);
+    
+    while (secondIdx === firstIdx) {
+      secondIdx = Math.floor(Math.random() * pool.length);
+    }
+  
+    return [pool[firstIdx], pool[secondIdx]];
+  }
+
+ function parseAndRoute(query) {
     const origNorm = query.toLowerCase().trim();
     let norm = normalizeQueryTypos(origNorm.replace(/\bpfic\s+(\d+)\b/gi, 'pfic$1'));
+  
+    const randomTriggers = ['?', 'example', 'random', 'exemple', 'aléatoire', 'aleatoire'];
+  
+    if (randomTriggers.includes(norm)) {
+        const [targetA, targetB] = getRandomComparisonTargets();
+        const variables = ['survival', 'cadd_scores', 'sex_ratio', 'variant_types', 'age_first_symptoms'];
+        const randomVar = variables[Math.floor(Math.random() * variables.length)];
+        
+        // Construct the explicit, deterministic query string
+        const resolvedQueryText = `${randomVar} ${targetA} vs ${targetB}`;
+    
+        const targetObjects = [targetA, targetB].map(key => ({
+          fullKey: key,
+          disease_name: key,
+          matchedGene: null,
+          data: diseasesIndex[key] || {}
+        }));
 
-    const tokens = norm.split(/[\s,;]+/).filter(Boolean);
+        return {
+              rawQuery: query,
+              targets: [targetA, targetB],
+              targetDiseases: targetObjects,
+              variable: randomVar,
+              detectedLab: 'SBA',
+              autoCorrections: [],
+              resolvedQuery: resolvedQueryText,
+              isMatched: true
+            };
+        }
 
-    // Multilingual Lab & Dimension Mappings (EN & FR)
-    const labMap = {
-      "ast": "AST", "asat": "AST", "alt": "ALT", "alat": "ALT",
-      "sba": "SBA", "cb": "CB", "tb": "TB", "ptinr": "PTINR",
-      "ggt": "GGT", "alp": "ALP", "alb": "ALB", "afp": "AFP",
-      "height": "height", "hauteur": "height", "taille": "height",
-      "weight": "weight", "poids": "weight"
-    };
+    // =========================================================================
+    // DISEASE ENTITY RESOLUTION & TYPO CORRECTION
+    // =========================================================================
+    const autoCorrections = [];
+    const matchedDiseases = [];
+  
+    const allKeys = Object.keys(diseasesIndex);
+    const baseDiseases = allKeys.filter(k => !k.includes(':'));
+  
+    // -------------------------------------------------------------------------
+    // ADD SUBTYPE ALIAS MAPPING HERE (BEFORE FUZZY/TYPO CHECK)
+    // -------------------------------------------------------------------------
 
-    let detectedLab = null;
-    for (const token of tokens) {
-      if (labMap[token]) {
-        detectedLab = labMap[token];
-        break;
+    for (const [alias, geneTarget] of Object.entries(PFIC_SUBTYPE_MAP)) {
+      const aliasRegex = new RegExp(`\\b${alias}\\b`, 'i');
+      if (aliasRegex.test(norm)) {
+        // Search index for key matching "PFIC:gene:ATP8B1" or similar
+        const matchingKey = allKeys.find(k => k.toLowerCase().includes(geneTarget.toLowerCase()));
+        if (matchingKey) {
+          matchedDiseases.push(matchingKey);
+        }
       }
     }
-
-    let subgroupCategory = 'all'; 
-    let subgroupKey = 'all';
-
-    // Multilingual Subgroup Extraction
-    if (norm.includes('boy') || norm.includes('garçon') || norm.includes('garcon') || norm.includes('male') || norm.includes('masculin') || norm.includes('m ')) {
-      subgroupCategory = 'sex'; subgroupKey = 'M';
-    } else if (norm.includes('girl') || norm.includes('fille') || norm.includes('female') || norm.includes('féminin') || norm.includes('feminin') || norm.includes('f ')) {
-      subgroupCategory = 'sex'; subgroupKey = 'F';
-    } else if (norm.includes('homozygous') || norm.includes('homozygote')) {
-      subgroupCategory = 'zygosity'; subgroupKey = 'homozygous';
-    } else if (norm.includes('compound heterozygous') || norm.includes('hétérozygote composé') || norm.includes('heterozygote compose')) {
-      subgroupCategory = 'zygosity'; subgroupKey = 'compound heterozygous';
-    } else if (norm.includes('heterozygous') || norm.includes('hétérozygote') || norm.includes('heterozygote')) {
-      subgroupCategory = 'zygosity'; subgroupKey = 'heterozygous';
-    } else if (norm.includes('missense') || norm.includes('faux-sens') || norm.includes('faux sens')) {
-      subgroupCategory = 'variant'; subgroupKey = 'missense';
-    } else if (norm.includes('frameshift') || norm.includes('décalage du cadre') || norm.includes('decalage du cadre') || norm.includes('fs')) {
-      subgroupCategory = 'variant'; subgroupKey = 'frameshift';
-    } else if (norm.includes('nonsense') || norm.includes('non-sens') || norm.includes('non sens')) {
-      subgroupCategory = 'variant'; subgroupKey = 'nonsense';
-    } else if (norm.includes('newborn period') || norm.includes('période néonatale') || norm.includes('periode neonatale') || norm.includes('0–2 months') || norm.includes('0-2 months') || norm.includes('0-2 mois')) {
-      subgroupCategory = 'onset'; subgroupKey = 'newborn period (0–2 months)';
-    } else if (norm.includes('infancy') || norm.includes('nourrisson') || norm.includes('3–11 months') || norm.includes('3-11 months') || norm.includes('3-11 mois')) {
-      subgroupCategory = 'onset'; subgroupKey = 'infancy (3–11 months)';
-    } else if (norm.includes('toddler') || norm.includes('petite enfance') || norm.includes('1–3 years') || norm.includes('1-3 years') || norm.includes('1-3 ans')) {
-      subgroupCategory = 'onset'; subgroupKey = 'toddler (1–3 years)';
-    } else if (norm.includes('preschooler') || norm.includes('préscolaire') || norm.includes('prescolaire') || norm.includes('3–5 years') || norm.includes('3-5 years') || norm.includes('3-5 ans')) {
-      subgroupCategory = 'onset'; subgroupKey = 'preschooler (3–5 years)';
-    } else if (norm.includes('middle childhood') || norm.includes('enfance') || norm.includes('6–11 years') || norm.includes('6-11 years') || norm.includes('6-11 ans')) {
-      subgroupCategory = 'onset'; subgroupKey = 'middle childhood (6–11 years)';
-    } else if (norm.includes('adolescence') || norm.includes('adolescent') || norm.includes('12–19 years') || norm.includes('12-19 years') || norm.includes('12-19 ans')) {
-      subgroupCategory = 'onset'; subgroupKey = 'adolescence (12–19 years)';
-    } else if (norm.includes('adult') || norm.includes('adulte') || norm.includes('> 19 years') || norm.includes('> 19 ans')) {
-      subgroupCategory = 'onset'; subgroupKey = 'adult (> 19 years)';
-    }
-
-    let variable = 'sex_ratio';
-    const hasBirthTerm = norm.includes('birth') || norm.includes('naissance') || norm.includes('birthweight') || norm.includes('birth weight');
-    const hasLongitudinalTerm = norm.includes('longitudinal') || norm.includes('trend') || norm.includes('tendance') || norm.includes('trajectory') || norm.includes('trajectoire');
-
-    if (detectedLab) {
-      if ((detectedLab === 'weight' || detectedLab === 'poids') && hasBirthTerm) {
-        variable = 'birth_weight';
-        detectedLab = null;
-      } else {
-        variable = 'longitudinal';
-      }
-    } else if (norm.includes('survival') || norm.includes('survie') || norm.includes('kaplan')) {
-      variable = 'survival';
-    } else if (norm.includes('variant') || norm.includes('mutation')) {
-      variable = 'variant_types';
-    } else if (norm.includes('zygosity') || norm.includes('zygosité') || norm.includes('zygosite')) {
-      variable = 'zygosity';
-    } else if (norm.includes('onset') || norm.includes('first symptom') || norm.includes('premiers symptômes') || norm.includes('premiers symptomes') || norm.includes('symptom age') || norm.includes('inverse survival')) {
-      variable = 'age_onset_inverse_survival';
-    } else if (norm.includes('absent')) {
-      variable = 'absent_symptom_prevalence';
-    } else if (hasBirthTerm && (norm.includes('weight') || norm.includes('poids') || norm.includes('wt') || (!norm.includes('height') && !norm.includes('taille')))) {
-      variable = 'birth_weight';
-    } else if (hasBirthTerm && (norm.includes('height') || norm.includes('taille') || norm.includes('hauteur') || norm.includes('length'))) {
-      variable = 'birth_height';
-    } else if (norm.includes('symptom') || norm.includes('symptôme') || norm.includes('symptome') || norm.includes('phenotype') || norm.includes('phénotype') || norm.includes('prevalence') || norm.includes('prévalence')) {
-      variable = 'symptom_prevalence';
-    } else if (norm.includes('treatment') || norm.includes('traitement') || norm.includes('therapy') || norm.includes('thérapie') || norm.includes('drug') || norm.includes('médicament') || norm.includes('efficacy') || norm.includes('efficacité')) {
-      variable = 'treatments';
-    } else if (hasLongitudinalTerm) {
-      variable = 'longitudinal';
-      if (!detectedLab) detectedLab = 'SBA';
-    }
-
-    let autoCorrections = [];
-    let matchedDiseases = [];
-
-    // Process top-level Base Diseases (keys without colons, e.g. "PFIC", "MVID")
-    const baseDiseaseKeys = Object.keys(diseasesIndex).filter(k => !k.includes(':'));
-
-    Object.keys(PFIC_SUBTYPE_MAP).forEach(pficKey => {
-      const geneSymbol = PFIC_SUBTYPE_MAP[pficKey];
-      const exactRegex = new RegExp(`\\b(${pficKey}|${geneSymbol})\\b`, 'i');
-
+  
+    // 1. Check for EXACT word-boundary matches across ALL keys (including gene sub-keys)
+    for (const key of allKeys) {
+      const searchTerm = key.includes(':') ? key.split(':').pop() : key;
+      const lowerSearch = searchTerm.toLowerCase();
+      const exactRegex = new RegExp(`\\b${lowerSearch}\\b`, 'i');
+  
       if (exactRegex.test(norm)) {
-        let disObj = diseasesIndex["PFIC"];
-        if (disObj && !matchedDiseases.some(m => m.disease_name === "PFIC" && m.matchedGene === geneSymbol)) {
-          matchedDiseases.push({
-            disease_name: "PFIC",
-            data: disObj,
-            matchedGene: geneSymbol
-          });
-        }
+        matchedDiseases.push(key);
       }
-    });
-
-    baseDiseaseKeys.forEach(disName => {
-      const disObj = diseasesIndex[disName];
-      const disNameNorm = disName.toLowerCase();
-      
-      if (disNameNorm === 'pfic' && matchedDiseases.length > 0) return;
-
-      const exactRegex = new RegExp(`\\b${disNameNorm}\\b`, 'i');
-
-      // Check available gene keys in the flat diseasesIndex
-      const availableGeneKeys = Object.keys(diseasesIndex)
-        .filter(k => k.startsWith(`${disName}:gene:`))
-        .map(k => k.split(':gene:')[1]);
-
-      let foundGeneMatch = null;
+    }
+  
+    // 2. Fall back to fuzzy matching ONLY if no matches were found from aliases or exact hits
+    if (matchedDiseases.length === 0) {
+      const tokens = norm.split(/\s+/);
       for (const token of tokens) {
-        const matchedKey = availableGeneKeys.find(g => g.toLowerCase() === token);
-        if (matchedKey) {
-          foundGeneMatch = matchedKey;
-          break;
-        }
-      }
-
-      const matchedToken = tokens.find(token => 
-        token.length >= 4 && 
-        !token.startsWith('pfic') && 
-        getLevenshteinDistance(token, disNameNorm) <= 1
-      );
-
-      if (exactRegex.test(norm) || foundGeneMatch || matchedToken) {
-        const alreadyMatched = matchedDiseases.some(m => 
-          m.disease_name.toLowerCase() === disNameNorm && m.matchedGene === foundGeneMatch
-        );
-
-        if (!alreadyMatched) {
-          matchedDiseases.push({
-            disease_name: disName,
-            data: disObj,
-            matchedGene: foundGeneMatch || null
-          });
-
-          if (matchedToken && matchedToken.toLowerCase() !== disNameNorm) {
-            autoCorrections.push({ original: matchedToken, corrected: disName });
+        if (token.length < 3) continue; 
+  
+        for (const key of baseDiseases) {
+          const lowerKey = key.toLowerCase();
+          const dist = getLevenshteinDistance(token, lowerKey);
+  
+          if (dist <= 1 && Math.abs(key.length - token.length) <= 1) {
+            matchedDiseases.push(key);
+            autoCorrections.push({ original: token, corrected: key });
+            break;
           }
         }
       }
-    }); 
+    }
   
-    let detectedTreatment = "";
-    matchedDiseases.forEach(m => {
-      const txs = m.data.treatments || {};
-      Object.keys(txs).forEach(tName => {
-        if (norm.includes(tName.toLowerCase())) detectedTreatment = tName;
-      });
+    // Deduplicate matched entities
+    let uniqueMatchedDiseases = [...new Set(matchedDiseases)].map(key => {
+      if (key.includes(':gene:')) {
+        const [baseName, geneName] = key.split(':gene:');
+        if (baseName.toLowerCase().includes(geneName.toLowerCase())) {
+          return baseName;
+        }
+      }
+      return key;
     });
-
-    const isMatched = matchedDiseases.length > 0;
-
-    return { 
-      variable, 
-      subgroupCategory,
-      subgroupKey,
-      targetDiseases: matchedDiseases, 
-      detectedLab, 
-      detectedTreatment,
-      autoCorrections,
-      isMatched
+  
+    uniqueMatchedDiseases = [...new Set(uniqueMatchedDiseases)];
+  
+    // =========================================================================
+    // VARIABLE EXTRACTION & PARSED OBJECT CONSTRUCTION
+    // =========================================================================
+    const detectedVariable = extractVariableFromQuery(norm);
+    const labMatch = norm.match(/\b(height|weight|cb|tb|ptinr|ast|alt|ggt|alp|sba|alb|afp)\b/i);
+    const detectedLab = labMatch ? labMatch[0].toUpperCase() : 'SBA';
+    const targetObjects = [...new Set(matchedDiseases)].map(key => {
+      if (key.includes(':gene:')) {
+        const [baseName, geneName] = key.split(':gene:');
+        return {
+          fullKey: key,
+          disease_name: baseName, // e.g., "PFIC"
+          matchedGene: geneName,  // e.g., "ATP8B1"
+          data: diseasesIndex[key] || {}
+        };
+      }
+      return {
+        fullKey: key,
+        disease_name: key,
+        matchedGene: null,
+        data: diseasesIndex[key] || {}
+      };
+    });
+    
+    return {
+      rawQuery: query,
+      targets: targetObjects.map(t => t.fullKey),
+      targetDiseases: targetObjects, // Pass the structured objects
+      variable: detectedVariable,
+      detectedLab: detectedLab,
+      autoCorrections: autoCorrections,
+      resolvedQuery: query,
+      isMatched: targetObjects.length > 0
     };
-  }
+  } 
 
-  function submitQuery() {
+
+
+ function submitQuery() {
     const input = document.getElementById('queryInput');
     const query = input.value.trim();
     if (!query) return;
 
-    if (queryHistory.length === 0 || queryHistory[queryHistory.length - 1] !== query) {
-      queryHistory.push(query);
+    input.value = '';
+
+    const parsed = parseAndRoute(query);
+    const finalQueryText = parsed.resolvedQuery || query;
+
+    if (queryHistory.length === 0 || queryHistory[queryHistory.length - 1] !== finalQueryText) {
+      queryHistory.push(finalQueryText);
     }
     historyIndex = queryHistory.length;
     currentDraft = "";
 
-    appendUserMessage(query);
-    input.value = '';
-
-    const parsed = parseAndRoute(query);
-    appendAiResponse(query, parsed);
-  }
+    appendUserMessage(finalQueryText);
+    appendAiResponse(finalQueryText, parsed);
+  } 
 
   function appendUserMessage(text) {
     const container = document.getElementById('messagesContainer');
@@ -875,6 +870,7 @@
       case 'sex_ratio':
         renderTopRoundedBarChart(chartId, parsed);
         break;
+      case 'cadd_scores':
       case 'age_first_symptoms':
         renderBoxOrRangeChart(chartId, parsed);
         break;
@@ -895,26 +891,24 @@
 
   // Lookup data in the flat dictionary index structure
   function getCohortData(diseaseMatch, subgroupCategory, subgroupKey) {
-    let key = diseaseMatch.disease_name;
-
-    if (diseaseMatch.matchedGene) {
-      key = `${key}:gene:${diseaseMatch.matchedGene}`;
-    }
-
+    // Use the full explicit key if available, otherwise fall back to disease_name
+    let key = diseaseMatch.fullKey || diseaseMatch.disease_name;
+  
     if (subgroupCategory !== 'all' && subgroupKey !== 'all') {
       const subKey = `${key}:${subgroupCategory}:${subgroupKey}`;
       if (diseasesIndex[subKey]) {
         return diseasesIndex[subKey];
       }
     }
-
-    return diseasesIndex[key] || diseaseMatch.data;
+  
+    return diseasesIndex[key] || diseaseMatch.data || {};
   }
 
   function renderSummaryTable(parsed) {
     const { variable, targetDiseases=[], subgroupCategory, subgroupKey, detectedLab } = parsed;
     const t = translations[currentLang].table;
     const isOnsetVar = (variable === 'age_first_symptoms' || variable === 'age_onset_inverse_survival');
+    const isCaddVar = (variable === 'cadd_scores');
     const isSurvivalVar = (variable === 'survival');
     const totalCount = targetDiseases.length;
 
@@ -926,6 +920,7 @@
       let geneLabel = item.matchedGene || t.allGenes;
       let detailVal = "-";
       let medianRangeVal = "-";
+      let medianCaddVal = "-";
       let sexRatioVal = "-";
 
       if (isOnsetVar) {
@@ -939,6 +934,18 @@
           medianRangeVal = `${med} m [${min} - ${max}]`;
         } else {
           medianRangeVal = "N/A";
+        }
+      } else if (isCaddVar) {
+        const caddStats = cohort?.genetics?.cadd_mean_scores || {};
+        const avail = caddStats?.available_count ?? 0;
+        detailVal = `${avail}/${pCount}`;
+        if (caddStats.median !== undefined && caddStats.median !== null) {
+          const med = typeof caddStats.median === 'number' ? caddStats.median.toFixed(1) : caddStats.median;
+          const min = typeof caddStats.min === 'number' ? caddStats.min.toFixed(1) : (caddStats.min ?? 0);
+          const max = typeof caddStats.max === 'number' ? caddStats.max.toFixed(1) : (caddStats.max ?? 0);
+          medianCaddVal = `${med} [${min} - ${max}]`;
+        } else {
+          medianCaddVal = "N/A";
         }
       } else if (variable === 'sex_ratio') {
         const boys = cohort?.demographics?.boys ?? 0;
@@ -989,7 +996,8 @@
         const avail = bh?.available_count ?? pCount;
         detailVal = `${avail}/${pCount}`;
       } else if (variable === 'longitudinal') {
-        const longObj = cohort?.longitudinal_trends?.[detectedLab];
+        const labKey = (detectedLab || 'SBA').toUpperCase();
+        const longObj = cohort?.longitudinal_trends?.[labKey];
         const cov = longObj?.patient_coverage;
         detailVal = cov ? `${cov.patients_with_data}/${cov.total_disease_patients}` : `0/${pCount}`;
       } else if (variable === 'treatments') {
@@ -1005,6 +1013,19 @@
             <td class="gene-name">${geneLabel}</td>
             <td>${pCount}</td>
             <td>${medianRangeVal}</td>
+            <td>${detailVal}</td>
+            <td><span class="color-swatch" style="background-color: ${color};"></span></td>
+          </tr>
+        `;
+      }
+
+      if (isCaddVar) {
+        return `
+          <tr>
+            <td>${name}</td>
+            <td class="gene-name">${geneLabel}</td>
+            <td>${pCount}</td>
+            <td>${medianCaddVal}</td>
             <td>${detailVal}</td>
             <td><span class="color-swatch" style="background-color: ${color};"></span></td>
           </tr>
@@ -1070,6 +1091,19 @@
             <th>${t.geneSubgroup}</th>
             <th>${t.patients}</th>
             <th>${t.medianOnset}</th>
+            <th>${t.dataCoverage}</th>
+            <th>${t.color}</th>
+          </tr>
+        </thead>
+      `;
+    } else if (isCaddVar) {
+      tableHeaders = `
+        <thead>
+          <tr>
+            <th>${t.disease}</th>
+            <th>${t.geneSubgroup}</th>
+            <th>${t.patients}</th>
+            <th>${t.medianCadd}</th>
             <th>${t.dataCoverage}</th>
             <th>${t.color}</th>
           </tr>
@@ -1247,6 +1281,9 @@
     } else if (variable === 'zygosity') {
       keys = ["homozygous", "compound heterozygous", "heterozygous"];
       categories = catT.zygosity;
+    } else if (variable === 'cadd_scores') {
+      keys = ["high (>=20)", "moderate (10-19.9)", "low (<10)"];
+      categories = catT.cadd;
     } else if (variable === 'treatments') {
       keys = ["Response / Benefit", "Transient / Limited", "No Response / Worse", "Unknown"];
       categories = catT.treatments;
@@ -1262,6 +1299,8 @@
           return cohort?.genetics?.variant_types?.counts?.[catKey] || 0;
         } else if (variable === 'zygosity') {
           return cohort?.genetics?.zygosity?.counts?.[catKey] || 0;
+        } else if (variable === 'cadd_scores') {
+          return cohort?.genetics?.cadd_tiers?.counts?.[catKey] || 0;
         } else if (variable === 'treatments') {
           const txs = cohort?.treatments || {};
           if (detectedTreatment && txs[detectedTreatment]) {
@@ -1281,7 +1320,7 @@
         y: yValues,
         name: label,
         type: 'bar',
-        marker: { color: color }
+        marker: { color: color, cornerradius: 8 }
       };
     });
 
@@ -1300,30 +1339,83 @@
   }
 
   function renderBoxOrRangeChart(containerId, parsed) {
-    const { targetDiseases=[], subgroupCategory, subgroupKey } = parsed;
+    const { targetDiseases = [], variable, subgroupCategory, subgroupKey } = parsed;
     const t = translations[currentLang].chart;
-
-    const traces = targetDiseases.map((d, idx) => {
+  
+    const xLabels = [];
+    const yMedians = [];
+    const errorPlus = [];
+    const errorMinus = [];
+    const markerColors = [];
+  
+    targetDiseases.forEach((d, idx) => {
       const cohort = getCohortData(d, subgroupCategory, subgroupKey);
-      const stats = cohort?.data_availability?.first_symptom_months || {};
+      
+      const stats = (variable === 'cadd_scores') 
+        ? cohort?.genetics?.cadd_mean_scores || {} 
+        : cohort?.data_availability?.first_symptom_months || {};
+  
       const min = stats.min ?? 0;
       const med = stats.median ?? 0;
       const max = stats.max ?? 0;
-
-      return {
-        x: [d.disease_name + (d.matchedGene ? ` (${d.matchedGene})` : '')],
-        y: [min, med, med, max],
-        type: 'box', name: d.disease_name,
-        marker: { color: getD3Color(idx, targetDiseases.length) }
-      };
+  
+      const label = d.disease_name + (d.matchedGene ? ` (${d.matchedGene})` : '');
+      
+      xLabels.push(label);
+      yMedians.push(med);
+      errorPlus.push(Math.max(0, max - med));
+      errorMinus.push(Math.max(0, med - min));
+      markerColors.push(getD3Color(idx, targetDiseases.length));
     });
-
-    const layout = {
-      showlegend: false, margin: { t: 20, l: 40, r: 20, b: 40 },
-      paper_bgcolor: '#ffffff', plot_bgcolor: '#ffffff',
-      yaxis: { title: t.ageMonths, showgrid: true }
+  
+    const trace = {
+      x: xLabels,
+      y: yMedians,
+      type: 'scatter',
+      mode: 'markers',
+      marker: {
+        size: 10,
+        color: markerColors
+      },
+      error_y: {
+        type: 'data',
+        symmetric: false,
+        array: errorPlus,
+        arrayminus: errorMinus,
+        color: '#4b5563',
+        thickness: 2,
+        width: 8
+      },
+      hovertemplate: variable === 'cadd_scores' 
+        ? '<b>%{x}</b><br>Median CADD: %{y}<br>Range: [%{customdata.min} - %{customdata.max}]<extra></extra>'
+        : '<b>%{x}</b><br>Median Age: %{y}m<extra></extra>',
+      customdata: targetDiseases.map((d, idx) => {
+        const cohort = getCohortData(d, subgroupCategory, subgroupKey);
+        const stats = (variable === 'cadd_scores') 
+          ? cohort?.genetics?.cadd_mean_scores || {} 
+          : cohort?.data_availability?.first_symptom_months || {};
+        return { min: stats.min ?? 0, max: stats.max ?? 0 };
+      })
     };
-    Plotly.newPlot(containerId, traces, layout, { responsive: true, displayModeBar: false });
+  
+    const layout = {
+      showlegend: false,
+      margin: { t: 30, l: 50, r: 30, b: 50 },
+      paper_bgcolor: '#ffffff',
+      plot_bgcolor: '#ffffff',
+      xaxis: { 
+        showgrid: false,
+        // Adds comfortable padding on the left and right sides
+        range: [-0.6, xLabels.length - 0.4] 
+      },
+      yaxis: { 
+        title: variable === 'cadd_scores' ? 'Median CADD Score [Min - Max]' : t.ageMonths, 
+        showgrid: true,
+        zeroline: false
+      }
+    };
+  
+    Plotly.newPlot(containerId, [trace], layout, { responsive: true, displayModeBar: false });
   }
 
   function renderInverseSurvivalPlot(containerId, parsed, subgroupCategory, subgroupKey) {
@@ -1363,6 +1455,8 @@
     const traces = [];
     const t = translations[currentLang].chart;
 
+    const labKey = (labVar || 'SBA').toUpperCase();
+
     targets.forEach((d, idx) => {
       const cohort = getCohortData(d, subgroupCategory, subgroupKey);
       const longData = cohort?.longitudinal_trends ? cohort.longitudinal_trends[labVar] : null;
@@ -1371,7 +1465,7 @@
       const model = longData.by_patient_age;
       if (!model) return;
 
-      const color = getD3Color(idx, targets.length);
+      color = getD3Color(idx, targets.length);
       const label = d.disease_name + (d.matchedGene ? ` (${d.matchedGene})` : '');
 
       if (model.scatter && Array.isArray(model.scatter)) {
