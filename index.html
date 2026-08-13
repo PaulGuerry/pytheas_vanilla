@@ -610,37 +610,52 @@
   }
 
   function getRandomComparisonTargets() {
-    const keys = Object.keys(diseasesIndex || {});
-    if (keys.length < 2) return keys;
+    const allKeys = Object.keys(diseasesIndex || {});
+    if (allKeys.length < 2) return allKeys;
   
-    const mode = Math.random() < 0.5 ? 'top_level' : 'same_disease_subgroup';
+    // 1. Extract strictly Top-Level Diseases (e.g. "PFIC", "ARC syndrome")
+    const topLevelDiseases = allKeys.filter(k => !k.includes(':'));
   
-    if (mode === 'top_level') {
-      const topLevelKeys = keys.filter(k => !k.includes(':'));
-      if (topLevelKeys.length >= 2) {
-        const shuffled = topLevelKeys.sort(() => 0.5 - Math.random());
-        return [shuffled[0], shuffled[1]];
-      }
-    }
-  
-    const diseaseGroups = {};
-    keys.forEach(k => {
-      const root = k.split(':')[0];
-      if (!diseaseGroups[root]) diseaseGroups[root] = [];
-      diseaseGroups[root].push(k);
+    // 2. Extract strictly Gene-Level Subgroups (e.g. "PFIC:gene:ATP8B1")
+    // Excludes further nested keys containing extra colons (like :cadd: or :sex:)
+    const geneSubgroups = allKeys.filter(k => {
+      const parts = k.split(':');
+      return parts.length === 3 && parts[1] === 'gene';
     });
   
-    const rootsWithSubgroups = Object.keys(diseaseGroups).filter(root => diseaseGroups[root].length >= 2);
+    // Group gene subgroups by their parent disease
+    const diseaseGeneMap = {};
+    geneSubgroups.forEach(k => {
+      const parent = k.split(':')[0];
+      if (!diseaseGeneMap[parent]) diseaseGeneMap[parent] = [];
+      diseaseGeneMap[parent].push(k);
+    });
   
-    if (rootsWithSubgroups.length > 0) {
-      const randomRoot = rootsWithSubgroups[Math.floor(Math.random() * rootsWithSubgroups.length)];
-      const availableSubgroups = diseaseGroups[randomRoot].sort(() => 0.5 - Math.random());
-      return [availableSubgroups[0], availableSubgroups[1]];
+    // Find parents that have at least two upper gene subgroups
+    const parentsWithMultipleGenes = Object.keys(diseaseGeneMap).filter(
+      parent => diseaseGeneMap[parent].length >= 2
+    );
+  
+    // 50/50 Chance: Compare 2 diseases OR 2 upper gene subgroups of the same disease
+    const chooseSameDiseaseSubgroups = Math.random() < 0.5;
+  
+    if (chooseSameDiseaseSubgroups && parentsWithMultipleGenes.length > 0) {
+      // Mode A: Compare 2 upper subgroups of the SAME disease
+      const randomParent = parentsWithMultipleGenes[Math.floor(Math.random() * parentsWithMultipleGenes.length)];
+      const availableGenes = diseaseGeneMap[randomParent].sort(() => 0.5 - Math.random());
+      return [availableGenes[0], availableGenes[1]];
+    } else if (topLevelDiseases.length >= 2) {
+      // Mode B: Compare 2 top-level diseases
+      const shuffledDiseases = topLevelDiseases.sort(() => 0.5 - Math.random());
+      return [shuffledDiseases[0], shuffledDiseases[1]];
     }
   
-    const shuffled = keys.sort(() => 0.5 - Math.random());
+    // Fallback if top-level keys are sparse
+    const fallbackKeys = topLevelDiseases.length >= 2 ? topLevelDiseases : allKeys;
+    const shuffled = fallbackKeys.sort(() => 0.5 - Math.random());
     return [shuffled[0], shuffled[1]];
   }
+
 
   const KNOWN_SUBGROUPS = {
     cadd_tier: {
