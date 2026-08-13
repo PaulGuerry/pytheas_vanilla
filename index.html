@@ -981,8 +981,11 @@
         `;
       } else if (variable === 'variant_types') {
         const vt = cohort?.genetics?.variant_types || {};
-        const avail = vt.available_count ?? pCount;
-        detailVal = `${avail}/${pCount}`;
+        const totalAlleles = pCount * 2;
+        const availAlleles = vt.available_count ?? totalAlleles;
+  
+        // Displays as e.g. "18/18 alleles" or "18/18"
+        detailVal = `${availAlleles}/${totalAlleles}`;
       } else if (variable === 'zygosity') {
         const zyg = cohort?.genetics?.zygosity || {};
         const avail = zyg.available_count ?? pCount;
@@ -1268,75 +1271,157 @@
     Plotly.newPlot(containerId, traces, layout, { responsive: true, displayModeBar: false });
   }
 
-  function renderGroupedBarChart(containerId, parsed) {
-    const { variable, targetDiseases = [], detectedTreatment, subgroupCategory, subgroupKey } = parsed;
-    const catT = translations[currentLang].categories;
-    const chartT = translations[currentLang].chart;
-    let categories = [];
-    let keys = [];
-
-    if (variable === 'variant_types') {
-      keys = ["missense", "frameshift", "nonsense", "splice_site", "deletion", "insertion"];
-      categories = catT.variant;
-    } else if (variable === 'zygosity') {
-      keys = ["homozygous", "compound heterozygous", "heterozygous"];
-      categories = catT.zygosity;
-    } else if (variable === 'cadd_scores') {
-      keys = ["high (>=20)", "moderate (10-19.9)", "low (<10)"];
-      categories = catT.cadd;
-    } else if (variable === 'treatments') {
-      keys = ["Response / Benefit", "Transient / Limited", "No Response / Worse", "Unknown"];
-      categories = catT.treatments;
-    }
-
-    const traces = targetDiseases.map((d, dIdx) => {
-      const cohort = getCohortData(d, subgroupCategory, subgroupKey);
-      const label = d.disease_name + (d.matchedGene ? ` (${d.matchedGene})` : '');
-      const color = getD3Color(dIdx, targetDiseases.length);
-
-      const yValues = keys.map(catKey => {
-        if (variable === 'variant_types') {
-          return cohort?.genetics?.variant_types?.counts?.[catKey] || 0;
-        } else if (variable === 'zygosity') {
-          return cohort?.genetics?.zygosity?.counts?.[catKey] || 0;
-        } else if (variable === 'cadd_scores') {
-          return cohort?.genetics?.cadd_tiers?.counts?.[catKey] || 0;
-        } else if (variable === 'treatments') {
-          const txs = cohort?.treatments || {};
-          if (detectedTreatment && txs[detectedTreatment]) {
-            return txs[detectedTreatment]?.[catKey] || 0;
-          }
-          let sum = 0;
-          Object.values(txs).forEach(tx => {
-            sum += tx?.[catKey] || 0;
-          });
-          return sum;
-        }
-        return 0;
+  function renderGroupedBarChart(targetDiseases, variable) {
+    // Define categories for variant_types
+    const categories = ['missense', 'frameshift', 'nonsense', 'splice_site', 'deletion', 'insertion'];
+  
+    const traces = targetDiseases.map((target, idx) => {
+      const data = target.data || {};
+      const cohort = target.matchedGene ? (data.genes?.[target.matchedGene] || {}) : data;
+      const pCount = cohort.patient_count || 0;
+      
+      // Total alleles = 2 * patients (fallback to vt.available_count if explicitly provided)
+      const vt = cohort.genetics?.variant_types || {};
+      const totalAlleles = vt.available_count ?? (pCount * 2);
+  
+      const countsObj = vt.counts || vt || {};
+  
+      // Map counts to percentage of total alleles
+      const yValues = categories.map(cat => {
+        const count = countsObj[cat] || 0;
+        return totalAlleles > 0 ? (count / totalAlleles) * 100 : 0;
       });
-
+  
+      // Label for trace legend
+      const legendName = target.matchedGene 
+        ? `${target.disease_name} (${target.matchedGene})` 
+        : target.disease_name;
+  
       return {
         x: categories,
         y: yValues,
-        name: label,
+        name: legendName,
         type: 'bar',
-        marker: { color: color, cornerradius: 8 }
+        marker: {
+          color: PALETTE[idx % PALETTE.length],
+          cornerradius: 8 // Enforce rounded bars
+        },
+        hovertemplate: `<b>%{x}</b><br>%{y:.1f}%<extra></extra>`
       };
     });
-
+  
     const layout = {
       barmode: 'group',
-      showlegend: true,
-      legend: { orientation: 'h', y: 1.15, x: 0.5, xanchor: 'center' },
-      margin: { t: 40, l: 40, r: 20, b: 40 },
-      paper_bgcolor: '#ffffff',
-      plot_bgcolor: '#ffffff',
-      xaxis: { showgrid: false },
-      yaxis: { title: chartT.counts, showgrid: true }
+      margin: { t: 30, r: 20, l: 60, b: 40 },
+      yaxis: {
+        title: 'Percentage of Alleles (%)', // Updated Y-axis title
+        ticksuffix: '%',                    // Appends % to Y-axis ticks
+        gridcolor: '#e2e8f0',
+        zerolinecolor: '#cbd5e1'
+      },
+      xaxis: {
+        tickangle: 0
+      },
+      legend: {
+        orientation: 'h',
+        x: 0.5,
+        xanchor: 'center',
+        y: 1.15
+      }
     };
-
-    Plotly.newPlot(containerId, traces, layout, { responsive: true, displayModeBar: false });
+  
+    Plotly.newPlot('chart-container', traces, layout, { responsive: true, displayModeBar: false });
   }
+
+    function renderGroupedBarChart(containerId, parsed) {
+        const { variable, targetDiseases = [], detectedTreatment, subgroupCategory, subgroupKey } = parsed;
+        const catT = translations[currentLang].categories;
+        const chartT = translations[currentLang].chart;
+        let categories = [];
+        let keys = [];
+    
+        if (variable === 'variant_types') {
+          keys = ["missense", "frameshift", "nonsense", "splice_site", "deletion", "insertion"];
+          categories = catT.variant;
+        } else if (variable === 'zygosity') {
+          keys = ["homozygous", "compound heterozygous", "heterozygous"];
+          categories = catT.zygosity;
+        } else if (variable === 'cadd_scores') {
+          keys = ["high (>=20)", "moderate (10-19.9)", "low (<10)"];
+          categories = catT.cadd;
+        } else if (variable === 'treatments') {
+          keys = ["Response / Benefit", "Transient / Limited", "No Response / Worse", "Unknown"];
+          categories = catT.treatments;
+        }
+    
+        const traces = targetDiseases.map((d, dIdx) => {
+          const cohort = getCohortData(d, subgroupCategory, subgroupKey);
+          const label = d.disease_name + (d.matchedGene ? ` (${d.matchedGene})` : '');
+          const color = getD3Color(dIdx, targetDiseases.length);
+    
+          const yValues = keys.map(catKey => {
+            if (variable === 'variant_types') {
+              const rawCount = cohort?.genetics?.variant_types?.counts?.[catKey] || 0;
+              const pCount = cohort?.patient_count || 0;
+              
+              // Total alleles = 2 per patient (or available_count if explicitly provided)
+              const totalAlleles = cohort?.genetics?.variant_types?.available_count ?? (pCount * 2);
+              
+              // Calculate percentage of all alleles
+              return totalAlleles > 0 ? (rawCount / totalAlleles) * 100 : 0;
+            } else if (variable === 'zygosity') {
+              return cohort?.genetics?.zygosity?.counts?.[catKey] || 0;
+            } else if (variable === 'cadd_scores') {
+              return cohort?.genetics?.cadd_tiers?.counts?.[catKey] || 0;
+            } else if (variable === 'treatments') {
+              const txs = cohort?.treatments || {};
+              if (detectedTreatment && txs[detectedTreatment]) {
+                return txs[detectedTreatment]?.[catKey] || 0;
+              }
+              let sum = 0;
+              Object.values(txs).forEach(tx => {
+                sum += tx?.[catKey] || 0;
+              });
+              return sum;
+            }
+            return 0;
+          });
+    
+          return {
+            x: categories,
+            y: yValues,
+            name: label,
+            type: 'bar',
+            marker: { color: color, cornerradius: 8 },
+            hovertemplate: variable === 'variant_types' 
+              ? `<b>%{x}</b><br>%{y:.1f}%<extra></extra>` 
+              : `<b>%{x}</b><br>%{y}<extra></extra>`
+          };
+        });
+    
+        // Dynamic Y-axis label and styling based on variable type
+        const isVariantTypes = variable === 'variant_types';
+        const yAxisTitle = isVariantTypes ? (chartT.allele_percentage || 'Percentage of Alleles (%)') : chartT.counts;
+    
+        const layout = {
+          barmode: 'group',
+          showlegend: true,
+          legend: { orientation: 'h', y: 1.15, x: 0.5, xanchor: 'center' },
+          margin: { t: 40, l: 60, r: 20, b: 40 },
+          paper_bgcolor: '#ffffff',
+          plot_bgcolor: '#ffffff',
+          xaxis: { showgrid: false },
+          yaxis: { 
+            title: yAxisTitle, 
+            ticksuffix: isVariantTypes ? '%' : '',
+            showgrid: true 
+          }
+        };
+    
+        Plotly.newPlot(containerId, traces, layout, { responsive: true, displayModeBar: false });
+    }
+
+
 
   function renderBoxOrRangeChart(containerId, parsed) {
     const { targetDiseases = [], variable, subgroupCategory, subgroupKey } = parsed;
