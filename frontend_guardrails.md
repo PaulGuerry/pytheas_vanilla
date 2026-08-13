@@ -45,6 +45,7 @@
 * **Random Sampling Behavior:**
   * Must randomly sample **two distinct dataset keys** (either two different diseases or two subgroups/genes) from `diseasesIndex`.
   * Must randomly sample one valid variable type (e.g., `survival`, `cadd_scores`, `sex_ratio`, `variant_types`, `age_first_symptoms`).
+  * Must compare either two upper subgroups of the same disease or two diseases for an upper level variable (no nesting below the subgroup)
 * **Deterministic Query Resolution & History Push:**
   * The router must return a `resolvedQuery` property containing the explicit string format: `"<variable> <DatasetA> vs <DatasetB>"`.
   * The standard submission workflow (`submitQuery`) **must** update the `queryHistory` array using `resolvedQuery` rather than the raw trigger word (`"random"`/`"example"`), allowing the user to navigate back to the generated comparison via arrow keys.
