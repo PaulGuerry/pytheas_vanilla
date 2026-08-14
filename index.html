@@ -704,11 +704,18 @@
 
 
 
-  function parseAndRoute(query) {
+  async function parseAndRoute(query) {
     const origNorm = query.toLowerCase().trim();
     let norm = normalizeQueryTypos(origNorm.replace(/\bpfic\s+(\d+)\b/gi, 'pfic$1'));
   
-    // 1. RANDOM / EXAMPLE TRIGGER MATCHING
+
+    // 1. CHECK IF QUERY IS A CLUSTER QUERY
+    const isClusterQuery = await handleClusterQuery(norm);
+    if (isClusterQuery) {
+        return { isCluster: true, isMatched: true };
+    }
+    
+    // 2. RANDOM / EXAMPLE TRIGGER MATCHING
     const randomTriggers = ["random", "example", "exemple", "aléatoire", "aleatoire", "?"];
     if (randomTriggers.includes(origNorm)) {
       // Sample two distinct dataset keys
@@ -730,12 +737,12 @@
       const constructedQuery = `${randomVar} ${targetA} vs ${targetB}`;
   
       // Re-route internally using the explicit constructed query
-      const rerouted = parseAndRoute(constructedQuery);
+      const rerouted = await parseAndRoute(constructedQuery);
       rerouted.resolvedQuery = constructedQuery; // Store deterministic query format
       return rerouted;
     }
   
-    // 2. Standard Variable & Subgroup Parsing
+    // 3. Standard Variable & Subgroup Parsing
     const detectedVariable = extractVariableFromQuery(norm);
     const labMatch = norm.match(/\b(height|weight|cb|tb|ptinr|ast|alt|ggt|alp|sba|alb|afp)\b/i);
     const detectedLab = labMatch ? labMatch[0].toUpperCase() : 'SBA';
@@ -824,14 +831,14 @@
 
 
 
-  function submitQuery() {
+  async function submitQuery() {
     const input = document.getElementById('queryInput');
     const query = input.value.trim();
     if (!query) return;
 
     input.value = '';
 
-    const parsed = parseAndRoute(query);
+    const parsed = await parseAndRoute(query);
     const finalQueryText = parsed.resolvedQuery || query;
 
     if (queryHistory.length === 0 || queryHistory[queryHistory.length - 1] !== finalQueryText) {
@@ -855,6 +862,9 @@
   }
 
   function appendAiResponse(query, parsed) {
+    // If the query was handled by the Phenotypic Cluster Module, return early
+    if (parsed && parsed.isCluster) return;
+
     const container = document.getElementById('messagesContainer');
     const stream = document.getElementById('chatStream');
     const t = translations[currentLang];
@@ -1398,7 +1408,7 @@
     }
 
     const traces = targetDiseases.map((d, dIdx) => {
-      const cohort = getCohortData(item);
+      const cohort = getCohortData(d);
       const label = d.disease_name + (d.matchedGene ? ` (${d.matchedGene})` : '');
       const color = getD3Color(dIdx, targetDiseases.length);
 
@@ -1471,7 +1481,7 @@
     const markerColors = [];
   
     targetDiseases.forEach((d, idx) => {
-      const cohort = getCohortData(item); 
+      const cohort = getCohortData(d); 
       const stats = (variable === 'cadd_scores') 
         ? cohort?.genetics?.cadd_mean_scores || {} 
         : cohort?.data_availability?.first_symptom_months || {};
@@ -1511,7 +1521,7 @@
         ? '<b>%{x}</b><br>Median CADD: %{y}<br>Range: [%{customdata.min} - %{customdata.max}]<extra></extra>'
         : '<b>%{x}</b><br>Median Age: %{y}m<extra></extra>',
       customdata: targetDiseases.map((d, idx) => {
-        const cohort = getCohortData(item);
+        const cohort = getCohortData(d);
         const stats = (variable === 'cadd_scores') 
           ? cohort?.genetics?.cadd_mean_scores || {} 
           : cohort?.data_availability?.first_symptom_months || {};
@@ -1545,7 +1555,7 @@
     const traces = [];
 
     targetDiseases.forEach((d, idx) => {
-      const cohort = getCohortData(item);
+      const cohort = getCohortData(d);
       const km = cohort?.inverse_survival_km;
       if (km && km.timeline && km.survival_probability) {
         const cumulativeIncidence = km.survival_probability.map(p => 1 - p);
@@ -1578,7 +1588,7 @@
     const t = translations[currentLang].chart;
 
     targets.forEach((d, idx) => {
-      const cohort = getCohortData(item);
+      const cohort = getCohortData(d);
       const longData = cohort?.longitudinal_trends ? cohort.longitudinal_trends[labVar] : null;
       if (!longData) return;
       
@@ -1663,5 +1673,329 @@
     });
   };
 </script>
+<script>
+// ==========================================
+// PYTHEAS - PHENOTYPIC CLUSTER MODULE
+// ==========================================
+let clusterDataCache = null;
+
+async function loadClusterData() {
+    if (clusterDataCache) return clusterDataCache;
+    try {
+        const response = await fetch('data/cluster_data.json.gz');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        if ('DecompressionStream' in window) {
+            const decompressedStream = response.body.pipeThrough(new DecompressionStream('gzip'));
+            const decompressedText = await new Response(decompressedStream).text();
+            clusterDataCache = JSON.parse(decompressedText);
+        } else {
+            clusterDataCache = await response.json();
+        }
+
+        return clusterDataCache;
+    } catch (error) {
+        console.error("Failed to load or decompress data/cluster_data.json.gz:", error);
+        return null;
+    }
+}
+
+async function handleClusterQuery(inputString) {
+    const rawTokens = inputString.trim().split(/\s+/);
+    
+    if (rawTokens[0].toLowerCase() === 'cluster') {
+        const genes = rawTokens.slice(1).map(g => g.toUpperCase()).filter(Boolean);
+        
+        if (genes.length === 0) {
+            showClusterSystemMessage("⚠️ Please specify at least one gene symbol. Example: <code>cluster ABCB4</code> or <code>cluster ABCB4 ABCB11</code>");
+            return true;
+        }
+
+        const data = await loadClusterData();
+        if (!data) {
+            showClusterSystemMessage(`
+                ⚠️ <strong>Data Unavailable:</strong> Unable to load phenotype cluster data.<br>
+                Please ensure <code>data/cluster_data.json.gz</code> is accessible or contact <a href="mailto:contact.pytheasdb@gmail.com">contact.pytheasdb@gmail.com</a> for support.
+            `);
+            return true;
+        }
+
+        renderClusterCard(genes, data);
+        return true;
+    }
+    
+    return false;
+}
+
+function showClusterSystemMessage(messageHtml) {
+  const container = document.getElementById('messagesContainer');
+  const stream = document.getElementById('chatStream');
+  if (!container) return;
+
+  const msgDiv = document.createElement('div');
+  msgDiv.className = 'message ai';
+  msgDiv.innerHTML = `
+    <div class="ai-card">
+      <div class="ai-card-header">
+        <img src="data/PYTHEAS_Logo.svg" alt="Pytheas" class="small-logo" onerror="this.src='https://via.placeholder.com/24x24?text=P'" />
+        <span class="ai-card-title">${translations[currentLang]?.assistantTitle || "Pytheas Assistant"}</span>
+      </div>
+      <div class="fallback-box" style="background:#f0fdf4; border-color:#bbf7d0; color:#166534;">
+        ${messageHtml}
+      </div>
+    </div>
+  `;
+  container.appendChild(msgDiv);
+  if (stream) stream.scrollTop = stream.scrollHeight;
+}
+
+function renderClusterCard(geneKey, data) {
+    const isFr = currentLang === 'fr';
+    const geneData = data[geneKey] || Object.values(data)[0];
+
+    if (!geneData) {
+        showClusterSystemMessage(
+            isFr 
+                ? `Aucune donnée de cluster trouvée pour ${geneKey}` 
+                : `No cluster data found for ${geneKey}`
+        );
+        return;
+    }
+
+    const clusters = geneData.clusters || [];
+    const crosstable = geneData.gene_cluster_crosstable || {};
+    const container = document.getElementById('messagesContainer');
+    const stream = document.getElementById('chatStream');
+
+    if (!container) return;
+
+    const appendCard = (cardHTML) => {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = "message ai";
+        msgDiv.innerHTML = cardHTML;
+        container.appendChild(msgDiv);
+    };
+
+    // ----------------------------------------------------
+    // BUILD TRANSPOSED CROSSTABLE (Clusters as Rows)
+    // ----------------------------------------------------
+    let tableHTML = '';
+    if (Object.keys(crosstable).length > 0) {
+        // Extract gene names (excluding 'Total')
+        const genesList = Object.keys(crosstable).filter(k => k !== 'Total').sort();
+        
+        // Extract all cluster names
+        const clusterSet = new Set();
+        Object.values(crosstable).forEach(row => {
+            Object.keys(row).forEach(k => {
+                if (k !== 'Total') clusterSet.add(k);
+            });
+        });
+        const clusterList = Array.from(clusterSet).sort();
+
+        // Build Table Header
+        let headerRow = `<th>CLUSTER</th>`;
+        genesList.forEach(g => { 
+            headerRow += `<th style="font-style: italic;">${g}</th>`; 
+        });
+        headerRow += `<th>TOTAL</th><th>COLOR</th>`;
+
+        // Build Transposed Rows
+        let bodyRows = '';
+        clusterList.forEach((clusterName, idx) => {
+            const color = getD3Color(idx, clusterList.length);
+            let rowCols = `<td style="font-weight: 600;">${clusterName.replace('_', ' ').toUpperCase()}</td>`;
+            let clusterTotal = 0;
+
+            genesList.forEach(geneName => {
+                const val = crosstable[geneName]?.[clusterName] ?? 0;
+                clusterTotal += val;
+                rowCols += `<td>${val}</td>`;
+            });
+
+            rowCols += `<td style="font-weight: 600;">${clusterTotal}</td>`;
+            rowCols += `<td><span class="color-swatch" style="background-color: ${color};"></span></td>`;
+            bodyRows += `<tr>${rowCols}</tr>`;
+        });
+
+        // Add Summary/Total Row at Bottom
+        let totalRowCols = `<td style="font-weight: 700; border-top: 2px solid #cbd5e1;">Total</td>`;
+        let grandTotal = 0;
+        genesList.forEach(geneName => {
+            const geneTotal = crosstable[geneName]?.['Total'] ?? 0;
+            grandTotal += geneTotal;
+            totalRowCols += `<td style="font-weight: 700; border-top: 2px solid #cbd5e1;">${geneTotal}</td>`;
+        });
+        totalRowCols += `<td style="font-weight: 700; border-top: 2px solid #cbd5e1;">${grandTotal}</td>`;
+        totalRowCols += `<td style="border-top: 2px solid #cbd5e1;">-</td>`;
+        bodyRows += `<tr>${totalRowCols}</tr>`;
+
+        tableHTML = `
+            <div class="data-table-container" style="overflow-x: auto; margin-bottom: 1.5rem;">
+                <table class="data-table" style="width: 100%; border-collapse: collapse;">
+                    <thead><tr>${headerRow}</tr></thead>
+                    <tbody>${bodyRows}</tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    // ----------------------------------------------------
+    // CARD 1: Combined Crosstable + UMAP Scatter Plot Card
+    // ----------------------------------------------------
+    const dims = clusters[0]?.dimensions_exported || 2;
+    const umapPlotId1 = `umap-plot1-${Date.now()}`;
+    const umapPlotId2 = `umap-plot2-${Date.now()}`;
+
+    let umapContainersHTML = '';
+    if (dims === 4) {
+        umapContainersHTML = `
+            <div style="display: flex; gap: 12px; width: 100%; height: 350px;">
+                <div id="${umapPlotId1}" style="flex: 1; height: 100%;"></div>
+                <div id="${umapPlotId2}" style="flex: 1; height: 100%;"></div>
+            </div>
+        `;
+    } else {
+        umapContainersHTML = `<div id="${umapPlotId1}" class="chart-container" style="height: 350px;"></div>`;
+    }
+
+    const combinedCardHTML = `
+        <div class="ai-card">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem;">
+                <img src="data/PYTHEAS_Logo.svg" style="height: 20px;" alt="Pytheas Logo" onerror="this.src='https://via.placeholder.com/24x24?text=P'">
+                <span style="font-weight: 600; font-size: 0.95rem; color: #334155;">
+                    ${isFr ? 'Analyse des Clusters Phénotypiques' : 'Phenotypic Cluster Analysis'}: ${geneKey}
+                </span>
+            </div>
+            ${tableHTML}
+            ${umapContainersHTML}
+        </div>
+    `;
+    appendCard(combinedCardHTML);
+
+    // ----------------------------------------------------
+    // CARDS 2+: Dedicated Symptom Cards per Cluster
+    // ----------------------------------------------------
+    const symptomPlotConfigs = [];
+    clusters.forEach((cluster, idx) => {
+        const barPlotId = `bar-plot-cluster-${idx}-${Date.now()}`;
+        symptomPlotConfigs.push({ plotId: barPlotId, cluster: cluster, index: idx });
+
+        const symptomCardHTML = `
+            <div class="ai-card">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 1rem;">
+                    <img src="data/PYTHEAS_Logo.svg" style="height: 20px;" alt="Pytheas Logo" onerror="this.src='https://via.placeholder.com/24x24?text=P'">
+                    <span style="font-weight: 600; font-size: 0.95rem; color: #334155;">
+                        ${isFr ? `Symptômes Archétypaux — Cluster ${cluster.cluster_id}` : `Archetypal Symptoms — Cluster ${cluster.cluster_id}`}
+                    </span>
+                </div>
+                <div id="${barPlotId}" class="chart-container" style="height: 320px;"></div>
+            </div>
+        `;
+        appendCard(symptomCardHTML);
+    });
+
+    if (stream) stream.scrollTop = stream.scrollHeight;
+
+    setTimeout(() => {
+        renderClusterUMAP(umapPlotId1, umapPlotId2, clusters, dims);
+        symptomPlotConfigs.forEach(cfg => {
+            renderSingleClusterSymptomChart(cfg.plotId, cfg.cluster, cfg.index, clusters.length);
+        });
+    }, 50);
+}
+
+function renderClusterUMAP(plotId1, plotId2, clusters, dimensions) {
+    const buildTraces = (xKey, yKey) => {
+        return clusters.map((c, idx) => {
+            const coords = c.umap_coordinates || {};
+            return {
+                x: coords[xKey] || [],
+                y: coords[yKey] || [],
+                mode: 'markers',
+                type: 'scatter',
+                name: `Cluster ${c.cluster_id}`,
+                marker: { size: 8, color: getD3Color(idx, clusters.length), opacity: 0.85 }
+            };
+        });
+    };
+
+    const baseLayout = {
+        margin: { l: 50, r: 20, t: 10, b: 50 },
+        autosize: true,
+        showlegend: false, // Legend removed
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent'
+    };
+
+    if (dimensions === 4) {
+        Plotly.newPlot(
+            plotId1, 
+            buildTraces('UMAP_1', 'UMAP_2'), 
+            { ...baseLayout, xaxis: { title: 'UMAP 1' }, yaxis: { title: 'UMAP 2' } }, 
+            { responsive: true, displayModeBar: false }
+        );
+        Plotly.newPlot(
+            plotId2, 
+            buildTraces('UMAP_3', 'UMAP_4'), 
+            { ...baseLayout, xaxis: { title: 'UMAP 3' }, yaxis: { title: 'UMAP 4' } }, 
+            { responsive: true, displayModeBar: false }
+        );
+    } else {
+        Plotly.newPlot(
+            plotId1, 
+            buildTraces('UMAP_1', 'UMAP_2'), 
+            { ...baseLayout, xaxis: { title: 'UMAP 1' }, yaxis: { title: 'UMAP 2' } }, 
+            { responsive: true, displayModeBar: false }
+        );
+    }
+}
+
+
+
+function renderSingleClusterSymptomChart(containerId, cluster, clusterIndex, totalClusters) {
+    const isFr = currentLang === 'fr';
+    const symptoms = (cluster.archetypal_signatures || []).slice(0, 10);
+    const labels = symptoms.map(s => s.description || s.hpo_code);
+    const values = symptoms.map(s => s.prevalence_percent);
+    const color = getD3Color(clusterIndex, totalClusters);
+
+    const strokeColor = getD3Color(clusterIndex, totalClusters);
+    const fillColor = hexToRgba(strokeColor, 0.45); // Semi-transparent fill
+
+    const trace = {
+        x: labels,
+        y: values,
+        name: `Cluster ${cluster.cluster_id}`,
+        type: 'bar',
+        marker: { 
+            color: fillColor,
+            line: {
+                color: strokeColor,
+                width: 2
+            },
+            cornerradius: 6 // Rounded top corners
+        }
+    };
+
+    const layout = {
+        margin: { l: 50, r: 20, t: 15, b: 100 },
+        autosize: true,
+        showlegend: false,
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        yaxis: {
+            title: isFr ? 'Prévalence (%)' : 'Prevalence (%)',
+            range: [0, 105]
+        },
+        xaxis: { tickangle: -30 }
+    };
+
+    Plotly.newPlot(containerId, [trace], layout, { responsive: true, displayModeBar: false });
+}
+
+</script>
+
+
 </body>
 </html>
