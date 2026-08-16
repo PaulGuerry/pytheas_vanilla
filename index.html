@@ -680,6 +680,81 @@
     }
   };
 
+
+  const ABBREVIATIONS = {
+    'aspartate aminotransferase': 'AST',
+    'alanine aminotransferase': 'ALT',
+    'gamma-glutamyltransferase': 'GGT',
+    'alpha-fetoprotein': 'AFP'
+  };
+  
+  // Words to strip out completely to save space
+  const REMOVAL_WORDS = ['circulating', 'concentration', 'level'];
+  
+  function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  function formatText(str, maxCharsPerLine = 25, map = ABBREVIATIONS, stripList = REMOVAL_WORDS) {
+    if (!str) return '';
+  
+    let text = str;
+  
+    // 1. Strip redundant words (case-insensitive)
+    stripList.forEach(word => {
+      const stripRegex = new RegExp(`\\b${word}\\b\\s*`, 'gi');
+      text = text.replace(stripRegex, '');
+    });
+  
+    // 2. Replace mapped medical terms
+    Object.keys(map).forEach(key => {
+      const mapRegex = new RegExp(`\\b${escapeRegExp(key)}\\b`, 'gi');
+      text = text.replace(mapRegex, map[key]);
+    });    
+  
+    // 3. Clean up any accidental double spaces left behind
+    text = text.replace(/\s+/g, ' ').trim();
+  
+    return wrapText(text, maxCharsPerLine);
+  }
+  
+   function wrapText(str, maxCharsPerLine = 25) {
+    if (!str) return '';
+    
+    const words = str.split(' ');
+    const lines = [];
+    let currentLine = '';
+  
+    words.forEach(word => {
+      // If a single word is longer than max limit, force a hyphenated break
+      if (word.length > maxCharsPerLine) {
+        if (currentLine) {
+          lines.push(currentLine);
+          currentLine = '';
+        }
+        for (let i = 0; i < word.length; i += maxCharsPerLine - 1) {
+          const chunk = word.slice(i, i + maxCharsPerLine - 1);
+          const isLastChunk = i + maxCharsPerLine - 1 >= word.length;
+          lines.push(isLastChunk ? chunk : `${chunk}-`);
+        }
+        return;
+      }
+  
+      // Check if adding the word exceeds line limit
+      const testLine = currentLine ? `${currentLine} ${word}` : word;
+      if (testLine.length <= maxCharsPerLine) {
+        currentLine = testLine;
+      } else {
+        lines.push(currentLine);
+        currentLine = word;
+      }
+    });
+  
+    if (currentLine) lines.push(currentLine);
+  
+    return lines.join('<br>');
+  }
+
   function extractSubgroupFromSegment(seg) {
     if (!seg) return { category: null, key: null };
     const normSeg = seg.toLowerCase();
@@ -1957,6 +2032,7 @@ function renderSingleClusterSymptomChart(containerId, cluster, clusterIndex, tot
     const isFr = currentLang === 'fr';
     const symptoms = (cluster.archetypal_signatures || []).slice(0, 10);
     const labels = symptoms.map(s => s.description || s.hpo_code);
+    const wrappedLabels = labels.map(label => formatText(label, 25));
     const values = symptoms.map(s => s.prevalence_percent);
     const color = getD3Color(clusterIndex, totalClusters);
 
@@ -1964,7 +2040,7 @@ function renderSingleClusterSymptomChart(containerId, cluster, clusterIndex, tot
     const fillColor = hexToRgba(strokeColor, 0.45); // Semi-transparent fill
 
     const trace = {
-        x: labels,
+        x: wrappedLabels,
         y: values,
         name: `Cluster ${cluster.cluster_id}`,
         type: 'bar',
@@ -1988,7 +2064,7 @@ function renderSingleClusterSymptomChart(containerId, cluster, clusterIndex, tot
             title: isFr ? 'Prévalence (%)' : 'Prevalence (%)',
             range: [0, 105]
         },
-        xaxis: { tickangle: -30 }
+        xaxis: { tickangle: -30, automargin: true }
     };
 
     Plotly.newPlot(containerId, [trace], layout, { responsive: true, displayModeBar: false });
