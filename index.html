@@ -1824,21 +1824,44 @@ function showClusterSystemMessage(messageHtml) {
   if (stream) stream.scrollTop = stream.scrollHeight;
 }
 
-function renderClusterCard(geneKey, data) {
+
+function renderClusterCard(genes, data) {
     const isFr = currentLang === 'fr';
-    const geneData = data[geneKey] || Object.values(data)[0];
 
-    if (!geneData) {
-        showClusterSystemMessage(
-            isFr 
-                ? `Aucune donnée de cluster trouvée pour ${geneKey}` 
-                : `No cluster data found for ${geneKey}`
-        );
-        return;
+    // 1. Extract requested gene keys into a clean array
+    const requestedGenes = Array.isArray(genes)
+        ? genes.map(g => String(g).trim())
+        : String(genes || '').split(',').map(g => g.trim()).filter(Boolean);
+    
+    // Helper function to generate all permutations of an array
+    const getPermutations = (arr) => {
+        if (arr.length <= 1) return [arr];
+        const permutations = [];
+        const subPerms = getPermutations(arr.slice(1));
+        for (const sub of subPerms) {
+            for (let i = 0; i <= sub.length; i++) {
+                permutations.push([...sub.slice(0, i), arr[0], ...sub.slice(i)]);
+            }
+        }
+        return permutations;
+    };
+
+    // 2. Build underscore keys for every possible order of requested genes
+    const genePermutations = getPermutations(requestedGenes);
+    const underscoreKeys = genePermutations.map(p => p.join('_'));
+
+    // Find the first matching key in data across all order permutations
+    let geneObj = {};
+    for (const key of underscoreKeys) {
+        if (data[key]) {
+            geneObj = data[key];
+            break;
+        }
     }
+    
+    const crosstable = geneObj.gene_cluster_crosstable || {};
+    const clusters = geneObj.clusters || [];
 
-    const clusters = geneData.clusters || [];
-    const crosstable = geneData.gene_cluster_crosstable || {};
     const container = document.getElementById('messagesContainer');
     const stream = document.getElementById('chatStream');
 
@@ -1856,17 +1879,28 @@ function renderClusterCard(geneKey, data) {
     // ----------------------------------------------------
     let tableHTML = '';
     if (Object.keys(crosstable).length > 0) {
-        // Extract gene names (excluding 'Total')
-        const genesList = Object.keys(crosstable).filter(k => k !== 'Total').sort();
-        
-        // Extract all cluster names
+        // Filter out 'Total' to get exact gene column names
+        const genesList = requestedGenes.length > 0 
+            ? requestedGenes 
+            : Object.keys(crosstable).filter(k => k !== 'Total');
+
+        // Extract and sort cluster keys dynamically (e.g., Cluster_0, Cluster_1, ...)
         const clusterSet = new Set();
-        Object.values(crosstable).forEach(row => {
-            Object.keys(row).forEach(k => {
-                if (k !== 'Total') clusterSet.add(k);
-            });
+        genesList.forEach(geneName => {
+            const row = crosstable[geneName];
+            if (row && typeof row === 'object') {
+                Object.keys(row).forEach(k => {
+                    if (k !== 'Total') clusterSet.add(k);
+                });
+            }
         });
-        const clusterList = Array.from(clusterSet).sort();
+        
+        // Sort clusters numerically by their cluster ID
+        const clusterList = Array.from(clusterSet).sort((a, b) => {
+            const numA = parseInt(a.replace(/\D/g, ''), 10) || 0;
+            const numB = parseInt(b.replace(/\D/g, ''), 10) || 0;
+            return numA - numB;
+        });
 
         // Build Table Header
         let headerRow = `<th>CLUSTER</th>`;
@@ -1897,7 +1931,10 @@ function renderClusterCard(geneKey, data) {
         let totalRowCols = `<td style="font-weight: 700; border-top: 2px solid #cbd5e1;">Total</td>`;
         let grandTotal = 0;
         genesList.forEach(geneName => {
-            const geneTotal = crosstable[geneName]?.['Total'] ?? 0;
+            let geneTotal = crosstable[geneName]?.['Total'];
+            if (geneTotal === undefined) {
+                geneTotal = clusterList.reduce((sum, c) => sum + (crosstable[geneName]?.[c] ?? 0), 0);
+            }
             grandTotal += geneTotal;
             totalRowCols += `<td style="font-weight: 700; border-top: 2px solid #cbd5e1;">${geneTotal}</td>`;
         });
@@ -1939,7 +1976,7 @@ function renderClusterCard(geneKey, data) {
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem;">
                 <img src="data/PYTHEAS_Logo.svg" style="height: 20px;" alt="Pytheas Logo" onerror="this.src='https://via.placeholder.com/24x24?text=P'">
                 <span style="font-weight: 600; font-size: 0.95rem; color: #334155;">
-                    ${isFr ? 'Analyse des Clusters Phénotypiques' : 'Phenotypic Cluster Analysis'}: ${geneKey}
+                    ${isFr ? 'Analyse des Clusters Phénotypiques' : 'Phenotypic Cluster Analysis'}: ${requestedGenes.join(', ')}
                 </span>
             </div>
             ${tableHTML}
@@ -1952,7 +1989,9 @@ function renderClusterCard(geneKey, data) {
     // CARDS 2+: Dedicated Symptom Cards per Cluster
     // ----------------------------------------------------
     const symptomPlotConfigs = [];
-    clusters.forEach((cluster, idx) => {
+    const validClusters = clusters.filter(c => c.cluster_id !== -1 && c.cluster_id !== '-1');
+
+    validClusters.forEach((cluster, idx) => {
         const barPlotId = `bar-plot-cluster-${idx}-${Date.now()}`;
         symptomPlotConfigs.push({ plotId: barPlotId, cluster: cluster, index: idx });
 
@@ -1975,7 +2014,7 @@ function renderClusterCard(geneKey, data) {
     setTimeout(() => {
         renderClusterUMAP(umapPlotId1, umapPlotId2, clusters, dims);
         symptomPlotConfigs.forEach(cfg => {
-            renderSingleClusterSymptomChart(cfg.plotId, cfg.cluster, cfg.index, clusters.length);
+            renderGroupedClusterSymptomChart(cfg.plotId, cfg.cluster, cfg.index, clusters.length);
         });
     }, 50);
 }
@@ -2069,6 +2108,91 @@ function renderSingleClusterSymptomChart(containerId, cluster, clusterIndex, tot
 
     Plotly.newPlot(containerId, [trace], layout, { responsive: true, displayModeBar: false });
 }
+
+function renderGroupedClusterSymptomChart(containerId, cluster, clusterIndex, totalClusters) {
+    const isFr = currentLang === 'fr';
+    const symptoms = (cluster.archetypal_signatures || []).slice(0, 10);
+    
+    // Extract unique x-axis labels (symptoms)
+    const labels = symptoms.map(s => s.description || s.hpo_code);
+    const wrappedLabels = labels.map(label => formatText(label, 25));
+
+    // Extract all cluster keys dynamically from the first symptom's cluster_prevalences dictionary
+    const samplePrevalences = symptoms[0]?.cluster_prevalences || {};
+    const rawClusterKeys = Object.keys(samplePrevalences);
+
+    // Sort cluster keys so the active cluster (clusterIndex) is first, followed by others numerically
+    const clusterKeys = rawClusterKeys.sort((a, b) => {
+        const numA = parseInt(a.replace(/\D/g, ''), 10);
+        const numB = parseInt(b.replace(/\D/g, ''), 10);
+
+        if (numA === clusterIndex) return -1;
+        if (numB === clusterIndex) return 1;
+        return numA - numB;
+    });
+
+    // Build one trace per cluster in the reordered sequence
+    const traces = clusterKeys.map((clusterKey) => {
+        // Parse numerical ID to preserve original D3 color assignments
+        const originalClusterNum = parseInt(clusterKey.replace(/\D/g, ''), 10);
+        const colorIdx = !isNaN(originalClusterNum) ? originalClusterNum : 0;
+
+        const strokeColor = getD3Color(colorIdx, totalClusters || clusterKeys.length);
+        const fillColor = hexToRgba(strokeColor, 0.45);
+
+        // Map y-values for this specific cluster across all top 10 symptoms
+        const values = symptoms.map(s => (s.cluster_prevalences ? s.cluster_prevalences[clusterKey] || 0 : 0));
+
+        // Format cluster name (e.g., "cluster_0" -> "Cluster 0")
+        const formattedName = clusterKey.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+
+        return {
+            x: wrappedLabels,
+            y: values,
+            name: formattedName,
+            type: 'bar',
+            text: values.map(v => `${Math.round(v)}%`),
+            textposition: 'inside',
+            insidetextanchor: 'end',
+            textfont: {
+                color: '#ffffff',
+                size: 11
+            },
+            marker: { 
+                color: fillColor,
+                line: {
+                    color: strokeColor,
+                    width: 2
+                },
+                cornerradius: 4
+            }
+        };
+    });
+
+    const layout = {
+        barmode: 'group',
+        margin: { l: 50, r: 20, t: 30, b: 100 },
+        autosize: true,
+        showlegend: false,
+        legend: {
+            orientation: 'h',
+            y: 1.15,
+            x: 0.5,
+            xanchor: 'center'
+        },
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        yaxis: {
+            title: isFr ? 'Prévalence (%)' : 'Prevalence (%)',
+            range: [0, 105]
+        },
+        xaxis: { tickangle: -30, automargin: true }
+    };
+
+    Plotly.newPlot(containerId, traces, layout, { responsive: true, displayModeBar: false });
+}
+
+
 
 </script>
 
