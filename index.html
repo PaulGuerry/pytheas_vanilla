@@ -1954,7 +1954,7 @@ function renderClusterCard(geneKey, rankKey = 'optimal') {
     };
 
     // ----------------------------------------------------
-    // CARD 1: Cohort Archetypal Signatures (Now First)
+    // CARD 1: Cohort Archetypal Signatures
     // ----------------------------------------------------
     const cohortSignatures = geneObj.cohort_archetypal_signatures || [];
     const cohortPlotId = `cohort-signatures-plot-${Date.now()}`;
@@ -1964,11 +1964,11 @@ function renderClusterCard(geneKey, rankKey = 'optimal') {
             <div class="ai-card">
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem;">
                     <img src="data/PYTHEAS_Logo.svg" style="height: 20px;" alt="Pytheas Logo" onerror="this.src='https://via.placeholder.com/24x24?text=P'">
-                        <span style="font-weight: 600; font-size: 0.95rem; color: #334155;">
-                            ${isFr 
-                                ? `Clustering phénotypique ${requestedGenes.join(', ')} : symptômes non-spécifiques (fréquents dans tous les clusters)` 
-                                : `${requestedGenes.join(', ')} phenotypic cluster analysis: non-specific symptoms (high prevalence in all clusters)`}
-                        </span>                    
+                    <span style="font-weight: 600; font-size: 0.95rem; color: #334155;">
+                        ${isFr 
+                            ? `Clustering phénotypique ${requestedGenes.join(', ')} : symptômes non-spécifiques (fréquents dans tous les clusters)` 
+                            : `${requestedGenes.join(', ')} phenotypic cluster analysis: non-specific symptoms (high prevalence in all clusters)`}
+                    </span>                    
                 </div>
                 <div id="${cohortPlotId}" class="chart-container" style="height: ${Math.max(380, cohortSignatures.length * 28)}px;"></div>
             </div>
@@ -1996,8 +1996,8 @@ function renderClusterCard(geneKey, rankKey = 'optimal') {
         });
         
         const clusterList = Array.from(clusterSet).sort((a, b) => {
-            const numA = parseInt(a.replace(/\D/g, ''), 10) || 0;
-            const numB = parseInt(b.replace(/\D/g, ''), 10) || 0;
+            const numA = parseInt(a.replace(/[^\d-]/g, ''), 10) || 0;
+            const numB = parseInt(b.replace(/[^\d-]/g, ''), 10) || 0;
             return numA - numB;
         });
 
@@ -2007,21 +2007,18 @@ function renderClusterCard(geneKey, rankKey = 'optimal') {
         });
         headerRow += `<th>TOTAL</th><th>COLOR</th>`;
 
+        const validClusters = clusters.filter(c => c.cluster_id !== -1 && c.cluster_id !== '-1');
+
         let bodyRows = '';
         clusterList.forEach((clusterName, idx) => {
             const clusterIdNum = parseInt(clusterName.replace(/[^\d-]/g, ''), 10);
             
             let color;
             if (clusterIdNum === -1) {
-                color = '#cbd5e1'; // Light grey for noise points
+                color = '#cbd5e1'; 
             } else {
-                // Filter out Cluster -1 before finding the index so color assignment starts cleanly at 0
-                const validClusters = clusters.filter(c => c.cluster_id !== -1 && c.cluster_id !== '-1');
                 const clusterObjIdx = validClusters.findIndex(c => String(c.cluster_id) === String(clusterIdNum));
-                
-                // Fall back to idx if not found in validClusters
                 const colorIdx = clusterObjIdx !== -1 ? clusterObjIdx : idx;
-                
                 color = getD3Color(colorIdx, validClusters.length || 1);
             }
 
@@ -2086,11 +2083,11 @@ function renderClusterCard(geneKey, rankKey = 'optimal') {
         <div class="ai-card">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem;">
                 <img src="data/PYTHEAS_Logo.svg" style="height: 20px;" alt="Pytheas Logo" onerror="this.src='https://via.placeholder.com/24x24?text=P'">
-                    <span style="font-weight: 600; font-size: 0.95rem; color: #334155;">
-                        ${isFr 
-                            ? `Clustering phénotypique ${requestedGenes.join(', ')} : (k = ${rankResult.num_clusters_k})` 
-                            : `${requestedGenes.join(', ')} phenotypic cluster analysis: (k = ${rankResult.num_clusters_k})`}
-                    </span>
+                <span style="font-weight: 600; font-size: 0.95rem; color: #334155;">
+                    ${isFr 
+                        ? `Clustering phénotypique ${requestedGenes.join(', ')} : (k = ${rankResult.num_clusters_k})` 
+                        : `${requestedGenes.join(', ')} phenotypic cluster analysis: (k = ${rankResult.num_clusters_k})`}
+                </span>
             </div>
             ${tableHTML}
             ${umapContainersHTML}
@@ -2106,7 +2103,28 @@ function renderClusterCard(geneKey, rankKey = 'optimal') {
 
     validClusters.forEach((cluster, idx) => {
         const barPlotId = `bar-plot-cluster-${idx}-${Date.now()}`;
-        symptomPlotConfigs.push({ plotId: barPlotId, cluster: cluster, index: idx });
+        const associatedPlotId = `associated-plot-cluster-${idx}-${Date.now()}`;
+        
+        symptomPlotConfigs.push({ 
+            plotId: barPlotId, 
+            associatedPlotId: associatedPlotId,
+            cluster: cluster, 
+            index: idx 
+        });
+
+        const assocSignatures = cluster.associated_signatures || [];
+        const assocPlotHeight = Math.max(300, assocSignatures.length * 36);
+
+        let assocSectionHTML = '';
+        if (assocSignatures.length > 0) {
+            assocSectionHTML = `
+                <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 1.5rem 0;" />
+                <div style="font-weight: 600; font-size: 0.9rem; color: #475569; margin-bottom: 0.75rem;">
+                    ${isFr ? 'Symptômes Associés Significatifs' : `Symptoms significantly associated with cluster ${cluster.cluster_id} vs. rest of cohort`}
+                </div>
+                <div id="${associatedPlotId}" class="chart-container" style="height: ${assocPlotHeight}px;"></div>
+            `;
+        }
 
         const symptomCardHTML = `
             <div class="ai-card">
@@ -2117,6 +2135,7 @@ function renderClusterCard(geneKey, rankKey = 'optimal') {
                     </span>
                 </div>
                 <div id="${barPlotId}" class="chart-container" style="height: 320px;"></div>
+                ${assocSectionHTML}
             </div>
         `;
         appendCard(symptomCardHTML);
@@ -2135,7 +2154,19 @@ function renderClusterCard(geneKey, rankKey = 'optimal') {
 
         // Render Individual Cluster Symptom Charts (Cards 3+)
         symptomPlotConfigs.forEach(cfg => {
-            renderGroupedClusterSymptomChart(cfg.plotId, cfg.cluster, cfg.index, clusters.length);
+            // Plot 1: Vertical Archetypal Symptoms
+            renderGroupedClusterSymptomChart(cfg.plotId, cfg.cluster, cfg.index, validClusters.length);
+
+            // Plot 2: Horizontal Grouped Associated Signatures
+            if (cfg.cluster.associated_signatures && cfg.cluster.associated_signatures.length > 0) {
+                renderAssociatedSignaturesChart(
+                    cfg.associatedPlotId, 
+                    cfg.cluster.associated_signatures, 
+                    cfg.index, 
+                    validClusters.length, 
+                    isFr
+                );
+            }
         });
     }, 50);
 }
@@ -2499,6 +2530,174 @@ function renderGroupedClusterSymptomChart(containerId, cluster, clusterIndex, to
 
     Plotly.newPlot(containerId, traces, layout, { responsive: true, displayModeBar: false });
 }
+
+
+function renderAssociatedSignaturesChart(containerId, associatedData, clusterIndex, totalClusters, isFr) {
+    if (!associatedData || !associatedData.length) return;
+
+    const items = [...associatedData].reverse();
+
+    const yCategories = items.map(item => {
+        return typeof formatText === 'function' 
+            ? formatText(item.description, 30) 
+            : item.description;
+    });
+
+    const clusterValues = items.map(item => parseFloat(String(item.cluster_prevalence).replace('%', '')) || 0);
+    const restValues = items.map(item => parseFloat(String(item.rest_cohort_prevalence).replace('%', '')) || 0);
+
+    const clusterStrokeColor = getD3Color(clusterIndex, totalClusters);
+    const clusterFillColor = hexToRgba(clusterStrokeColor, 0.45);
+
+    const restStrokeColor = '#94a3b8';
+    const restFillColor = hexToRgba(restStrokeColor, 0.35);
+
+    const barHeight = 0.35;
+    const offset = 0.20;
+
+    const shapes = [];
+    const annotations = [];
+
+    items.forEach((item, i) => {
+        const yCenter = i;
+
+        const seriesData = [
+            { val: clusterValues[i], yMid: yCenter + offset, stroke: clusterStrokeColor, fill: clusterFillColor },
+            { val: restValues[i], yMid: yCenter - offset, stroke: restStrokeColor, fill: restFillColor }
+        ];
+
+        seriesData.forEach(series => {
+            const val = series.val;
+            const yMin = series.yMid - barHeight / 2;
+            const yMax = series.yMid + barHeight / 2;
+            const xMin = 0;
+            const xMax = val;
+
+            if (xMax > 0) {
+                const rx = Math.min(1.5, xMax * 0.1);
+
+                const path = `M ${xMin},${yMin} ` +
+                             `L ${xMax - rx},${yMin} ` +
+                             `Q ${xMax},${yMin} ${xMax},${series.yMid} ` +
+                             `Q ${xMax},${yMax} ${xMax - rx},${yMax} ` +
+                             `L ${xMin},${yMax} Z`;
+
+                shapes.push({
+                    type: 'path',
+                    path: path,
+                    fillcolor: series.fill,
+                    line: { color: series.stroke, width: 2 },
+                    xref: 'x',
+                    yref: 'y'
+                });
+            }
+
+            // Position label outside to the right if <= 10% (including 0%), otherwise inside to the left
+            const isOutside = val <= 10;
+
+            annotations.push({
+                x: val,
+                y: series.yMid,
+                text: `${val}%`,
+                xanchor: isOutside ? 'left' : 'right',
+                yanchor: 'middle',
+                xshift: isOutside ? 6 : -6,
+                showarrow: false,
+                font: {
+                    family: 'sans-serif',
+                    size: 10,
+                    color: isOutside ? '#475569' : '#334155',
+                    weight: 600
+                }
+            });
+        });
+
+        // P-Value Annotation placed after the highest extending label/bar of the pair
+        const maxVal = Math.max(clusterValues[i], restValues[i]);
+        // Shift p-value extra to the right if the max value bar has an outside label
+        const pValueShift = maxVal <= 10 ? 38 : 12;
+
+        const pValText = String(item.p_value || '').startsWith('<') 
+            ? `p ${item.p_value}` 
+            : `p = ${item.p_value}`;
+
+        annotations.push({
+            x: maxVal,
+            y: yCenter,
+            text: pValText,
+            xanchor: 'left',
+            yanchor: 'middle',
+            xshift: pValueShift,
+            showarrow: false,
+            font: {
+                family: 'sans-serif',
+                size: 10,
+                color: '#64748b',
+                style: 'italic',
+                weight: 500
+            }
+        });
+    });
+
+    shapes.push({
+        type: 'line',
+        x0: 0,
+        x1: 0,
+        y0: -0.5,
+        y1: items.length - 0.5,
+        line: { color: '#1f1f1f', width: 2 },
+        xref: 'x',
+        yref: 'y'
+    });
+
+    const tickVals = items.map((_, i) => i);
+
+    const trace = {
+        x: clusterValues,
+        y: tickVals,
+        type: 'scatter',
+        mode: 'markers',
+        marker: { opacity: 0 },
+        hoverinfo: 'text',
+        hovertext: items.map(item => 
+            `<b>${item.description}</b><br>` +
+            `${isFr ? 'Prévalence Cluster' : 'Cluster Prevalence'}: ${item.cluster_prevalence}<br>` +
+            `${isFr ? 'Prévalence Reste Cohorte' : 'Rest Cohort Prevalence'}: ${item.rest_cohort_prevalence}<br>` +
+            `p-value: ${item.p_value}`
+        )
+    };
+
+    const layout = {
+        autosize: true,
+        margin: { l: 220, r: 80, t: 30, b: 40 },
+        shapes: shapes,
+        annotations: annotations,
+        showlegend: false,
+        xaxis: {
+            title: { text: isFr ? 'Prévalence (%)' : 'Prevalence (%)', font: { size: 12, color: '#334155' } },
+            range: [0, 120],
+            zeroline: false,
+            showline: false,
+            gridcolor: '#e2e8f0'
+        },
+        yaxis: {
+            tickmode: 'array',
+            tickvals: tickVals,
+            ticktext: yCategories,
+            range: [-0.6, items.length - 0.4],
+            zeroline: false,
+            showline: false,
+            automargin: true,
+            tickfont: { size: 11, color: '#334155' }
+        },
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent'
+    };
+
+    Plotly.newPlot(containerId, [trace], layout, { responsive: true, displayModeBar: false });
+}
+
+
 
 
 </script>
