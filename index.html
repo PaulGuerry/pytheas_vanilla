@@ -504,11 +504,21 @@
     "#17becf", "#9edae5"
   ];
 
+
   function getD3Color(index, totalCount) {
     if (totalCount < 10) {
       return D3_CATEGORY10[index % D3_CATEGORY10.length];
     }
     return D3_CATEGORY20[index % D3_CATEGORY20.length];
+  }
+
+  const BREWER_SET2 = [
+    "#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3",
+    "#a6d854", "#ffd92f", "#e5c494", "#b3b3b3"
+  ];
+  
+  function getBrewerSet2Color(index) {
+    return BREWER_SET2[index % BREWER_SET2.length];
   }
 
   let diseasesIndex = {};
@@ -1944,6 +1954,29 @@ function renderClusterCard(geneKey, rankKey = 'optimal') {
     };
 
     // ----------------------------------------------------
+    // CARD 1: Cohort Archetypal Signatures (Now First)
+    // ----------------------------------------------------
+    const cohortSignatures = geneObj.cohort_archetypal_signatures || [];
+    const cohortPlotId = `cohort-signatures-plot-${Date.now()}`;
+
+    if (cohortSignatures.length > 0) {
+        const cohortCardHTML = `
+            <div class="ai-card">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem;">
+                    <img src="data/PYTHEAS_Logo.svg" style="height: 20px;" alt="Pytheas Logo" onerror="this.src='https://via.placeholder.com/24x24?text=P'">
+                        <span style="font-weight: 600; font-size: 0.95rem; color: #334155;">
+                            ${isFr 
+                                ? `Clustering phénotypique ${requestedGenes.join(', ')} : symptômes non-spécifiques (fréquents dans tous les clusters)` 
+                                : `${requestedGenes.join(', ')} phenotypic cluster analysis: non-specific symptoms (high prevalence in all clusters)`}
+                        </span>                    
+                </div>
+                <div id="${cohortPlotId}" class="chart-container" style="height: ${Math.max(380, cohortSignatures.length * 28)}px;"></div>
+            </div>
+        `;
+        appendCard(cohortCardHTML);
+    }
+
+    // ----------------------------------------------------
     // BUILD TRANSPOSED CROSSTABLE (Clusters as Rows)
     // ----------------------------------------------------
     let tableHTML = '';
@@ -1982,11 +2015,14 @@ function renderClusterCard(geneKey, rankKey = 'optimal') {
             if (clusterIdNum === -1) {
                 color = '#cbd5e1'; // Light grey for noise points
             } else {
-                const clusterObjIdx = clusters.findIndex(c => String(c.cluster_id) === String(clusterIdNum));
+                // Filter out Cluster -1 before finding the index so color assignment starts cleanly at 0
+                const validClusters = clusters.filter(c => c.cluster_id !== -1 && c.cluster_id !== '-1');
+                const clusterObjIdx = validClusters.findIndex(c => String(c.cluster_id) === String(clusterIdNum));
+                
+                // Fall back to idx if not found in validClusters
                 const colorIdx = clusterObjIdx !== -1 ? clusterObjIdx : idx;
                 
-                const validCount = clusters.filter(c => c.cluster_id !== -1 && c.cluster_id !== '-1').length;
-                color = getD3Color(colorIdx, validCount || clusters.length);
+                color = getD3Color(colorIdx, validClusters.length || 1);
             }
 
             let rowCols = `<td style="font-weight: 600;">${clusterName.replace('_', ' ').toUpperCase()}</td>`;
@@ -2028,7 +2064,7 @@ function renderClusterCard(geneKey, rankKey = 'optimal') {
     }
 
     // ----------------------------------------------------
-    // CARD 1: Combined Crosstable + UMAP Scatter Plot Card
+    // CARD 2: Combined Crosstable + UMAP Scatter Plot Card
     // ----------------------------------------------------
     const dims = clusters[0]?.dimensions_exported || 2;
     const umapPlotId1 = `umap-plot1-${Date.now()}`;
@@ -2050,36 +2086,17 @@ function renderClusterCard(geneKey, rankKey = 'optimal') {
         <div class="ai-card">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem;">
                 <img src="data/PYTHEAS_Logo.svg" style="height: 20px;" alt="Pytheas Logo" onerror="this.src='https://via.placeholder.com/24x24?text=P'">
-                <span style="font-weight: 600; font-size: 0.95rem; color: #334155;">
-                    ${isFr ? 'Analyse des Clusters Phénotypiques' : 'Phenotypic Cluster Analysis'}: ${requestedGenes.join(', ')} (k = ${rankResult.num_clusters_k})
-                </span>
+                    <span style="font-weight: 600; font-size: 0.95rem; color: #334155;">
+                        ${isFr 
+                            ? `Clustering phénotypique ${requestedGenes.join(', ')} : (k = ${rankResult.num_clusters_k})` 
+                            : `${requestedGenes.join(', ')} phenotypic cluster analysis: (k = ${rankResult.num_clusters_k})`}
+                    </span>
             </div>
             ${tableHTML}
             ${umapContainersHTML}
         </div>
     `;
     appendCard(combinedCardHTML);
-
-    // ----------------------------------------------------
-    // CARD 2: Cohort Archetypal Signatures (Horizontal Bar Plot Card)
-    // ----------------------------------------------------
-    const cohortSignatures = geneObj.cohort_archetypal_signatures || [];
-    const cohortPlotId = `cohort-signatures-plot-${Date.now()}`;
-
-    if (cohortSignatures.length > 0) {
-        const cohortCardHTML = `
-            <div class="ai-card">
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem;">
-                    <img src="data/PYTHEAS_Logo.svg" style="height: 20px;" alt="Pytheas Logo" onerror="this.src='https://via.placeholder.com/24x24?text=P'">
-                    <span style="font-weight: 600; font-size: 0.95rem; color: #334155;">
-                        ${isFr ? 'Signatures Archétypales de la Cohorte' : 'Non-specific Symptoms (high prevalence in all clusters)'}: ${requestedGenes.join(', ')}
-                    </span>
-                </div>
-                <div id="${cohortPlotId}" class="chart-container" style="height: ${Math.max(380, cohortSignatures.length * 28)}px;"></div>
-            </div>
-        `;
-        appendCard(cohortCardHTML);
-    }
 
     // ----------------------------------------------------
     // CARDS 3+: Dedicated Symptom Cards per Cluster
@@ -2108,13 +2125,15 @@ function renderClusterCard(geneKey, rankKey = 'optimal') {
     if (stream) stream.scrollTop = stream.scrollHeight;
 
     setTimeout(() => {
-        renderClusterUMAP(umapPlotId1, umapPlotId2, clusters, dims);
-
-        // Render Card 2 Horizontal Bar Plot (Custom SVG rounded paths as per guardrails)
+        // Render Cohort Plot (Card 1)
         if (cohortSignatures.length > 0) {
             renderCohortSignaturesChart(cohortPlotId, cohortSignatures, isFr);
         }
 
+        // Render UMAP (Card 2)
+        renderClusterUMAP(umapPlotId1, umapPlotId2, clusters, dims);
+
+        // Render Individual Cluster Symptom Charts (Cards 3+)
         symptomPlotConfigs.forEach(cfg => {
             renderGroupedClusterSymptomChart(cfg.plotId, cfg.cluster, cfg.index, clusters.length);
         });
@@ -2125,10 +2144,8 @@ function renderClusterCard(geneKey, rankKey = 'optimal') {
 // HELPER: Render Cohort Signatures Horizontal Bar Chart
 // ----------------------------------------------------
 function renderCohortSignaturesChart(containerId, signaturesData, isFr) {
-    // Reverse array so highest prevalence items render at the top
     const items = [...signaturesData].reverse();
 
-    // 1. Process labels with formatText
     const yCategories = items.map(item => {
         return typeof formatText === 'function' 
             ? formatText(item['Description'], 30) 
@@ -2137,14 +2154,13 @@ function renderCohortSignaturesChart(containerId, signaturesData, isFr) {
 
     const xValues = items.map(item => parseFloat(item['Cohort Prevalence']) || 0);
 
-    const strokeColor = '#1f77b4';
-    const fillColor = 'rgba(31, 119, 180, 0.45)';
-    const barHeight = 0.45; // Thickness of the horizontal bar
+    const strokeColor = getBrewerSet2Color(0);
+    const fillColor = hexToRgba(strokeColor, 0.45);
+    const barHeight = 0.45;
 
     const shapes = [];
     const annotations = [];
 
-    // Map each item to integer indices [0, 1, 2...] for exact Y-axis coordinate alignment
     xValues.forEach((val, i) => {
         const yCenter = i; 
         const yMin = yCenter - barHeight / 2;
@@ -2153,7 +2169,6 @@ function renderCohortSignaturesChart(containerId, signaturesData, isFr) {
         const xMax = val;
 
         if (xMax > 0) {
-            // Horizontal rounding radius
             const rx = Math.min(1.5, xMax * 0.1); 
 
             const path = `M ${xMin},${yMin} ` +
@@ -2172,7 +2187,6 @@ function renderCohortSignaturesChart(containerId, signaturesData, isFr) {
             });
         }
 
-        // Inside-bar text percentage labels aligned directly on yCenter
         annotations.push({
             x: val,
             y: yCenter,
@@ -2190,7 +2204,7 @@ function renderCohortSignaturesChart(containerId, signaturesData, isFr) {
         });
     });
 
-    // Dark baseline resting at x=0
+    // Vertical baseline on the left (x=0) extended slightly for padding
     shapes.push({
         type: 'line',
         x0: 0,
@@ -2202,7 +2216,6 @@ function renderCohortSignaturesChart(containerId, signaturesData, isFr) {
         yref: 'y'
     });
 
-    // Use explicit tick values array mapped 1:1 with categorical index positions
     const tickVals = items.map((_, i) => i);
 
     const trace = {
@@ -2224,16 +2237,18 @@ function renderCohortSignaturesChart(containerId, signaturesData, isFr) {
             title: { text: isFr ? 'Prévalence dans la Cohorte (%)' : 'Cohort Prevalence (%)', font: { size: 12, color: '#334155' } },
             range: [0, 105],
             zeroline: false,
+            showline: false,
             gridcolor: '#e2e8f0'
         },
         yaxis: {
             tickmode: 'array',
             tickvals: tickVals,
             ticktext: yCategories,
+            range: [-0.6, items.length - 0.4],
+            zeroline: false,
+            showline: false,
             automargin: true,
-            tickfont: { size: 11, color: '#334155' },
-            // Force strict central vertical alignment for multi-line labels
-            layer: 'below traces'
+            tickfont: { size: 11, color: '#334155' }
         },
         paper_bgcolor: 'transparent',
         plot_bgcolor: 'transparent'
@@ -2354,87 +2369,136 @@ function renderSingleClusterSymptomChart(containerId, cluster, clusterIndex, tot
 
 function renderGroupedClusterSymptomChart(containerId, cluster, clusterIndex, totalClusters) {
     const isFr = currentLang === 'fr';
-    const symptoms = (cluster.archetypal_signatures || []).slice(0, 10);
+    const allSymptoms = (cluster.archetypal_signatures || []).slice(0, 10);
+    if (!allSymptoms.length) return;
+
+    // Determine if we need to split into 2 subplots
+    const splitNeeded = allSymptoms.length > 5;
+    const midIndex = Math.ceil(allSymptoms.length / 2);
     
-    // Extract unique x-axis labels (symptoms)
-    const labels = symptoms.map(s => s.description || s.hpo_code);
-    const wrappedLabels = labels.map(label => formatText(label, 15));
+    // Divide symptoms: [[topChunk], [bottomChunk]] or [[allChunk]]
+    const chunks = splitNeeded 
+        ? [allSymptoms.slice(0, midIndex), allSymptoms.slice(midIndex)] 
+        : [allSymptoms];
 
-    // Extract all cluster keys dynamically from the first symptom's cluster_prevalences dictionary
-    const samplePrevalences = symptoms[0]?.cluster_prevalences || {};
+    // Adjust DOM container height first to ensure full 1:1 vertical scaling per subplot
+    const containerEl = document.getElementById(containerId);
+    if (containerEl) {
+        const baseHeightPerPlot = 320; 
+        containerEl.style.height = `${baseHeightPerPlot * chunks.length}px`;
+    }
+
+    // Extract cluster keys sorted as before
+    const samplePrevalences = allSymptoms[0]?.cluster_prevalences || {};
     const rawClusterKeys = Object.keys(samplePrevalences);
-
-    // Sort cluster keys so the active cluster (clusterIndex) is first, followed by others numerically
     const clusterKeys = rawClusterKeys.sort((a, b) => {
         const numA = parseInt(a.replace(/\D/g, ''), 10);
         const numB = parseInt(b.replace(/\D/g, ''), 10);
-
         if (numA === clusterIndex) return -1;
         if (numB === clusterIndex) return 1;
         return numA - numB;
     });
 
-    // Build one trace per cluster in the reordered sequence
-    const traces = clusterKeys.map((clusterKey) => {
-        // Parse numerical ID to preserve original D3 color assignments
-        const originalClusterNum = parseInt(clusterKey.replace(/\D/g, ''), 10);
-        const colorIdx = !isNaN(originalClusterNum) ? originalClusterNum : 0;
+    const traces = [];
 
-        const strokeColor = getD3Color(colorIdx, totalClusters || clusterKeys.length);
-        const fillColor = hexToRgba(strokeColor, 0.45);
+    // Loop over chunks to create top / bottom subplot traces
+    chunks.forEach((chunkSymptoms, chunkIdx) => {
+        const labels = chunkSymptoms.map(s => s.description || s.hpo_code);
+        const wrappedLabels = labels.map(label => formatText(label, 15));
+        
+        // Plotly axis reference suffixes ('', '2', etc.)
+        const axisSuffix = chunkIdx === 0 ? '' : `${chunkIdx + 1}`;
+        const xAxisRef = `x${axisSuffix}`;
+        const yAxisRef = `y${axisSuffix}`;
 
-        // Map y-values for this specific cluster across all top 10 symptoms
-        const values = symptoms.map(s => (s.cluster_prevalences ? s.cluster_prevalences[clusterKey] || 0 : 0));
+        clusterKeys.forEach((clusterKey) => {
+            const originalClusterNum = parseInt(clusterKey.replace(/\D/g, ''), 10);
+            const colorIdx = !isNaN(originalClusterNum) ? originalClusterNum : 0;
+            const strokeColor = getD3Color(colorIdx, totalClusters || clusterKeys.length);
+            const fillColor = hexToRgba(strokeColor, 0.45);
 
-        // Format cluster name (e.g., "cluster_0" -> "Cluster 0")
-        const formattedName = clusterKey.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+            const values = chunkSymptoms.map(s => (s.cluster_prevalences ? s.cluster_prevalences[clusterKey] || 0 : 0));
+            const formattedName = clusterKey.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
 
-        return {
-            x: wrappedLabels,
-            y: values,
-            name: formattedName,
-            type: 'bar',
-            text: values.map(v => `${Math.round(v)}%`),
-            textposition: 'inside',
-            insidetextanchor: 'end',
-            textfont: {
-                color: '#ffffff',
-                size: 11
-            },
-            marker: { 
-                color: fillColor,
-                line: {
-                    color: strokeColor,
-                    width: 2
+            const textPositions = values.map(v => (v < 10 ? 'outside' : 'inside'));
+            const fontColors = values.map(v => (v < 10 ? '#1e293b' : '#ffffff'));
+
+            traces.push({
+                x: wrappedLabels,
+                y: values,
+                name: formattedName,
+                type: 'bar',
+                xaxis: xAxisRef,
+                yaxis: yAxisRef,
+                text: values.map(v => `${Math.round(v)}%`),
+                textposition: textPositions,
+                insidetextanchor: 'end',
+                showlegend: false,
+                textfont: {
+                    color: fontColors,
+                    size: 11,
+                    weight: 500
                 },
-                cornerradius: 4
-            }
-        };
+                marker: { 
+                    color: fillColor,
+                    line: { color: strokeColor, width: 2 },
+                    cornerradius: 4
+                }
+            });
+        });
     });
+    // Pre-calculate wrapped labels for both chunks to feed the layout
+    const labelsTop = chunks[0].map(s => formatText(s.description || s.hpo_code, 15));
+    const labelsBottom = splitNeeded ? chunks[1].map(s => formatText(s.description || s.hpo_code, 15)) : [];
 
+    // Layout configuration
     const layout = {
         barmode: 'group',
-        margin: { l: 50, r: 20, t: 30, b: 100 },
+        margin: { l: 50, r: 20, t: 30, b: 80 },
         autosize: true,
-        showlegend: false,
-        legend: {
-            orientation: 'h',
-            y: 1.15,
-            x: 0.5,
-            xanchor: 'center'
-        },
         paper_bgcolor: 'transparent',
-        plot_bgcolor: 'transparent',
-        yaxis: {
-            title: isFr ? 'Prévalence (%)' : 'Prevalence (%)',
-            range: [0, 105]
-        },
-        xaxis: { tickangle: 0, automargin: true }
+        plot_bgcolor: 'transparent'
     };
+
+    if (splitNeeded) {
+        layout.grid = { 
+            rows: 2, 
+            columns: 1, 
+            pattern: 'independent', 
+            roworder: 'top to bottom',
+            ygap: 0.25 
+        };
+        
+        layout.yaxis = { title: isFr ? 'Prévalence (%)' : 'Prevalence (%)', range: [0, 105] };
+        layout.yaxis2 = { title: isFr ? 'Prévalence (%)' : 'Prevalence (%)', range: [0, 105] };
+        
+        layout.xaxis = { 
+            type: 'category',
+            categoryorder: 'array',
+            categoryarray: labelsTop,
+            tickangle: 0, 
+            automargin: true 
+        };
+        layout.xaxis2 = { 
+            type: 'category',
+            categoryorder: 'array',
+            categoryarray: labelsBottom,
+            tickangle: 0, 
+            automargin: true 
+        };
+    } else {
+        layout.yaxis = { title: isFr ? 'Prévalence (%)' : 'Prevalence (%)', range: [0, 105] };
+        layout.xaxis = { 
+            type: 'category',
+            categoryorder: 'array',
+            categoryarray: labelsTop,
+            tickangle: 0, 
+            automargin: true 
+        };
+    }
 
     Plotly.newPlot(containerId, traces, layout, { responsive: true, displayModeBar: false });
 }
-
 
 
 </script>
