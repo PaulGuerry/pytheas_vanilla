@@ -171,6 +171,8 @@ export async function handleClusterQuery(inputString) {
     const rawTokens = inputString.trim().split(/\s+/);
     
     if (rawTokens[0].toLowerCase() === 'cluster') {
+        // Raw query string without the "cluster" command (e.g., "aaRS", "aaRS genes", or "ABCB4 ABCB11")
+        const rawQuery = rawTokens.slice(1).join(' ').trim();
         const genes = rawTokens.slice(1).map(g => g.toUpperCase()).filter(Boolean);
 
         const data = await loadClusterData();
@@ -186,12 +188,14 @@ export async function handleClusterQuery(inputString) {
         const getAvailableCombinationsHtml = (dataset) => {
             const combinations = Object.keys(dataset).map(key => {
                 const comboStr = key.replace(/_/g, ' ');
-                return `<a href="#" class="cluster-combo-link" data-query="cluster ${comboStr}" style="color: #2563eb; text-decoration: underline; font-weight: 600; cursor: pointer; margin-right: 10px;">${comboStr}</a>`;
+                // Use custom label if defined in JSON, otherwise fallback to the formatted gene list
+                const labelText = dataset[key]?.display_label || comboStr;
+        
+                return `<a href="#" class="cluster-combo-link" data-query="cluster ${comboStr}" style="color: #2563eb; text-decoration: underline; font-weight: 600; cursor: pointer; margin-right: 10px;">${labelText}</a>`;
             }).join(' | ');
-
+        
             return `<div style="margin-top: 10px; font-size: 0.9em; color: #4b5563;"><strong>Available combinations:</strong> ${combinations}</div>`;
-        };        
-
+        };       
 
         if (genes.length === 0) {
             showClusterSystemMessage(`
@@ -201,21 +205,34 @@ export async function handleClusterQuery(inputString) {
             return true;
         }
 
-        const findMatchingGeneKey = (geneList, dataset) => {
-            const sortedCandidate = [...geneList].sort().join('_');
+        const findMatchingGeneKey = (queryStr, geneList, dataset) => {
+            const normalizedQuery = queryStr.toLowerCase().replace(/\s+/g, ' ');
+
             for (const key of Object.keys(dataset)) {
+                const entry = dataset[key];
+                
+                // 1. Match display_label (e.g., "aaRS", "aaRS genes", or "19 aaRS genes")
+                if (entry?.display_label) {
+                    const normalizedLabel = entry.display_label.toLowerCase().replace(/\s+/g, ' ');
+                    if (normalizedLabel === normalizedQuery || normalizedLabel.replace(' genes', '') === normalizedQuery) {
+                        return key;
+                    }
+                }
+
+                // 2. Fallback to gene list matching (sorted gene keys)
                 const keySorted = key.split('_').sort().join('_');
+                const sortedCandidate = [...geneList].sort().join('_');
                 if (keySorted === sortedCandidate) return key;
             }
             return null;
         };
 
-        const geneKey = findMatchingGeneKey(genes, data);
+        const geneKey = findMatchingGeneKey(rawQuery, genes, data);
         const geneData = geneKey ? data[geneKey] : null;
 
         if (!geneData || !geneData.clustering_results) {
             showClusterSystemMessage(`
-                No clustering results found for gene combination: <strong>${genes.join(' + ')}</strong>
+                No clustering results found for gene combination: <strong>${rawQuery}</strong>
                 ${getAvailableCombinationsHtml(data)}
             `);
             return true;
@@ -228,8 +245,8 @@ export async function handleClusterQuery(inputString) {
             .map(rank => clusteringResults[rank]?.num_clusters_k)
             .filter(k => k !== undefined);
 
-        const matchedGenes = geneKey.split('_');
-        const geneQueryStr = matchedGenes.join(' + ');
+        // Display the display_label if present (e.g., "aaRS genes"), otherwise format gene list with '+'
+        const displayName = geneData.display_label || geneKey.split('_').join(' + ');
 
         let kListStr = "";
         if (kValues.length === 1) {
@@ -240,7 +257,7 @@ export async function handleClusterQuery(inputString) {
             kListStr = `k = ${kValues.slice(0, -1).join(', ')}, or ${kValues[kValues.length - 1]}`;
         }
 
-        const promptText = `PytheasDB clustering analyses indicate patient phenotypes for <strong>${geneQueryStr}</strong> can be split into ${kListStr} clusters. Which results would you like to inspect?`;
+        const promptText = `PytheasDB clustering analyses indicate patient phenotypes for <strong>${displayName}</strong> can be split into ${kListStr} clusters. Which results would you like to inspect?`;
 
         const totalRanks = rankKeys.length;
         const linksHtml = rankKeys.map((rank, index) => {
@@ -266,3 +283,6 @@ export async function handleClusterQuery(inputString) {
     
     return false;
 }
+
+
+

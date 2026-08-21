@@ -74,9 +74,16 @@ export  async function fetchGzipOrJson(url) {
 
 
 export async function loadClusterData() {
+    // Comment out or remove this line temporarily if you want to force fresh re-fetches without refreshing the page
     if (clusterDataCache) return clusterDataCache;
+
     try {
-        const response = await fetch('data/cluster_data.json.gz');
+        // Add ?t=${Date.now()} to the fetch URL
+        // Automatically append timestamp on localhost, but serve clean URL in production
+        const isLocal = ['localhost', '127.0.0.1', ''].includes(window.location.hostname);
+        const url = isLocal ? `data/cluster_data.json.gz?v=${Date.now()}` : 'data/cluster_data.json.gz';
+        
+        const response = await fetch(url);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
         if ('DecompressionStream' in window) {
@@ -93,6 +100,8 @@ export async function loadClusterData() {
         return null;
     }
 }
+
+
 
 
 export function getCohortData(diseaseMatch) {
