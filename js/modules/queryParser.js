@@ -76,39 +76,157 @@ function parseSegmentEntities(seg, lexicon) {
 /**
  * Dynamic resolution: Finds all unique disease roots matching the queried gene target, ignoring subgroups.
  */
-function resolveSegmentToKeys(seg, lexicon, indexData) {
-  const { disease, gene } = parseSegmentEntities(seg, lexicon);
-  const allIndexKeys = Object.keys(indexData || {});
-  const matchedDiseaseKeys = new Set();
+const DISEASE_ALIASES = {
+  'MIXED': 'MVID+PFIC'
+};
 
-  // 1. Explicit Disease + Gene requested
-  if (disease && gene) {
-    if (indexData[disease]) matchedDiseaseKeys.add(disease);
+/**
+ * Normalizes subgroup values (e.g., 'boys' -> 'M') using the lexicon alias map.
+ */
+function normalizeSubgroupValue(category, val, lexicon) {
+  if (!val) return null;
+  const cleanVal = val.toString().trim().toLowerCase();
+  const alias = lexicon.aliases?.[category]?.[cleanVal];
+  if (alias) return alias.toUpperCase();
+  return cleanVal.toUpperCase();
+}
+
+/**
+ * Validates key subgroup values against requested constraints.
+ */
+function keyMatchesSubgroups(keyParts, requestedSubgroups, lexicon) {
+  const subgroupCategories = Object.keys(lexicon.subgroups || {});
+
+  for (const category of subgroupCategories) {
+    const catIdx = keyParts.indexOf(category.toUpperCase());
+    const keyVal = catIdx !== -1 ? keyParts[catIdx + 1] : null;
+
+    const rawReqVal = requestedSubgroups[category];
+    const normReqVal = normalizeSubgroupValue(category, rawReqVal, lexicon);
+
+    if (normReqVal) {
+      // Subgroup requested: Key must contain this category and match the canonical value
+      const normKeyVal = normalizeSubgroupValue(category, keyVal, lexicon);
+      if (!normKeyVal || normKeyVal !== normReqVal) return false;
+    } else {
+      // Subgroup NOT requested: Key must NOT contain this subgroup slice
+      if (keyVal !== null) return false;
+    }
   }
-  // 2. Only Gene requested (e.g. "MYO5B" or "ATP8B1") -> Map to root diseases
-  else if (gene) {
-    const geneLower = gene.toLowerCase();
-    
-    allIndexKeys.forEach(key => {
-      const parts = key.split(':');
-      const rootDisease = parts[0];
-      
-      const isGeneMatch = parts.includes('gene') 
-        ? parts[parts.indexOf('gene') + 1]?.toLowerCase() === geneLower
-        : parts[0]?.toLowerCase() === geneLower;
+  return true;
+}
 
-      if (isGeneMatch && indexData[rootDisease]) {
-        matchedDiseaseKeys.add(rootDisease);
+/**
+ * Extracts disease name from key structure or index payload.
+ */
+function extractDiseaseForKey(key, keyParts, isGeneRoot, indexData) {
+  // 1. Explicit :disease: segment (e.g., "MYO5B:disease:MVID:sex:M")
+  const disIdx = keyParts.indexOf('DISEASE');
+  if (disIdx !== -1 && keyParts[disIdx + 1]) {
+    return keyParts[disIdx + 1];
+  }
+
+  // 2. Disease as root segment (e.g., "MVID:gene:MYO5B:sex:M")
+  if (!isGeneRoot) {
+    return keyParts[0];
+  }
+
+  // 3. Fallback to entry payload metadata in indexData
+  const entry = indexData[key];
+  if (entry?.disease_name) return entry.disease_name.toUpperCase();
+  if (entry?.disease) return entry.disease.toUpperCase();
+
+  return null;
+}
+
+export function resolveSegmentToKeys(seg, lexicon, indexData) {
+  const entities = parseSegmentEntities(seg, lexicon);
+  const { disease, gene, subgroups = {} } = entities;
+
+  const allIndexKeys = Object.keys(indexData || {});
+  const matchedKeys = new Set();
+
+  const requestedGene = gene?.toUpperCase();
+  const requestedDisease = disease ? (DISEASE_ALIASES[disease.toUpperCase()] || disease.toUpperCase()) : null;
+
+  // 1. Gene Query (with optional Disease and Subgroup modifiers)
+  if (requestedGene) {
+    const diseaseBaseKeys = new Map();
+
+    allIndexKeys.forEach(key => {
+      const parts = key.split(':').map(p => p.toUpperCase());
+
+      // Check Gene match
+      const isGeneRoot = parts[0] === requestedGene;
+      const geneIdx = parts.indexOf('GENE');
+      const isGeneSubkey = geneIdx !== -1 && parts[geneIdx + 1] === requestedGene;
+      if (!isGeneRoot && !isGeneSubkey) return;
+
+      // Check dynamic Subgroup constraints with alias resolution
+      if (!keyMatchesSubgroups(parts, subgroups, lexicon)) return;
+
+      // Extract associated disease
+      const rawDisease = extractDiseaseForKey(key, parts, isGeneRoot, indexData);
+
+      // Filter by explicit disease if requested
+      if (requestedDisease && rawDisease && rawDisease !== requestedDisease) return;
+
+      if (rawDisease) {
+        const canonicalDisease = DISEASE_ALIASES[rawDisease] || rawDisease;
+        const existingKey = diseaseBaseKeys.get(canonicalDisease);
+
+        const isCurrentKeyExplicit = key.toUpperCase().includes('MVID+PFIC');
+        const isExistingKeyExplicit = existingKey?.toUpperCase().includes('MVID+PFIC');
+
+        if (!existingKey || (isCurrentKeyExplicit && !isExistingKeyExplicit)) {
+          diseaseBaseKeys.set(canonicalDisease, key);
+        } else if (key.split(':').length < existingKey.split(':').length && !isExistingKeyExplicit) {
+          diseaseBaseKeys.set(canonicalDisease, key);
+        }
       }
     });
-  }
-  // 3. Only Disease requested
-  else if (disease) {
-    if (indexData[disease]) matchedDiseaseKeys.add(disease);
+
+    diseaseBaseKeys.forEach(key => matchedKeys.add(key));
+  } 
+  // 2. Pure Disease Query (with optional Subgroup modifiers)
+  else if (requestedDisease) {
+    const geneBaseKeys = new Map();
+
+    allIndexKeys.forEach(key => {
+      const parts = key.split(':').map(p => p.toUpperCase());
+
+      // Check Disease match
+      const isDiseaseRoot = parts[0] === requestedDisease;
+      const disIdx = parts.indexOf('DISEASE');
+      const isDiseaseSubkey = disIdx !== -1 && parts[disIdx + 1] === requestedDisease;
+      if (!isDiseaseRoot && !isDiseaseSubkey) return;
+
+      // Check dynamic Subgroup constraints with alias resolution
+      if (!keyMatchesSubgroups(parts, subgroups, lexicon)) return;
+
+      let associatedGene = null;
+      const geneIdx = parts.indexOf('GENE');
+      if (geneIdx !== -1) {
+        associatedGene = parts[geneIdx + 1];
+      } else if (!isDiseaseRoot) {
+        associatedGene = parts[0];
+      }
+
+      const groupKey = associatedGene || 'ALL';
+      const existingKey = geneBaseKeys.get(groupKey);
+      if (!existingKey || key.split(':').length < existingKey.split(':').length) {
+        geneBaseKeys.set(groupKey, key);
+      }
+    });
+
+    geneBaseKeys.forEach(key => matchedKeys.add(key));
   }
 
-  return Array.from(matchedDiseaseKeys);
+  return Array.from(matchedKeys);
 }
+
+
+
 
 
 
@@ -119,44 +237,30 @@ function decomposeKeyForTable(fullKey, indexData) {
   const parts = fullKey.split(':');
   let diseaseName = 'Unknown';
   let geneSubgroupLabel = 'All Genes';
-  let sexSubgroup = null;
-  let geneName = null;
 
-  // Case 1: Key has explicit disease prefix (e.g. "PFIC:gene:MYO5B:sex:M")
-  if (fullKey.includes(':gene:')) {
+  if (fullKey.includes(':disease:')) {
+    // Gene-first format: "MYO5B:disease:MVID"
+    const disIdx = parts.indexOf('disease');
+    diseaseName = parts[disIdx + 1];
+    geneSubgroupLabel = parts[0];
+  } else if (fullKey.includes(':gene:')) {
+    // Disease-first format: "MVID:gene:MYO5B"
     diseaseName = parts[0];
-    geneName = parts[2];
-    if (fullKey.includes(':sex:')) {
-      sexSubgroup = parts[parts.indexOf('sex') + 1];
-    }
-  } 
-  // Case 2: Standalone key (e.g. "MYO5B:sex:M" or "MYO5B")
-  else {
-    geneName = parts[0];
-    if (fullKey.includes(':sex:')) {
-      sexSubgroup = parts[parts.indexOf('sex') + 1];
-    }
-    
-    // Infer parent disease from indexData fallback
+    geneSubgroupLabel = parts[parts.indexOf('gene') + 1];
+  } else {
+    // Root keys: "MYO5B" or "MVID"
     const entry = indexData[fullKey];
-    diseaseName = entry?.disease_name || entry?.disease || 'PFIC'; 
+    diseaseName = entry?.disease_name || entry?.disease || parts[0];
+    geneSubgroupLabel = entry?.gene || parts[0];
   }
 
-  // Format subgroup display text
-  if (geneName) {
+  if (fullKey.includes(':sex:')) {
+    const sexSubgroup = parts[parts.indexOf('sex') + 1];
     const sexStr = sexSubgroup === 'M' ? 'Boys' : sexSubgroup === 'F' ? 'Girls' : sexSubgroup;
-    geneSubgroupLabel = sexStr ? `${geneName} (${sexStr})` : geneName;
+    geneSubgroupLabel = `${geneSubgroupLabel} (${sexStr})`;
   }
 
-  // Build target refinement queries for hyperlinks
-  const sexQueryPart = sexSubgroup ? (sexSubgroup === 'M' ? ' boys' : ' girls') : '';
-  
-  return {
-    diseaseName,
-    geneSubgroupLabel,
-    diseaseQuery: `${diseaseName}${sexQueryPart}`.trim(),
-    subgroupQuery: `${diseaseName} ${geneName || ''}${sexQueryPart}`.trim()
-  };
+  return { diseaseName, geneSubgroupLabel };
 }
 
 export function extractVariableFromQuery(norm) {

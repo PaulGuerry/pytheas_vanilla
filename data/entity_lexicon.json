@@ -1,0 +1,111 @@
+{
+  "diseases": [
+    "AARS1 deficiency",
+    "ARC syndrome",
+    "Aagenaes syndrome",
+    "DARS1 deficiency",
+    "FARSB deficiency",
+    "FHC",
+    "FHL5",
+    "FOCADS",
+    "HBSL",
+    "KARS1 deficiency",
+    "LARS1 deficiency",
+    "LSR deficiency",
+    "MARS1 deficiency",
+    "MVID",
+    "MVID+PFIC",
+    "NARS1 deficiency",
+    "PFIC",
+    "QARS1 deficiency",
+    "RARS1 deficiency",
+    "STX3 deficiency",
+    "STXBP2 deficiency",
+    "THES",
+    "THES1",
+    "THES2",
+    "UNC45A deficiency",
+    "VARS1 deficiency",
+    "YARS1 deficiency",
+    "mixed"
+  ],
+  "genes": [
+    "AARS1",
+    "ABCB11",
+    "ABCB4",
+    "ATP8B1",
+    "DARS1",
+    "FARSB",
+    "FOCAD",
+    "KARS1",
+    "KIF12",
+    "LARS1",
+    "LSR",
+    "MARS1",
+    "MYO5B",
+    "NARS1",
+    "QARS1",
+    "RARS1",
+    "SKIC2",
+    "SKIC3",
+    "STX3",
+    "STXBP2",
+    "TJP2",
+    "UNC45A",
+    "USP53",
+    "VARS1",
+    "VPS33B",
+    "YARS1"
+  ],
+  "variables": [
+    "height",
+    "weight",
+    "CB",
+    "TB",
+    "PTINR",
+    "AST",
+    "ALT",
+    "GGT",
+    "ALP",
+    "SBA",
+    "ALB",
+    "AFP"
+  ],
+  "subgroups": {
+    "sex": [
+      "M",
+      "F"
+    ],
+    "zygosity": [
+      "homozygous",
+      "compound heterozygous",
+      "heterozygous"
+    ],
+    "cadd": [
+      "low (<15)",
+      "moderate (15-19)",
+      "high (>=20)"
+    ],
+    "onset": [
+      "newborn period (0\u20132 months)",
+      "infancy (3\u201311 months)",
+      "toddler (1\u20133 years)",
+      "preschooler (3\u20135 years)",
+      "middle childhood (6\u201311 years)",
+      "adolescence (12\u201319 years)",
+      "adult (> 19 years)"
+    ]
+  },
+  "aliases": {
+    "sex": {
+      "boy": "M",
+      "boys": "M",
+      "male": "M",
+      "males": "M",
+      "girl": "F",
+      "girls": "F",
+      "female": "F",
+      "females": "F"
+    }
+  }
+}

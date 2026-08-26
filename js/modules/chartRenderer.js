@@ -149,8 +149,9 @@ export function renderSummaryTable(parsed) {
     const name = item.disease_name;
     const cohort = getCohortData(item);
     const pCount = cohort?.total_patients ?? 0;
-    let geneLabel = item.matchedGene || t.allGenes;
-    if (item.subgroupKey) {
+
+    let geneLabel = item.geneSubgroupLabel || item.matchedGene || t.allGenes;
+    if (item.subgroupKey && !item.geneSubgroupLabel) {
       geneLabel += ` (${item.subgroupKey})`;
     }
     let detailVal = "-";
