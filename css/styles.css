@@ -273,3 +273,72 @@ body {
   align-items: center;
   gap: 8px;
 }
+
+
+/* ==========================================================================
+   Live Pill Tokenizer Styles
+   ========================================================================== */
+.pill-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.2;
+  transition: all 0.15s ease-in-out;
+}
+
+/* Blue Pills: Diseases */
+.pill-disease {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+/* Green Pills: Genes */
+.pill-gene {
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+/* Gray Pills: Subgroups & Variables */
+.pill-variable {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.pill-remove {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  opacity: 0.65;
+}
+
+.pill-remove:hover {
+  opacity: 1.0;
+}
+
+.pill-subgroup {
+  background-color: #e0e7ff;
+  color: #3730a3;
+  border-radius: 12px;
+  padding: 4px 10px;
+}

@@ -41,13 +41,18 @@
 
     <!-- Dialogue Input Box Below Response Window -->
     <div class="input-container">
-      <div class="chat-box">
-        <input type="text" id="queryInput" class="chat-input" placeholder="Ask Pytheas a question..." data-i18n-placeholder="inputPlaceholder" />
-        <button class="send-btn" onclick="submitQuery()" aria-label="Send query">
-          <svg viewBox="0 0 24 24">
-            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
-          </svg>
-        </button>
+      <div style="width: 100%; max-width: 900px;">
+        <!-- Live Pill Tokenizer Container -->
+        <div id="pillContainer" class="pill-container"></div>
+
+        <div class="chat-box">
+          <input type="text" id="queryInput" class="chat-input" placeholder="Ask Pytheas a question..." data-i18n-placeholder="inputPlaceholder" />
+          <button class="send-btn" onclick="submitQuery()" aria-label="Send query">
+            <svg viewBox="0 0 24 24">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   </main>

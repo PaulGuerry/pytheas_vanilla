@@ -1,18 +1,33 @@
 let clusterDataCache = null;
 
 export let diseasesIndex = {};
+export let hpoDescriptors = {};
 
 export async function initData() {
   try {
-    try {
-      diseasesIndex = await fetchGzipOrJson('data/diseases_index.json.gz');
-    } catch (e) {
-      diseasesIndex = await fetchGzipOrJson('data/diseases_index.json');
-    }
+    const [diseasesRes, hpoRes] = await Promise.all([
+      fetchGzipOrJson('data/diseases_index.json.gz').catch(() => 
+        fetchGzipOrJson('data/diseases_index.json')
+      ),
+      fetch('data/hpo_descriptors.json')
+        .then(res => res.json())
+        .catch(err => {
+          console.warn("Could not load HPO descriptors", err);
+          return {};
+        })
+    ]);
+
+    diseasesIndex = diseasesRes || {};
+    hpoDescriptors = hpoRes || {};
   } catch (e) {
-    console.warn("Could not load diseases index", e);
+    console.warn("Could not load application initial data", e);
   }
   return diseasesIndex;
+}
+
+export function getHpoLabel(hpoCode) {
+  if (!hpoCode) return '';
+  return hpoDescriptors[hpoCode] || hpoCode;
 }
 
 export function getRandomComparisonTargets() {

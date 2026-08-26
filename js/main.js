@@ -2,6 +2,7 @@ import { setLanguage } from './i18n.js';
 import { initData } from './api.js';
 import { renderClusterCard } from './modules/chartRenderer.js';
 import { submitQuery, getQueryState, setQueryState } from './modules/chatUI.js';
+import { initPillTokenizer } from './pillTokenizer.js';
 
 window.setLanguage = setLanguage;
 window.submitQuery = submitQuery;
@@ -11,6 +12,13 @@ window.addEventListener('DOMContentLoaded', async () => {
   await initData();
 
   const queryInput = document.getElementById('queryInput');
+  const pillContainer = document.getElementById('pillContainer');
+
+  // Initialize live pill tokenizer
+  if (queryInput && pillContainer) {
+    initPillTokenizer(queryInput, pillContainer);
+  }
+
   if (queryInput) {
     queryInput.addEventListener('keydown', (e) => {
       let { queryHistory, historyIndex, currentDraft } = getQueryState();

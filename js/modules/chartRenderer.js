@@ -1,7 +1,7 @@
 
 import { getLevenshteinDistance } from './utils.js';
 import { currentLang, translations } from '../i18n.js';
-import { getCohortData, loadClusterData } from '../api.js';
+import { getCohortData, loadClusterData, getHpoLabel } from '../api.js';
 import { ABBREVIATIONS, REMOVAL_WORDS } from '../constants.js';
 
 // Color utility definitions
@@ -735,7 +735,7 @@ export   function renderSurvivalPlot(containerId, targets) {
     });
   
     const layout = {
-      showlegend: true,
+      showlegend: false,
       legend: { orientation: 'h', y: 1.12, x: 0.5, xanchor: 'center' },
       margin: { t: 30, l: 40, r: 20, b: 45 },
       paper_bgcolor: '#ffffff', 
@@ -775,18 +775,17 @@ export function renderGroupedBarChart(containerId, parsed) {
       return keys.map(catKey => {
         if (variable === 'variant_types') {
           const rawCount = cohort?.genetics?.variant_types?.counts?.[catKey] || 0;
-          const pCount = cohort?.patient_count || 0;
+          const pCount = cohort?.total_patients || cohort?.patient_count || 0;
           const totalAlleles = cohort?.genetics?.variant_types?.available_count ?? (pCount * 2);
           return totalAlleles > 0 ? (rawCount / totalAlleles) * 100 : 0;
         } else if (variable === 'zygosity') {
           const zyg = cohort?.genetics?.zygosity || {};
           const counts = zyg.counts || {};
-          const rawAvail = zyg.available_count ?? (cohort?.patient_count || 0);
+          const rawAvail = zyg.available_count ?? (cohort?.total_patients || cohort?.patient_count || 0);
           const unknownCount = counts.unknown || 0;
           const avail = Math.max(0, rawAvail - unknownCount);
 
           const count = counts[catKey] || 0;
-          // Calculate percentage rounded to nearest integer
           return avail > 0 ? Math.round((count / avail) * 100) : 0;
         } else if (variable === 'cadd_scores') {
           return cohort?.genetics?.cadd_tiers?.counts?.[catKey] || 0;
@@ -1049,6 +1048,7 @@ export function renderCohortSignaturesChart(containerId, signaturesData, isFr) {
     const items = [...signaturesData].reverse();
 
     const yCategories = items.map(item => {
+        const rawLabel = getHpoLabel(item['HPO Code']) || item['Description']; 
         return typeof formatText === 'function' 
             ? formatText(item['Description'], 30) 
             : item['Description'];
@@ -1226,7 +1226,7 @@ export function renderClusterUMAP(plotId1, plotId2, clusters, dimensions) {
 export function renderSingleClusterSymptomChart(containerId, cluster, clusterIndex, totalClusters) {
     const isFr = currentLang === 'fr';
     const symptoms = (cluster.archetypal_signatures || []).slice(0, 10);
-    const labels = symptoms.map(s => s.description || s.hpo_code);
+    const labels = symptoms.map(s => getHpoLabel(s.hpo_code || s.hpoCode) || s.description);
     const wrappedLabels = labels.map(label => formatText(label, 15));
     const values = symptoms.map(s => s.prevalence_percent);
     const color = getD3Color(clusterIndex, totalClusters);
@@ -1290,8 +1290,8 @@ export function renderGroupedClusterSymptomChart(containerId, cluster, clusterIn
     const samplePrevalences = allSymptoms[0]?.cluster_prevalences || {};
     const rawClusterKeys = Object.keys(samplePrevalences);
     const clusterKeys = rawClusterKeys.sort((a, b) => {
-        const numA = parseInt(a.replace(/\D/g, ''), 10);
-        const numB = parseInt(b.replace(/\D/g, ''), 10);
+        const numA = parseInt(a.replace(/[^\d-]/g, ''), 10) || 0;
+        const numB = parseInt(b.replace(/[^\d-]/g, ''), 10) || 0;
         if (numA === clusterIndex) return -1;
         if (numB === clusterIndex) return 1;
         return numA - numB;
@@ -1346,8 +1346,8 @@ export function renderGroupedClusterSymptomChart(containerId, cluster, clusterIn
         });
     });
     // Pre-calculate wrapped labels for both chunks to feed the layout
-    const labelsTop = chunks[0].map(s => formatText(s.description || s.hpo_code, 15));
-    const labelsBottom = splitNeeded ? chunks[1].map(s => formatText(s.description || s.hpo_code, 15)) : [];
+    const labelsTop = chunks[0].map(s => formatText(getHpoLabel(s.hpo_code || s.hpoCode) || s.description, 15));
+    const labelsBottom = splitNeeded ? chunks[1].map(s => formatText(getHpoLabel(s.hpo_code || s.hpoCode) || s.description, 15)) : [];
 
     // Layout configuration
     const layout = {
@@ -1404,6 +1404,7 @@ export function renderAssociatedSignaturesChart(containerId, associatedData, clu
     const items = [...associatedData].reverse();
 
     const yCategories = items.map(item => {
+        const rawLabel = getHpoLabel(item.hpo_code || item.hpoCode || item.hpo_id) || item.description;
         return typeof formatText === 'function' 
             ? formatText(item.description, 30) 
             : item.description;

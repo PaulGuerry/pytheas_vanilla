@@ -3,6 +3,161 @@ import { getLevenshteinDistance, normalizeQueryTypos, escapeRegExp } from './uti
 import { PFIC_SUBTYPE_MAP } from '../constants.js';
 import { showClusterSystemMessage } from './chatUI.js';
 
+let entityLexicon = null;
+
+async function loadLexicon() {
+  if (entityLexicon) return entityLexicon;
+  try {
+    const res = await fetch('data/entity_lexicon.json');
+    entityLexicon = await res.json();
+  } catch (err) {
+    console.warn("Could not load entity_lexicon.json, falling back to legacy parsing:", err);
+    entityLexicon = {};
+  }
+  return entityLexicon;
+}
+
+/**
+ * Extracts entities (Disease, Gene, Sex/Subgroups) from a segment string using lexicon & aliases.
+ */
+function parseSegmentEntities(seg, lexicon) {
+  const normSeg = seg.toLowerCase().trim();
+  let disease = null;
+  let gene = null;
+  let sex = null;
+
+  // 1. Detect Disease
+  if (Array.isArray(lexicon.diseases)) {
+    for (const d of lexicon.diseases) {
+      const regex = new RegExp(`\\b${escapeRegExp(d.toLowerCase())}\\b`, 'i');
+      if (regex.test(normSeg)) {
+        disease = d;
+        break;
+      }
+    }
+  }
+
+  // 2. Detect Gene
+  if (Array.isArray(lexicon.genes)) {
+    for (const g of lexicon.genes) {
+      const regex = new RegExp(`\\b${escapeRegExp(g.toLowerCase())}\\b`, 'i');
+      if (regex.test(normSeg)) {
+        gene = g;
+        break;
+      }
+    }
+  }
+
+  // 3. Detect Sex (Aliases e.g. "boys" -> "M", or Direct "M"/"F")
+  if (lexicon.aliases?.sex) {
+    for (const [alias, canonicalSex] of Object.entries(lexicon.aliases.sex)) {
+      const regex = new RegExp(`\\b${escapeRegExp(alias.toLowerCase())}\\b`, 'i');
+      if (regex.test(normSeg)) {
+        sex = canonicalSex;
+        break;
+      }
+    }
+  }
+
+  if (!sex && lexicon.subgroups?.sex) {
+    for (const s of lexicon.subgroups.sex) {
+      const regex = new RegExp(`\\b${escapeRegExp(s.toLowerCase())}\\b`, 'i');
+      if (regex.test(normSeg)) {
+        sex = s;
+        break;
+      }
+    }
+  }
+
+  return { disease, gene, sex };
+}
+
+
+/**
+ * Dynamic resolution: Finds all unique disease roots matching the queried gene target, ignoring subgroups.
+ */
+function resolveSegmentToKeys(seg, lexicon, indexData) {
+  const { disease, gene } = parseSegmentEntities(seg, lexicon);
+  const allIndexKeys = Object.keys(indexData || {});
+  const matchedDiseaseKeys = new Set();
+
+  // 1. Explicit Disease + Gene requested
+  if (disease && gene) {
+    if (indexData[disease]) matchedDiseaseKeys.add(disease);
+  }
+  // 2. Only Gene requested (e.g. "MYO5B" or "ATP8B1") -> Map to root diseases
+  else if (gene) {
+    const geneLower = gene.toLowerCase();
+    
+    allIndexKeys.forEach(key => {
+      const parts = key.split(':');
+      const rootDisease = parts[0];
+      
+      const isGeneMatch = parts.includes('gene') 
+        ? parts[parts.indexOf('gene') + 1]?.toLowerCase() === geneLower
+        : parts[0]?.toLowerCase() === geneLower;
+
+      if (isGeneMatch && indexData[rootDisease]) {
+        matchedDiseaseKeys.add(rootDisease);
+      }
+    });
+  }
+  // 3. Only Disease requested
+  else if (disease) {
+    if (indexData[disease]) matchedDiseaseKeys.add(disease);
+  }
+
+  return Array.from(matchedDiseaseKeys);
+}
+
+
+
+/**
+ * Formats key breakdown into Disease Name, Subgroup Label, and Refinement Queries
+ */
+function decomposeKeyForTable(fullKey, indexData) {
+  const parts = fullKey.split(':');
+  let diseaseName = 'Unknown';
+  let geneSubgroupLabel = 'All Genes';
+  let sexSubgroup = null;
+  let geneName = null;
+
+  // Case 1: Key has explicit disease prefix (e.g. "PFIC:gene:MYO5B:sex:M")
+  if (fullKey.includes(':gene:')) {
+    diseaseName = parts[0];
+    geneName = parts[2];
+    if (fullKey.includes(':sex:')) {
+      sexSubgroup = parts[parts.indexOf('sex') + 1];
+    }
+  } 
+  // Case 2: Standalone key (e.g. "MYO5B:sex:M" or "MYO5B")
+  else {
+    geneName = parts[0];
+    if (fullKey.includes(':sex:')) {
+      sexSubgroup = parts[parts.indexOf('sex') + 1];
+    }
+    
+    // Infer parent disease from indexData fallback
+    const entry = indexData[fullKey];
+    diseaseName = entry?.disease_name || entry?.disease || 'PFIC'; 
+  }
+
+  // Format subgroup display text
+  if (geneName) {
+    const sexStr = sexSubgroup === 'M' ? 'Boys' : sexSubgroup === 'F' ? 'Girls' : sexSubgroup;
+    geneSubgroupLabel = sexStr ? `${geneName} (${sexStr})` : geneName;
+  }
+
+  // Build target refinement queries for hyperlinks
+  const sexQueryPart = sexSubgroup ? (sexSubgroup === 'M' ? ' boys' : ' girls') : '';
+  
+  return {
+    diseaseName,
+    geneSubgroupLabel,
+    diseaseQuery: `${diseaseName}${sexQueryPart}`.trim(),
+    subgroupQuery: `${diseaseName} ${geneName || ''}${sexQueryPart}`.trim()
+  };
+}
 
 export function extractVariableFromQuery(norm) {
   if (/\b(survival|surv|km|kaplan)\b/i.test(norm)) return 'survival';
@@ -12,7 +167,7 @@ export function extractVariableFromQuery(norm) {
   if (/\b(zygosity|homozygous|heterozygous|compound)\b/i.test(norm)) return 'zygosity';
   if (/\b(age_first_symptoms|onset|first symptom|symptom age)\b/i.test(norm)) return 'age_first_symptoms';
   if (/\b(birth_weight|birth weight|weight at birth|bw)\b/i.test(norm)) return 'birth_weight';
-  if (/\b(birth_height|birth height|height at birth|length)\b/i.test(norm)) return 'birth_height';
+  if (/\b(birth_height|birth height|height at birth|length|poids|taille)\b/i.test(norm)) return 'birth_height';
   if (/\b(longitudinal|trend|loess|sba|alt|ast)\b/i.test(norm)) return 'longitudinal';
   if (/\b(treatments|treatment|therapy|drug|response)\b/i.test(norm)) return 'treatments';
   
@@ -39,7 +194,6 @@ export function extractSubgroupFromSegment(seg) {
   return { category: null, key: null };
 }
 
-
 const VALID_VARIABLES = [
   'survival',
   'cadd_scores',
@@ -50,8 +204,6 @@ const VALID_VARIABLES = [
   'birth_weight',
   'birth_height'
 ];
-
-const VARIABLE_PREFIX_REGEX = new RegExp(`^(${VALID_VARIABLES.join('|')})\\s+`, 'i');
 
 export async function parseAndRoute(query) {
     const origNorm = query.toLowerCase().trim();
@@ -65,8 +217,6 @@ export async function parseAndRoute(query) {
     const randomTriggers = ["random", "example", "exemple", "aléatoire", "aleatoire", "?"];
     if (randomTriggers.includes(origNorm)) {
       const [targetA, targetB] = getRandomComparisonTargets();
-      
-      // Use the shared array here instead of a duplicate array
       const randomVar = VALID_VARIABLES[Math.floor(Math.random() * VALID_VARIABLES.length)];
       const constructedQuery = `${randomVar} ${targetA} vs ${targetB}`;         
   
@@ -78,45 +228,46 @@ export async function parseAndRoute(query) {
     const detectedVariable = extractVariableFromQuery(norm);
     const labMatch = norm.match(/\b(height|weight|cb|tb|ptinr|ast|alt|ggt|alp|sba|alb|afp)\b/i);
     const detectedLab = labMatch ? labMatch[0].toUpperCase() : 'SBA';
-  
-    const cleanQuery = norm.replace(/^(survival|cadd_scores|sex_ratio|variant_types|zygosity|age_first_symptoms)\s+/i, '');
-    const rawSegments = cleanQuery.split(/\s+(?:vs|v\.|and)\s+/i);
+
+    const lexicon = await loadLexicon();
+
+    // 1. Strip variable from query head
+    const cleanQuery = norm.replace(/^(survival|cadd_scores|sex_ratio|variant_types|zygosity|age_first_symptoms|birth_weight|birth_height|longitudinal|treatments)\s+/i, '');
+
+    // 2. Split comparison clauses (vs, versus, compared to, et, and, etc.)
+    const rawSegments = cleanQuery.split(/\s+(?:vs|v\.|versus|compared\s+to|contre|and|et)\s+/i);
   
     const targetObjects = [];
     const autoCorrections = [];
-    const allKeys = Object.keys(diseasesIndex || {});
-    const baseDiseases = allKeys.filter(k => !k.includes(':'));
+    const baseDiseases = Object.keys(diseasesIndex || {}).filter(k => !k.includes(':'));
   
     rawSegments.forEach(seg => {
       let matchedKeysForSegment = [];
 
-      // 1. Alias / Subtype mapping: collect ALL keys matching the target gene
-      for (const [alias, geneTarget] of Object.entries(PFIC_SUBTYPE_MAP || {})) {
-        const aliasRegex = new RegExp(`\\b${escapeRegExp(alias)}\\b`, 'i');
-        if (aliasRegex.test(seg)) {
-          const targetLower = geneTarget.toLowerCase();
-          const matches = allKeys.filter(k => k.toLowerCase().includes(targetLower));
-          if (matches.length > 0) {
-            matchedKeysForSegment.push(...matches);
+      // Primary: Deterministic lexicon-based resolution
+      if (Object.keys(lexicon).length > 0) {
+        matchedKeysForSegment = resolveSegmentToKeys(seg, lexicon, diseasesIndex || {});
+      }
+
+      // Fallback 1: Subtype alias mapping (e.g. "PFIC1")
+      if (matchedKeysForSegment.length === 0) {
+        for (const [alias, geneTarget] of Object.entries(PFIC_SUBTYPE_MAP || {})) {
+          const aliasRegex = new RegExp(`\\b${escapeRegExp(alias)}\\b`, 'i');
+          if (aliasRegex.test(seg)) {
+            const { sex } = parseSegmentEntities(seg, lexicon);
+            let candidate = sex ? `${geneTarget}:sex:${sex}` : geneTarget;
+            
+            if (diseasesIndex[candidate]) {
+              matchedKeysForSegment.push(candidate);
+            } else if (diseasesIndex[geneTarget]) {
+              matchedKeysForSegment.push(geneTarget);
+            }
             break;
           }
         }
       }
 
-      // 2. Direct key lookup: collect ALL matching candidate keys in diseasesIndex
-      if (matchedKeysForSegment.length === 0) {
-        for (const key of allKeys) {
-          const lowerKey = key.toLowerCase();
-          const searchTerm = key.includes(':') ? key.split(':').pop() : key;
-          const exactRegex = new RegExp(`\\b${escapeRegExp(searchTerm.toLowerCase())}\\b`, 'i');
-
-          if (seg.includes(lowerKey) || exactRegex.test(seg)) {
-            matchedKeysForSegment.push(key);
-          }
-        }
-      }  
-
-      // 3. Typo/Levenshtein fallback
+      // Fallback 2: Typo / Levenshtein matching on root diseases
       if (matchedKeysForSegment.length === 0) {
         const tokens = seg.split(/\s+/);
         for (const token of tokens) {
@@ -132,27 +283,22 @@ export async function parseAndRoute(query) {
         }
       }
 
-      // Deduplicate keys for this segment and build target objects
       const uniqueKeys = [...new Set(matchedKeysForSegment)];
 
       uniqueKeys.forEach(segMatchedKey => {
         const { category: subCat, key: subKey } = extractSubgroupFromSegment(seg);
-        let baseName = segMatchedKey;
-        let matchedGene = null;
-
-        if (segMatchedKey.includes(':gene:')) {
-          [baseName, matchedGene] = segMatchedKey.split(':gene:');
-        }
+        const decomposed = decomposeKeyForTable(segMatchedKey, diseasesIndex || {});
 
         targetObjects.push({
           fullKey: segMatchedKey,
-          disease_name: baseName,
-          matchedGene: matchedGene,
+          disease_name: decomposed.diseaseName,
+          matchedGene: seg.toUpperCase(),
           subgroupCategory: subCat,
           subgroupKey: subKey,
           data: diseasesIndex[segMatchedKey] || {}
         });
       });
+      
     });
 
     return {
@@ -171,7 +317,6 @@ export async function handleClusterQuery(inputString) {
     const rawTokens = inputString.trim().split(/\s+/);
     
     if (rawTokens[0].toLowerCase() === 'cluster') {
-        // Raw query string without the "cluster" command (e.g., "aaRS", "aaRS genes", or "ABCB4 ABCB11")
         const rawQuery = rawTokens.slice(1).join(' ').trim();
         const genes = rawTokens.slice(1).map(g => g.toUpperCase()).filter(Boolean);
 
@@ -184,13 +329,10 @@ export async function handleClusterQuery(inputString) {
             return true;
         }
 
-        // Helper to format available keys into clickable hyperlinks
         const getAvailableCombinationsHtml = (dataset) => {
             const combinations = Object.keys(dataset).map(key => {
                 const comboStr = key.replace(/_/g, ' ');
-                // Use custom label if defined in JSON, otherwise fallback to the formatted gene list
                 const labelText = dataset[key]?.display_label || comboStr;
-        
                 return `<a href="#" class="cluster-combo-link" data-query="cluster ${comboStr}" style="color: #2563eb; text-decoration: underline; font-weight: 600; cursor: pointer; margin-right: 10px;">${labelText}</a>`;
             }).join(' | ');
         
@@ -210,16 +352,12 @@ export async function handleClusterQuery(inputString) {
 
             for (const key of Object.keys(dataset)) {
                 const entry = dataset[key];
-                
-                // 1. Match display_label (e.g., "aaRS", "aaRS genes", or "19 aaRS genes")
                 if (entry?.display_label) {
                     const normalizedLabel = entry.display_label.toLowerCase().replace(/\s+/g, ' ');
                     if (normalizedLabel === normalizedQuery || normalizedLabel.replace(' genes', '') === normalizedQuery) {
                         return key;
                     }
                 }
-
-                // 2. Fallback to gene list matching (sorted gene keys)
                 const keySorted = key.split('_').sort().join('_');
                 const sortedCandidate = [...geneList].sort().join('_');
                 if (keySorted === sortedCandidate) return key;
@@ -240,12 +378,10 @@ export async function handleClusterQuery(inputString) {
 
         const clusteringResults = geneData.clustering_results;
         const rankKeys = Object.keys(clusteringResults);
-
         const kValues = rankKeys
             .map(rank => clusteringResults[rank]?.num_clusters_k)
             .filter(k => k !== undefined);
 
-        // Display the display_label if present (e.g., "aaRS genes"), otherwise format gene list with '+'
         const displayName = geneData.display_label || geneKey.split('_').join(' + ');
 
         let kListStr = "";
@@ -262,7 +398,6 @@ export async function handleClusterQuery(inputString) {
         const totalRanks = rankKeys.length;
         const linksHtml = rankKeys.map((rank, index) => {
             const kVal = clusteringResults[rank]?.num_clusters_k;
-            
             let labelSuffix = "";
             if (index === 0) {
                 labelSuffix = " (optimal)";
@@ -283,6 +418,3 @@ export async function handleClusterQuery(inputString) {
     
     return false;
 }
-
-
-
