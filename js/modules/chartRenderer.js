@@ -150,9 +150,31 @@ export function renderSummaryTable(parsed) {
     const cohort = getCohortData(item);
     const pCount = cohort?.total_patients ?? 0;
 
-    let geneLabel = item.geneSubgroupLabel || item.matchedGene || t.allGenes;
-    if (item.subgroupKey && !item.geneSubgroupLabel) {
-      geneLabel += ` (${item.subgroupKey})`;
+    // Extract clean gene name and subgroup from item properties or fullKey
+    let rawGeneField = item.matchedGene || item.geneSubgroupLabel || t.allGenes;
+    const geneCol = item.matchedGene || t.allGenes;
+    const subCol = item.subgroupKey || item.subgroupCategory || '–';
+
+    // If subgroup isn't explicit yet but is embedded in the matchedGene string (e.g. "ABCB4 BOYS"), split it out
+    if (subCol === '–' && typeof rawGeneField === 'string') {
+      const parts = rawGeneField.split(/\s+/);
+      if (parts.length > 1) {
+        // Last token or terms like "BOYS"/"GIRLS"/etc. often represent the subgroup
+        const potentialSubgroup = parts[parts.length - 1];
+        if (['BOYS', 'GIRLS', 'M', 'F', 'MALE', 'FEMALE'].includes(potentialSubgroup.toUpperCase())) {
+          subCol = potentialSubgroup;
+          geneCol = parts.slice(0, parts.length - 1).join(' ');
+        }
+      }
+    }
+
+    // Fallback: check if fullKey contains subgroup details (e.g. ":sex:M")
+    if (subCol === '–' && item.fullKey) {
+      const keyParts = item.fullKey.split(':');
+      const sexIdx = keyParts.indexOf('sex');
+      if (sexIdx !== -1 && keyParts[sexIdx + 1]) {
+        subCol = keyParts[sexIdx + 1] === 'M' ? 'Boys' : 'Girls';
+      }
     }
     let detailVal = "-";
     let medianRangeVal = "-";
@@ -206,8 +228,8 @@ export function renderSummaryTable(parsed) {
       return `
         <tr>
           <td>${name}</td>
-          <td class="gene-name">${geneLabel}</td>
-          <td>${pCount}</td>
+          <td class="gene-name">${geneCol}</td>
+          <td>${subCol}</td>
           <td>${detailVal}</td>
           <td>${rate1yr}</td>
           <td>${rate5yr}</td>
@@ -250,8 +272,8 @@ export function renderSummaryTable(parsed) {
       return `
         <tr>
           <td>${name}</td>
-          <td class="gene-name">${geneLabel}</td>
-          <td>${pCount}</td>
+          <td class="gene-name">${geneCol}</td>
+          <td>${subCol}</td>
           <td>${medianRangeVal}</td>
           <td>${detailVal}</td>
           <td><span class="color-swatch" style="background-color: ${color};"></span></td>
@@ -263,8 +285,8 @@ export function renderSummaryTable(parsed) {
       return `
         <tr>
           <td>${name}</td>
-          <td class="gene-name">${geneLabel}</td>
-          <td>${pCount}</td>
+          <td class="gene-name">${geneCol}</td>
+          <td>${subCol}</td>
           <td>${medianCaddVal}</td>
           <td>${detailVal}</td>
           <td><span class="color-swatch" style="background-color: ${color};"></span></td>
@@ -276,8 +298,8 @@ export function renderSummaryTable(parsed) {
       return `
         <tr>
           <td>${name}</td>
-          <td class="gene-name">${geneLabel}</td>
-          <td>${pCount}</td>
+          <td class="gene-name">${geneCol}</td>
+          <td>${subCol}</td>
           <td>${detailVal}</td>
           <td>${sexRatioVal}</td>
           <td><span class="color-swatch" style="background-color: ${color};"></span></td>
@@ -288,8 +310,8 @@ export function renderSummaryTable(parsed) {
     return `
       <tr>
         <td>${name}</td>
-        <td class="gene-name">${geneLabel}</td>
-        <td>${pCount}</td>
+        <td class="gene-name">${geneCol}</td>
+        <td>${subCol}</td>
         <td>${detailVal}</td>
         <td><span class="color-swatch" style="background-color: ${color};"></span></td>
       </tr>
@@ -300,8 +322,8 @@ export function renderSummaryTable(parsed) {
     <thead>
       <tr>
         <th>${t.disease}</th>
-        <th>${t.geneSubgroup}</th>
-        <th>${t.patients}</th>
+        <th>${t.gene || 'Gene'}</th>
+        <th>${t.subgroup || 'Subgroup'}</th>
         <th>${t.dataCoverage}</th>
         <th>${t.color}</th>
       </tr>
@@ -313,8 +335,8 @@ export function renderSummaryTable(parsed) {
       <thead>
         <tr>
           <th>${t.disease}</th>
-          <th>${t.geneSubgroup}</th>
-          <th>${t.patients}</th>
+          <th>${t.gene || 'Gene'}</th>
+          <th>${t.subgroup || 'Subgroup'}</th>
           <th>${t.dataCoverage}</th>
           <th>${t.surv1yr}</th>
           <th>${t.surv5yr}</th>
@@ -328,8 +350,8 @@ export function renderSummaryTable(parsed) {
       <thead>
         <tr>
           <th>${t.disease}</th>
-          <th>${t.geneSubgroup}</th>
-          <th>${t.patients}</th>
+          <th>${t.gene || 'Gene'}</th>
+          <th>${t.subgroup || 'Subgroup'}</th>
           <th>${t.medianOnset}</th>
           <th>${t.dataCoverage}</th>
           <th>${t.color}</th>
@@ -341,8 +363,8 @@ export function renderSummaryTable(parsed) {
       <thead>
         <tr>
           <th>${t.disease}</th>
-          <th>${t.geneSubgroup}</th>
-          <th>${t.patients}</th>
+          <th>${t.gene || 'Gene'}</th>
+          <th>${t.subgroup || 'Subgroup'}</th>
           <th>${t.medianCadd}</th>
           <th>${t.dataCoverage}</th>
           <th>${t.color}</th>
@@ -354,8 +376,8 @@ export function renderSummaryTable(parsed) {
       <thead>
         <tr>
           <th>${t.disease}</th>
-          <th>${t.geneSubgroup}</th>
-          <th>${t.patients}</th>
+          <th>${t.gene || 'Gene'}</th>
+          <th>${t.subgroup || 'Subgroup'}</th>
           <th>${t.dataCoverage}</th>
           <th>${t.sexRatio}</th>
           <th>${t.color}</th>

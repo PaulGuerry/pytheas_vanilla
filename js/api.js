@@ -2,6 +2,19 @@ let clusterDataCache = null;
 
 export let diseasesIndex = {};
 export let hpoDescriptors = {};
+export let entityLexicon = null;
+
+export async function loadLexicon() {
+  if (entityLexicon) return entityLexicon;
+  try {
+    const res = await fetch('data/entity_lexicon.json');
+    entityLexicon = await res.json();
+  } catch (err) {
+    console.warn("Could not load entity_lexicon.json, falling back to legacy parsing:", err);
+    entityLexicon = {};
+  }
+  return entityLexicon;
+}
 
 export async function initData() {
   try {

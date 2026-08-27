@@ -1,21 +1,9 @@
-import { diseasesIndex, getRandomComparisonTargets, loadClusterData } from '../api.js';
+import { diseasesIndex, getRandomComparisonTargets, loadClusterData, loadLexicon } from '../api.js';
 import { getLevenshteinDistance, normalizeQueryTypos, escapeRegExp } from './utils.js';
 import { PFIC_SUBTYPE_MAP } from '../constants.js';
 import { showClusterSystemMessage } from './chatUI.js';
 
-let entityLexicon = null;
 
-async function loadLexicon() {
-  if (entityLexicon) return entityLexicon;
-  try {
-    const res = await fetch('data/entity_lexicon.json');
-    entityLexicon = await res.json();
-  } catch (err) {
-    console.warn("Could not load entity_lexicon.json, falling back to legacy parsing:", err);
-    entityLexicon = {};
-  }
-  return entityLexicon;
-}
 
 /**
  * Extracts entities (Disease, Gene, Sex/Subgroups) from a segment string using lexicon & aliases.
@@ -220,12 +208,15 @@ export function resolveSegmentToKeys(seg, lexicon, indexData) {
       allIndexKeys.forEach(key => {
         const parts = key.split(':').map(p => p.toUpperCase());
 
-        // Key MUST contain the requested gene symbol token as an exact segment match
-        const knownGenes = (lexicon.genes || []).map(g => g.toUpperCase());
-        const hasGeneToken = parts.includes(requestedGene);
-        if (!hasGeneToken) return;
+        // Key MUST contain the gene symbol token
+        if (!parts.includes(requestedGene)) return;
 
-        // Key MUST match target subgroup constraints strictly
+        // If user didn't request a subgroup (like variant/sex), DO NOT greedily match variant-sliced keys!
+        const hasUnrequestedSubgroups = parts.includes('VARIANT') || parts.includes('SEX');
+        const userRequestedSubgroups = Object.keys(targetSubgroups).length > 0;
+        if (hasUnrequestedSubgroups && !userRequestedSubgroups) return;
+
+        // Key MUST match target subgroup constraints strictly if provided
         if (!keyMatchesSubgroups(parts, targetSubgroups, lexicon, true)) return;
 
         const rawDisease = extractDiseaseForKey(key, parts, lexicon, indexData);
@@ -234,20 +225,19 @@ export function resolveSegmentToKeys(seg, lexicon, indexData) {
         const hasDiseaseSegment = parts.includes('DISEASE');
 
         if (rawDisease && hasDiseaseSegment) {
-          const canonicalDisease = DISEASE_ALIASES[rawDisease] || rawDisease;
-          // Use a composite unique key (Gene + Disease + Subgroups) so multiple genes don't overwrite each other
-          const uniqueMapKey = `${requestedGene}:${canonicalDisease}:${JSON.stringify(targetSubgroups)}`;
-          explicitDiseaseKeys.set(uniqueMapKey, key);
-        } else if (rawDisease) {
-          const canonicalDisease = DISEASE_ALIASES[rawDisease] || rawDisease;
-          const uniqueMapKey = `${requestedGene}:${canonicalDisease}:${JSON.stringify(targetSubgroups)}`;
-          if (!explicitDiseaseKeys.has(uniqueMapKey)) {
+          let canonicalDisease = DISEASE_ALIASES[rawDisease] || rawDisease;
+          
+          // Prefer explicit/combined keys like "PFIC+MVID" over "MIXED" if both map
+          const uniqueMapKey = `${requestedGene}:${canonicalDisease}`;
+          
+          // If we already have a key for this disease, prefer the one that is cleaner or explicitly "PFIC+MVID"
+          if (explicitDiseaseKeys.has(uniqueMapKey)) {
+            const existingKey = explicitDiseaseKeys.get(uniqueMapKey);
+            if (key.includes('PFIC+MVID') && !existingKey.includes('PFIC+MVID')) {
+              explicitDiseaseKeys.set(uniqueMapKey, key);
+            }
+          } else {
             explicitDiseaseKeys.set(uniqueMapKey, key);
-          }
-        } else {
-          const existingKey = untaggedFallbackKeys.get('DEFAULT');
-          if (!existingKey || key.split(':').length < existingKey.split(':').length) {
-            untaggedFallbackKeys.set('DEFAULT', key);
           }
         }
       });
@@ -255,18 +245,13 @@ export function resolveSegmentToKeys(seg, lexicon, indexData) {
       if (explicitDiseaseKeys.size > 0) {
         explicitDiseaseKeys.forEach(key => matchedKeys.add(key));
         return true;
-      } else if (untaggedFallbackKeys.size > 0) {
-        untaggedFallbackKeys.forEach(key => matchedKeys.add(key));
-        return true;
       }
       return false;
     };
 
-    let found = collectGeneKeys(subgroups);
-    if (!found && Object.keys(subgroups).length > 0) {
-      collectGeneKeys({});
-    }
+    collectGeneKeys(subgroups);
   }
+
   // 2. Pure Disease Query (e.g., "PFIC boys")
   else if (requestedDisease) {
     const geneBaseKeys = new Map();
@@ -459,19 +444,24 @@ export async function parseAndRoute(query) {
       const uniqueKeys = [...new Set(matchedKeysForSegment)];
 
       uniqueKeys.forEach(segMatchedKey => {
-        console.log(`[DEBUG] Index data payload for key "${segMatchedKey}":`, diseasesIndex[segMatchedKey]);
-        const { category: subCat, key: subKey } = extractSubgroupFromSegment(seg);
-        const decomposed = decomposeKeyForTable(segMatchedKey, diseasesIndex || {});
+          console.log(`[DEBUG] Index data payload for key "${segMatchedKey}":`, diseasesIndex[segMatchedKey]);
+          
+          // Parse entities specifically for this segment to cleanly separate gene, disease, and subgroups
+          const segmentEntities = parseSegmentEntities(seg, lexicon);
+          const { category: subCat, key: subKey } = extractSubgroupFromSegment(seg);
+          const decomposed = decomposeKeyForTable(segMatchedKey, diseasesIndex || {});
 
-        targetObjects.push({
-          fullKey: segMatchedKey,
-          disease_name: decomposed.diseaseName,
-          matchedGene: seg.toUpperCase(),
-          subgroupCategory: subCat,
-          subgroupKey: subKey,
-          data: diseasesIndex[segMatchedKey] || {}
+          targetObjects.push({
+            fullKey: segMatchedKey,
+            disease_name: decomposed.diseaseName,
+            // Extract strictly the gene symbol if present, otherwise fallback
+            matchedGene: segmentEntities.gene || decomposed.gene || seg.toUpperCase(),
+            subgroupCategory: subCat,
+            // Ensure subgroupKey captures explicit tags like sex/variant if present in segmentEntities or segMatchedKey
+            subgroupKey: subKey || segmentEntities.sex || segmentEntities.variant || null,
+            data: diseasesIndex[segMatchedKey] || {}
+          });
         });
-      });
       
     });
 

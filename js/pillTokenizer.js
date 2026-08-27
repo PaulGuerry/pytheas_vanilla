@@ -1,3 +1,6 @@
+import { loadLexicon } from './api.js';
+
+
 /**
  * Debounce helper to prevent excessive tokenization on fast keypresses
  */
@@ -60,6 +63,7 @@ export function initPillTokenizer(inputEl, containerEl, onQueryUpdate) {
 async function extractPillTokens(query) {
     const tokens = [];
     const seenTerms = new Set();
+    const lexicon = await loadLexicon(); // Assuming loadLexicon() is available in your scope
 
     // 1. Variable Pills
     VARIABLE_PATTERNS.forEach(varTerm => {
@@ -71,18 +75,42 @@ async function extractPillTokens(query) {
         }
     });
 
-    // 2. Subgroup Pills (e.g. boys, girls, homozygous)
-    SUBGROUP_PATTERNS.forEach(subTerm => {
-        const reg = new RegExp(`\\b${escapeRegExp(subTerm)}\\b`, 'gi');
-        const match = query.match(reg);
-        if (match && !seenTerms.has(subTerm.toLowerCase())) {
-            seenTerms.add(subTerm.toLowerCase());
-            tokens.push({ text: match[0], raw: match[0], type: 'subgroup' });
-        }
-    });
+    // 2. Dynamic Subgroup Pills from Lexicon & Aliases
+    if (lexicon && lexicon.subgroups) {
+        const subgroupEntries = [];
 
-    // 3. Green Pills: Genes
-    KNOWN_GENES.forEach(gene => {
+        // Build a comprehensive map of search terms -> normalized primary key
+        // e.g. "boys" -> "M", "girls" -> "F", "homozygous" -> "homozygous"
+        for (const [category, values] of Object.entries(lexicon.subgroups)) {
+            values.forEach(val => {
+                subgroupEntries.push({ term: val.toLowerCase(), canonical: val.toUpperCase() });
+            });
+        }
+
+        if (lexicon.aliases) {
+            for (const [category, aliasMap] of Object.entries(lexicon.aliases)) {
+                for (const [alias, canonicalVal] of Object.entries(aliasMap)) {
+                    subgroupEntries.push({ term: alias.toLowerCase(), canonical: canonicalVal.toUpperCase() });
+                }
+            }
+        }
+
+        // Sort terms by length descending to match multi-word phrases first (e.g. "compound heterozygous")
+        subgroupEntries.sort((a, b) => b.term.length - a.term.length);
+
+        subgroupEntries.forEach(({ term, canonical }) => {
+            const reg = new RegExp(`\\b${escapeRegExp(term)}\\b`, 'gi');
+            const match = query.match(reg);
+            if (match && !seenTerms.has(term)) {
+                seenTerms.add(term);
+                tokens.push({ text: canonical, raw: match[0], type: 'subgroup' });
+            }
+        });
+    }
+
+    // 3. Green Pills: Genes (fallback to KNOWN_GENES or lexicon.genes)
+    const geneList = (lexicon && lexicon.genes) ? lexicon.genes : KNOWN_GENES;
+    geneList.forEach(gene => {
         const reg = new RegExp(`\\b${escapeRegExp(gene)}\\b`, 'gi');
         const match = query.match(reg);
         if (match && !seenTerms.has(gene.toLowerCase())) {
@@ -91,17 +119,31 @@ async function extractPillTokens(query) {
         }
     });
 
-    // 4. Blue Pills: Diseases (e.g. PFIC, PFIC1, Byler Disease)
-    const diseaseRegex = /\b(pfic\s*\d*|byler\s*disease|progressive\s*familial\s*intrahepatic\s*cholestasis)\b/gi;
-    const diseaseMatches = query.match(diseaseRegex);
-    if (diseaseMatches) {
-        diseaseMatches.forEach(dm => {
-            const key = dm.toLowerCase().trim();
-            if (!seenTerms.has(key)) {
-                seenTerms.add(key);
-                tokens.push({ text: dm.toUpperCase(), raw: dm, type: 'disease' });
+    // 4. Blue Pills: Diseases (fallback to lexicon.diseases or regex)
+    const diseaseList = (lexicon && lexicon.diseases) ? lexicon.diseases : [];
+    if (diseaseList.length > 0) {
+        // Sort diseases by length descending to match multi-word names first
+        const sortedDiseases = [...diseaseList].sort((a, b) => b.length - a.length);
+        sortedDiseases.forEach(dis => {
+            const reg = new RegExp(`\\b${escapeRegExp(dis)}\\b`, 'gi');
+            const match = query.match(reg);
+            if (match && !seenTerms.has(dis.toLowerCase())) {
+                seenTerms.add(dis.toLowerCase());
+                tokens.push({ text: match[0].toUpperCase(), raw: match[0], type: 'disease' });
             }
         });
+    } else {
+        const diseaseRegex = /\b(pfic\s*\d*|byler\s*disease|progressive\s*familial\s*intrahepatic\s*cholestasis)\b/gi;
+        const diseaseMatches = query.match(diseaseRegex);
+        if (diseaseMatches) {
+            diseaseMatches.forEach(dm => {
+                const key = dm.toLowerCase().trim();
+                if (!seenTerms.has(key)) {
+                    seenTerms.add(key);
+                    tokens.push({ text: dm.toUpperCase(), raw: dm, type: 'disease' });
+                }
+            });
+        }
     }
 
     return tokens;
