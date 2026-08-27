@@ -1,4 +1,5 @@
 import { ABBREVIATIONS, REMOVAL_WORDS } from '../constants.js';
+import { hpoDescriptors } from '../api.js';
 
 export function getLevenshteinDistance(a, b) {
   if (a.length === 0) return b.length;
@@ -143,4 +144,29 @@ export function normalizeQueryTypos(norm) {
 }
 
 
+export function parseHpo(codeInput) {
+  const digits = String(codeInput).replace(/\D/g, "").padStart(7, "0");
+  return { fullCode: `HP:${digits}`, digits };
+}
 
+export function loadHpoDescriptor(descriptors, targetDigits) {
+  if (!descriptors) return "Unknown Descriptor";
+  
+  if (Array.isArray(descriptors)) {
+    for (const item of descriptors) {
+      const itemCode = item.id || item.hpo_code || "";
+      const { digits } = parseHpo(itemCode);
+      if (digits === targetDigits) {
+        return item.name || item.descriptor || "Unknown Descriptor";
+      }
+    }
+  } else if (typeof descriptors === "object") {
+    for (const [key, val] of Object.entries(descriptors)) {
+      const { digits } = parseHpo(key);
+      if (digits === targetDigits) {
+        return typeof val === "string" ? val : (val?.name || "Unknown Descriptor");
+      }
+    }
+  }
+  return "Unknown Descriptor";
+}

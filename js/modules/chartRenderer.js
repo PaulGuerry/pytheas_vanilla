@@ -1586,3 +1586,87 @@ export function renderAssociatedSignaturesChart(containerId, associatedData, clu
 
     Plotly.newPlot(containerId, [trace], layout, { responsive: true, displayModeBar: false });
 }
+
+
+export function renderSymptomResultCard(fullCode, descriptor, geneKey, matchedClusters) {
+  const container = document.getElementById('messagesContainer');
+  if (!container) return;
+
+  const cardDiv = document.createElement('div');
+  cardDiv.className = "message ai";
+
+  let contentHtml = '';
+
+  if (matchedClusters.length === 0) {
+    contentHtml = `<p style="color: #64748b;">Symptom "<strong>${fullCode}</strong>" (${descriptor}) was not found in associated signatures for any cluster in PytheasDB (all).</p>`;
+    cardDiv.innerHTML = `
+      <div class="ai-card">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem;">
+          <span style="font-weight: 600; font-size: 0.95rem; color: #334155;">HPO Symptom Analysis — PytheasDB (all)</span>
+        </div>
+        ${contentHtml}
+      </div>
+    `;
+    container.appendChild(cardDiv);
+    return;
+  }
+
+  // Base card container
+  cardDiv.innerHTML = `
+    <div class="ai-card">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem;">
+        <span style="font-weight: 600; font-size: 0.95rem; color: #334155;">HPO Symptom Analysis — PytheasDB (all)</span>
+      </div>
+      <div id="symptom-results-body-${fullCode}"></div>
+    </div>
+  `;
+  container.appendChild(cardDiv);
+
+  const bodyContainer = cardDiv.querySelector(`#symptom-results-body-${fullCode}`);
+
+  // Loop through matched clusters and render their summary info + summary table
+  matchedClusters.forEach(match => {
+    const sectionWrapper = document.createElement('div');
+    sectionWrapper.style.marginBottom = "1.5rem";
+
+    const rankKey = match.rankKey || 'optimal'; // typically 'optimal' or specific cluster rank identifier
+
+    // Text description making the word "cluster" a clickable link to renderClusterCard
+    const textP = document.createElement('p');
+    textP.style.fontSize = "0.9rem";
+    textP.style.color = "#334155";
+    textP.style.marginBottom = "0.5rem";
+    
+    textP.innerHTML = `Symptom "<strong>${fullCode}</strong>", ${descriptor}, is significantly associated with <a href="#" class="cluster-link" style="color: #2563eb; text-decoration: underline; font-weight: 600;">cluster ${match.clusterId}</a> (p = ${match.pValue}), in the following patients:`;
+
+    // Bind event listener to the "cluster" link to call renderClusterCard
+    const linkEl = textP.querySelector('.cluster-link');
+    linkEl.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (typeof window.renderClusterCard === 'function') {
+        window.renderClusterCard(geneKey, rankKey, match.clusterId);
+      } else {
+        console.warn("renderClusterCard is not defined globally.");
+      }
+    });
+
+    sectionWrapper.appendChild(textP);
+
+    // Container for the summary table
+    const tableContainer = document.createElement('div');
+    sectionWrapper.appendChild(tableContainer);
+    
+    bodyContainer.appendChild(sectionWrapper);
+
+    // Render patient rows using the project's standard renderSummaryTable utility
+    if (typeof renderSummaryTable === 'function') {
+      renderSummaryTable(match.patientRows, tableContainer);
+    } else {
+      // Fallback if renderSummaryTable isn't loaded in this scope
+      tableContainer.innerHTML = `<p style="font-size: 0.8rem; color: #ef4444;">Summary table renderer not found.</p>`;
+    }
+  });
+
+  const stream = document.getElementById('chatStream');
+  if (stream) stream.scrollTop = stream.scrollHeight;
+}
