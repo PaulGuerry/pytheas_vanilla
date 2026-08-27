@@ -1587,7 +1587,6 @@ export function renderAssociatedSignaturesChart(containerId, associatedData, clu
     Plotly.newPlot(containerId, [trace], layout, { responsive: true, displayModeBar: false });
 }
 
-
 export function renderSymptomResultCard(fullCode, descriptor, geneKey, matchedClusters) {
   const container = document.getElementById('messagesContainer');
   if (!container) return;
@@ -1595,78 +1594,160 @@ export function renderSymptomResultCard(fullCode, descriptor, geneKey, matchedCl
   const cardDiv = document.createElement('div');
   cardDiv.className = "message ai";
 
-  let contentHtml = '';
-
-  if (matchedClusters.length === 0) {
-    contentHtml = `<p style="color: #64748b;">Symptom "<strong>${fullCode}</strong>" (${descriptor}) was not found in associated signatures for any cluster in PytheasDB (all).</p>`;
+  if (!matchedClusters || matchedClusters.length === 0) {
     cardDiv.innerHTML = `
       <div class="ai-card">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem;">
-          <span style="font-weight: 600; font-size: 0.95rem; color: #334155;">HPO Symptom Analysis — PytheasDB (all)</span>
-        </div>
-        ${contentHtml}
+        <div style="font-weight: 600; font-size: 0.95rem; color: #334155; margin-bottom: 0.75rem;">HPO Symptom Analysis — PytheasDB (all)</div>
+        <p style="color: #64748b;">Symptom "<strong>${fullCode}</strong>" (${descriptor}) was not found in associated signatures for any cluster in PytheasDB (all).</p>
       </div>
     `;
     container.appendChild(cardDiv);
     return;
   }
 
-  // Base card container
+  const safeIdCode = fullCode.replace(/[^a-zA-Z0-9-_]/g, '-');
+
   cardDiv.innerHTML = `
     <div class="ai-card">
-      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem;">
-        <span style="font-weight: 600; font-size: 0.95rem; color: #334155;">HPO Symptom Analysis — PytheasDB (all)</span>
-      </div>
-      <div id="symptom-results-body-${fullCode}"></div>
+      <div style="font-weight: 600; font-size: 0.95rem; color: #334155; margin-bottom: 0.75rem;">HPO Symptom Analysis — PytheasDB (all)</div>
+      <div id="symptom-results-body-${safeIdCode}"></div>
     </div>
   `;
   container.appendChild(cardDiv);
 
-  const bodyContainer = cardDiv.querySelector(`#symptom-results-body-${fullCode}`);
+  const bodyContainer = cardDiv.querySelector(`#symptom-results-body-${safeIdCode}`);
 
-  // Loop through matched clusters and render their summary info + summary table
+  // 1. Gather all patient rows first (useful for total dataset and counting)
+  const allPatientRows = [];
   matchedClusters.forEach(match => {
-    const sectionWrapper = document.createElement('div');
-    sectionWrapper.style.marginBottom = "1.5rem";
-
-    const rankKey = match.rankKey || 'optimal'; // typically 'optimal' or specific cluster rank identifier
-
-    // Text description making the word "cluster" a clickable link to renderClusterCard
-    const textP = document.createElement('p');
-    textP.style.fontSize = "0.9rem";
-    textP.style.color = "#334155";
-    textP.style.marginBottom = "0.5rem";
-    
-    textP.innerHTML = `Symptom "<strong>${fullCode}</strong>", ${descriptor}, is significantly associated with <a href="#" class="cluster-link" style="color: #2563eb; text-decoration: underline; font-weight: 600;">cluster ${match.clusterId}</a> (p = ${match.pValue}), in the following patients:`;
-
-    // Bind event listener to the "cluster" link to call renderClusterCard
-    const linkEl = textP.querySelector('.cluster-link');
-    linkEl.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (typeof window.renderClusterCard === 'function') {
-        window.renderClusterCard(geneKey, rankKey, match.clusterId);
-      } else {
-        console.warn("renderClusterCard is not defined globally.");
-      }
-    });
-
-    sectionWrapper.appendChild(textP);
-
-    // Container for the summary table
-    const tableContainer = document.createElement('div');
-    sectionWrapper.appendChild(tableContainer);
-    
-    bodyContainer.appendChild(sectionWrapper);
-
-    // Render patient rows using the project's standard renderSummaryTable utility
-    if (typeof renderSummaryTable === 'function') {
-      renderSummaryTable(match.patientRows, tableContainer);
-    } else {
-      // Fallback if renderSummaryTable isn't loaded in this scope
-      tableContainer.innerHTML = `<p style="font-size: 0.8rem; color: #ef4444;">Summary table renderer not found.</p>`;
+    if (match.patientRows && Array.isArray(match.patientRows)) {
+      // Inject clusterId into each row for the detail table counters
+      const rowsWithCluster = match.patientRows.map(r => ({ ...r, cluster: match.clusterId }));
+      allPatientRows.push(...rowsWithCluster);
     }
   });
 
+  // 2. CALL renderSymptomResultStatement HERE
+  const textP = document.createElement('p');
+  textP.style.fontSize = "0.9rem";
+  textP.style.color = "#334155";
+  textP.style.marginBottom = "1rem";
+  textP.innerHTML = renderSymptomResultStatement(fullCode, descriptor, matchedClusters);
+
+  // 3. Bind click handlers to the generated cluster links
+  textP.querySelectorAll('.cluster-link').forEach(link => {
+    const clusterId = link.getAttribute('data-cluster');
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (typeof window.renderClusterCard === 'function') {
+        window.renderClusterCard(geneKey, 'optimal', clusterId);
+      }
+    });
+  });
+
+  bodyContainer.appendChild(textP);
+
+  // 4. Render Patient Details Table
+  const tableContainer = document.createElement('div');
+  bodyContainer.appendChild(tableContainer);
+
+  console.log("[DEBUG] allPatientRows data payload:", allPatientRows);  
+  if (typeof renderPatientDetailsTable === 'function' && allPatientRows.length > 0) {
+    tableContainer.innerHTML = renderPatientDetailsTable(allPatientRows);
+  } else {
+    console.error("[ERROR] renderPatientDetailsTable is missing or payload is empty!");
+  }
+
   const stream = document.getElementById('chatStream');
   if (stream) stream.scrollTop = stream.scrollHeight;
+}
+
+
+
+
+export function renderPatientDetailsTable(payload) {
+  let dataRows = [];
+  if (Array.isArray(payload)) {
+    dataRows = payload;
+  } else if (payload) {
+    dataRows = payload.patients || payload.records || [];
+  }
+
+  // Track counters per cluster independently
+  const clusterCounters = {};
+
+  let rowsHtml = dataRows.map((item) => {
+    // Robust fallbacks for missing patient ID fields
+    const patientId = item.patientId || item.patient_ID || item.id || item.subject_id || item.patient || item.name || '–';
+    const gene = item.gene || item.matchedGene || '–';
+    const doi = item.doi || item.reference_doi || '–';
+    const clusterNum = item.cluster || item.cluster_id || '1';
+
+    // Increment counter for this specific cluster
+    clusterCounters[clusterNum] = (clusterCounters[clusterNum] || 0) + 1;
+    const counterVal = clusterCounters[clusterNum];
+
+    const doiCell = doi !== '–' 
+      ? `<a href="https://doi.org/${doi}" target="_blank" rel="noopener noreferrer">${doi}</a>` 
+      : '–';
+
+    return `
+      <tr style="line-height: 1.2;">
+        <td style="padding: 4px 8px;">Cluster ${clusterNum}</td>
+        <td style="padding: 4px 8px;">${counterVal}</td>
+        <td style="padding: 4px 8px;"><span class="gene-name">${gene}</span></td>
+        <td style="padding: 4px 8px;">${doiCell}</td>
+        <td style="padding: 4px 8px;">${patientId}</td>
+      </tr>
+    `;
+  }).join('');
+
+  const tableHeaders = `
+    <thead>
+      <tr style="border-bottom: 2px solid #ddd;">
+        <th style="padding: 6px 8px;">Cluster</th>
+        <th style="padding: 6px 8px;">#</th>
+        <th style="padding: 6px 8px;">Gene</th>
+        <th style="padding: 6px 8px;">DOI</th>
+        <th style="padding: 6px 8px;">Patient ID</th>
+      </tr>
+    </thead>
+  `;
+
+  return `
+    <div class="data-table-container" style="max-height: 400px; overflow-y: auto;">
+      <table class="data-table" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        ${tableHeaders}
+        <tbody>${rowsHtml}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+
+
+
+
+
+export function renderSymptomResultStatement(code, descriptor, matchedClusters) {
+  const clusterParts = matchedClusters.map(match => {
+    const cId = match.clusterId;
+    const pValStr = match.pValue ? match.pValue.toString().trim() : '< 0.001';
+    const formattedP = pValStr.startsWith('<') ? pValStr : `= ${pValStr}`;
+    const patientCount = match.patientRows ? match.patientRows.length : 0;
+
+    return `<a href="#" class="cluster-link" data-cluster="${cId}" style="color: #2563eb; text-decoration: underline; font-weight: 600;">cluster ${cId}</a> (${patientCount} patients, p ${formattedP})`;
+  });
+
+  let clustersText = "";
+  if (clusterParts.length === 1) {
+    clustersText = clusterParts[0];
+  } else if (clusterParts.length === 2) {
+    clustersText = `${clusterParts[0]} and ${clusterParts[1]}`;
+  } else {
+    const last = clusterParts.pop();
+    clustersText = `${clusterParts.join(', ')}, and ${last}`;
+  }
+
+  return `Symptom "<strong>${code}</strong>", ${descriptor}, is significantly associated with ${clustersText}, in the following patients:`;
 }

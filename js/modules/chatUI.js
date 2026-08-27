@@ -1,6 +1,7 @@
 import { translations, currentLang } from '../i18n.js';
 import { parseAndRoute } from './queryParser.js';
-import { escapeHtml } from './utils.js';
+import { escapeHtml, parseHpo, loadHpoDescriptor } from './utils.js';
+import { loadClusterData, hpoDescriptors } from '../api.js';
 import { 
   renderSummaryTable, 
   renderSurvivalPlot, 
@@ -8,7 +9,8 @@ import {
   renderTopRoundedBarChart, 
   renderBoxOrRangeChart, 
   renderInverseSurvivalPlot, 
-  renderLongitudinalChart 
+  renderLongitudinalChart,
+  renderSymptomResultCard 
 } from './chartRenderer.js';
 
 let queryHistory = [];
@@ -57,6 +59,12 @@ export async function submitQuery() {
   input.value = '';
 
   const parsed = await parseAndRoute(query);
+  
+  // If the router handled it as a direct symptom query, exit early here!
+  if (parsed && parsed.isSymptomQuery) {
+    return;
+  }
+
   const finalQueryText = parsed.resolvedQuery || query;
 
   if (queryHistory.length === 0 || queryHistory[queryHistory.length - 1] !== finalQueryText) {
@@ -68,6 +76,8 @@ export async function submitQuery() {
   appendUserMessage(finalQueryText);
   appendAiResponse(finalQueryText, parsed);
 }
+
+
 
 function appendUserMessage(text) {
   const container = document.getElementById('messagesContainer');
@@ -186,3 +196,93 @@ document.addEventListener('click', (event) => {
         }
     }
 });
+
+
+export async function handleSingleSymptomQuery(queryInput, descriptorsData = {}) {
+  console.log(`[DEBUG] handleSingleSymptomQuery received input: "${queryInput}"`);
+  
+  const { fullCode, digits: targetDigits } = parseHpo(queryInput);
+  console.log(`[DEBUG] Parsed HPO -> fullCode: ${fullCode}, digits: ${targetDigits}`);
+  
+  // Check if query looks like an HPO code or single symptom query
+  if (!fullCode && !queryInput.startsWith("HP:")) {
+    console.log(`[DEBUG] Failed validation: fullCode or HP: prefix missing`);
+    return false;
+  }
+
+  const clusterDataCache = await loadClusterData();
+  if (!clusterDataCache) {
+    console.log(`[DEBUG] clusterDataCache failed to load or is empty`);
+    return false;
+  }
+
+  // Find the dataset with "display_label": "PytheasDB (all)"
+  let targetGeneKey = null;
+  for (const [key, entry] of Object.entries(clusterDataCache)) {
+    if (entry.display_label === "PytheasDB (all)") {
+      targetGeneKey = key;
+      break;
+    }
+  }
+
+  console.log(`[DEBUG] Target gene key for PytheasDB (all):`, targetGeneKey);
+  if (!targetGeneKey) return false;
+
+  const geneObj = clusterDataCache[targetGeneKey];
+  const clusteringResults = geneObj.clustering_results?.optimal || {};
+  const clusters = clusteringResults.clusters || [];
+  console.log(`[DEBUG] Total clusters found in optimal results:`, clusters.length);
+  
+  const descriptor = loadHpoDescriptor(hpoDescriptors, targetDigits);
+  const matchedClusters = [];
+
+  clusters.forEach(cluster => {
+    const clusterId = cluster.cluster_id;
+    const assocSigs = cluster.associated_signatures || [];
+
+    let matchedSig = null;
+    for (const sig of assocSigs) {
+      const sigRaw = sig.hpo_code || sig.id || "";
+      const { digits: sigDigits } = parseHpo(sigRaw);
+      if (sigDigits === targetDigits) {
+        matchedSig = sig;
+        break;
+      }
+    }
+
+    if (matchedSig) {
+      const pValue = matchedSig.p_value || "N/A";
+      const patientRows = [];
+
+      (cluster.patients || []).forEach(patient => {
+        const patientSymptomsDigits = (patient.symptoms || []).map(s => parseHpo(s).digits);
+
+        console.log(`[DEBUG] Patient ID:`, patient.patients, `Symptoms array:`, patient.symptoms);
+        console.log(`[DEBUG] Mapped patient digits:`, patientSymptomsDigits, `Target digits:`, targetDigits);
+        
+        if (patientSymptomsDigits.includes(targetDigits)) {
+          let doi = patient.doi || "";
+          if (doi && !doi.startsWith("http")) {
+            doi = `https://doi.org/${doi}`;
+          }
+          patientRows.push({
+            doi,
+            patientId: patient.patients || "",
+            gene: patient.gene || "N/A"
+          });
+        }
+      });
+
+      matchedClusters.push({
+        clusterId,
+        pValue,
+        patientRows
+      });
+    }
+  });
+
+  console.log(`[DEBUG] Total matched clusters for symptom:`, matchedClusters.length);
+
+  renderSymptomResultCard(fullCode, descriptor, targetGeneKey, matchedClusters);
+  return true;
+}

@@ -1,7 +1,7 @@
 import { diseasesIndex, getRandomComparisonTargets, loadClusterData, loadLexicon } from '../api.js';
 import { getLevenshteinDistance, normalizeQueryTypos, escapeRegExp, parseHpo, loadHpoDescriptor } from './utils.js';
 import { PFIC_SUBTYPE_MAP } from '../constants.js';
-import { showClusterSystemMessage } from './chatUI.js';
+import { showClusterSystemMessage, handleSingleSymptomQuery } from './chatUI.js';
 
 
 
@@ -363,7 +363,19 @@ const VALID_VARIABLES = [
 ];
 
 export async function parseAndRoute(query) {
-    const origNorm = query.toLowerCase().trim();
+    if (!query) return { isMatched: false };
+    const rawQueryStr = query.toString().trim();
+
+    // --- Intercept symptom-only / HPO queries immediately ---
+    if (rawQueryStr.toUpperCase().startsWith("HP:") || /^\d{7}$/.test(rawQueryStr)) {
+        const handled = await handleSingleSymptomQuery(rawQueryStr);
+        if (handled) {
+            return { isSymptomQuery: true, isMatched: true };
+        }
+    }
+    // --------------------------------------------------------   
+
+    const origNorm = rawQueryStr.toLowerCase();
     let norm = normalizeQueryTypos(origNorm.replace(/\bpfic\s+(\d+)\b/gi, 'pfic$1'));
   
     const isClusterQuery = await handleClusterQuery(norm);
@@ -584,77 +596,5 @@ export async function handleClusterQuery(inputString) {
 }
 
 
-export async function handleSingleSymptomQuery(queryInput, descriptorsData = {}) {
-  const { fullCode, digits: targetDigits } = parseHpo(queryInput);
-  
-  // Check if query looks like an HPO code or single symptom query
-  if (!fullCode && !queryInput.startsWith("HP:")) return false;
 
-  const clusterDataCache = await loadClusterData();
-  if (!clusterDataCache) return false;
 
-  // Find the dataset with "display_label": "PytheasDB (all)"
-  let targetGeneKey = null;
-  for (const [key, entry] of Object.entries(clusterDataCache)) {
-    if (entry.display_label === "PytheasDB (all)") {
-      targetGeneKey = key;
-      break;
-    }
-  }
-
-  if (!targetGeneKey) return false;
-
-  const geneObj = clusterDataCache[targetGeneKey];
-  const clusteringResults = geneObj.clustering_results?.optimal || {};
-  const clusters = clusteringResults.clusters || [];
-  
-  const descriptor = loadHpoDescriptor(descriptorsData, targetDigits);
-  const matchedClusters = [];
-
-  clusters.forEach(cluster => {
-    const clusterId = cluster.cluster_id;
-    const assocSigs = cluster.associated_signatures || [];
-
-    // Match target against cluster signatures
-    let matchedSig = null;
-    for (const sig of assocSigs) {
-      const sigRaw = sig.hpo_code || sig.id || "";
-      const { digits: sigDigits } = parseHpo(sigRaw);
-      if (sigDigits === targetDigits) {
-        matchedSig = sig;
-        break;
-      }
-    }
-
-    if (matchedSig) {
-      const pValue = matchedSig.p_value || "N/A";
-      const patientRows = [];
-
-      (cluster.patients || []).forEach(patient => {
-        const patientSymptomsDigits = (patient.symptoms || []).map(s => parseHpo(s).digits);
-
-        if (patientSymptomsDigits.includes(targetDigits)) {
-          let doi = patient.doi || "";
-          if (doi && !doi.startsWith("http")) {
-            doi = `https://doi.org/${doi}`;
-          }
-          patientRows.push({
-            doi,
-            patientId: patient.patients || "",
-            gene: patient.gene || "N/A"
-          });
-        }
-      });
-
-      matchedClusters.push({
-        clusterId,
-        pValue,
-        patientRows
-      });
-    }
-  });
-
-  // Render Card Output containing hyperlinks to renderClusterCard
-  renderSymptomResultCard(fullCode, descriptor, targetGeneKey, matchedClusters);
-  return true;
-}

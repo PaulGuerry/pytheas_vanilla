@@ -149,24 +149,21 @@ export function parseHpo(codeInput) {
   return { fullCode: `HP:${digits}`, digits };
 }
 
-export function loadHpoDescriptor(descriptors, targetDigits) {
-  if (!descriptors) return "Unknown Descriptor";
-  
-  if (Array.isArray(descriptors)) {
-    for (const item of descriptors) {
-      const itemCode = item.id || item.hpo_code || "";
-      const { digits } = parseHpo(itemCode);
-      if (digits === targetDigits) {
-        return item.name || item.descriptor || "Unknown Descriptor";
-      }
-    }
-  } else if (typeof descriptors === "object") {
-    for (const [key, val] of Object.entries(descriptors)) {
-      const { digits } = parseHpo(key);
-      if (digits === targetDigits) {
-        return typeof val === "string" ? val : (val?.name || "Unknown Descriptor");
+export function loadHpoDescriptor(descriptorsData, targetDigits) {
+  if (!descriptorsData || typeof descriptorsData !== 'object') return "Unknown Descriptor";
+
+  const cleanTarget = String(targetDigits).replace(/\D/g, "");
+
+  for (const [key, val] of Object.entries(descriptorsData)) {
+    const cleanKey = String(key).replace(/\D/g, "");
+    if (cleanKey === cleanTarget) {
+      if (typeof val === "string") return val;
+      if (val && typeof val === "object") {
+        return val.name || val.descriptor || val.label || "Unknown Descriptor";
       }
     }
   }
   return "Unknown Descriptor";
 }
+
+
