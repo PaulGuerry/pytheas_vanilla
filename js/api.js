@@ -120,7 +120,17 @@ export async function loadClusterData() {
 
 
 export function getCohortData(diseaseMatch) {
+  console.log('[DEBUG] getCohortData called with item:', diseaseMatch);
   if (!diseaseMatch) return {};
+  // 1. ALWAYS trust fullKey first since it's the exact key resolved by the parser
+  if (diseaseMatch.fullKey && diseasesIndex[diseaseMatch.fullKey]) {
+    return diseasesIndex[diseaseMatch.fullKey];
+  }
+
+  // 2. Fallback to pre-attached data payload if available
+  if (diseaseMatch.data && Object.keys(diseaseMatch.data).length > 0) {
+    return diseaseMatch.data;
+  }
 
   const subCat = diseaseMatch.subgroupCategory || 'cadd';
   const subKey = diseaseMatch.subgroupKey;
