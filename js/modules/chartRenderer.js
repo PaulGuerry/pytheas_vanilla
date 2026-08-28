@@ -1749,5 +1749,5 @@ export function renderSymptomResultStatement(code, descriptor, matchedClusters) 
     clustersText = `${clusterParts.join(', ')}, and ${last}`;
   }
 
-  return `Symptom "<strong>${code}</strong>", ${descriptor}, is significantly associated with ${clustersText}, in the following patients:`;
+  return `Symptom "<strong>${code}</strong>", ${descriptor}, is significantly associated with ${clustersText}.`;
 }
