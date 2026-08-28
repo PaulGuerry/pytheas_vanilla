@@ -1663,8 +1663,6 @@ export function renderSymptomResultCard(fullCode, descriptor, geneKey, matchedCl
 }
 
 
-
-
 export function renderPatientDetailsTable(payload) {
   let dataRows = [];
   if (Array.isArray(payload)) {
@@ -1673,31 +1671,59 @@ export function renderPatientDetailsTable(payload) {
     dataRows = payload.patients || payload.records || [];
   }
 
-  // Track counters per cluster independently
+  // Track patient counters per cluster independently
   const clusterCounters = {};
 
-  let rowsHtml = dataRows.map((item) => {
-    // Robust fallbacks for missing patient ID fields
-    const patientId = item.patientId || item.patient_ID || item.id || item.subject_id || item.patient || item.name || '–';
+  // Group matching rows while preserving insertion order
+  const groupedRows = new Map();
+
+  dataRows.forEach((item) => {
+    const patientId = item.patientId || item.patient_id || item.patient_ID || item.id || item.subject_id || item.patient || item.name || '–';
     const gene = item.gene || item.matchedGene || '–';
     const doi = item.doi || item.reference_doi || '–';
     const clusterNum = item.cluster || item.cluster_id || '1';
 
-    // Increment counter for this specific cluster
+    // Increment counter for this specific cluster to obtain individual patient index
     clusterCounters[clusterNum] = (clusterCounters[clusterNum] || 0) + 1;
     const counterVal = clusterCounters[clusterNum];
 
-    const doiCell = doi !== '–' 
-      ? `<a href="https://doi.org/${doi}" target="_blank" rel="noopener noreferrer">${doi}</a>` 
-      : '–';
+    // Unique grouping key for cluster + gene + doi
+    const groupKey = `${clusterNum}___${gene}___${doi}`;
+
+    if (!groupedRows.has(groupKey)) {
+      groupedRows.set(groupKey, {
+        clusterNum,
+        gene,
+        doi,
+        counterVals: [],
+        patientIds: []
+      });
+    }
+
+    const group = groupedRows.get(groupKey);
+    group.counterVals.push(counterVal);
+    group.patientIds.push(patientId);
+  });
+
+  // Render table rows from grouped data
+  let rowsHtml = Array.from(groupedRows.values()).map((group) => {
+    const counterValStr = group.counterVals.join(', ');
+    const patientIdStr = group.patientIds.join(', ');
+
+    const doi = group.doi;
+    let doiCell = '–';
+    if (doi !== '–') {
+      const href = doi.startsWith('http') ? doi : `https://doi.org/${doi}`;
+      doiCell = `<a href="${href}" target="_blank" rel="noopener noreferrer">${doi}</a>`;
+    }
 
     return `
       <tr style="line-height: 1.2;">
-        <td style="padding: 4px 8px;">Cluster ${clusterNum}</td>
-        <td style="padding: 4px 8px;">${counterVal}</td>
-        <td style="padding: 4px 8px;"><span class="gene-name">${gene}</span></td>
+        <td style="padding: 4px 8px;">Cluster ${group.clusterNum}</td>
+        <td style="padding: 4px 8px;">${counterValStr}</td>
+        <td style="padding: 4px 8px;"><span class="gene-name">${group.gene}</span></td>
         <td style="padding: 4px 8px;">${doiCell}</td>
-        <td style="padding: 4px 8px;">${patientId}</td>
+        <td style="padding: 4px 8px;">${patientIdStr}</td>
       </tr>
     `;
   }).join('');
@@ -1723,6 +1749,9 @@ export function renderPatientDetailsTable(payload) {
     </div>
   `;
 }
+
+
+
 
 
 
