@@ -1,4 +1,3 @@
-
 import { getLevenshteinDistance } from './utils.js';
 import { currentLang, translations } from '../i18n.js';
 import { getCohortData, loadClusterData, getHpoLabel } from '../api.js';
@@ -44,7 +43,6 @@ export function hexToRgba(hexStr, opacity) {
   const b = num & 255;
   return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 }
-
 
 // Text processing utilities
 function escapeRegExp(string) {
@@ -130,12 +128,6 @@ export function normalizeQueryTypos(norm) {
     .replace(/\bpfic\s*10\b/gi, 'pfic10');
 }
 
-
-
-
-
-
-
 export function renderSummaryTable(parsed) {
   const { variable, targetDiseases=[], subgroupCategory, subgroupKey, detectedLab } = parsed;
   const t = translations[currentLang].table;
@@ -150,25 +142,20 @@ export function renderSummaryTable(parsed) {
     const cohort = getCohortData(item);
     const pCount = cohort?.total_patients ?? 0;
 
-    // Extract clean gene name and subgroup from item properties or fullKey
     let rawGeneField = item.matchedGene || item.geneSubgroupLabel || t.allGenes;
     const geneCol = item.matchedGene || t.allGenes;
-    const subCol = item.subgroupKey || item.subgroupCategory || '–';
+    let subCol = item.subgroupKey || item.subgroupCategory || '–';
 
-    // If subgroup isn't explicit yet but is embedded in the matchedGene string (e.g. "ABCB4 BOYS"), split it out
     if (subCol === '–' && typeof rawGeneField === 'string') {
       const parts = rawGeneField.split(/\s+/);
       if (parts.length > 1) {
-        // Last token or terms like "BOYS"/"GIRLS"/etc. often represent the subgroup
         const potentialSubgroup = parts[parts.length - 1];
         if (['BOYS', 'GIRLS', 'M', 'F', 'MALE', 'FEMALE'].includes(potentialSubgroup.toUpperCase())) {
           subCol = potentialSubgroup;
-          geneCol = parts.slice(0, parts.length - 1).join(' ');
         }
       }
     }
 
-    // Fallback: check if fullKey contains subgroup details (e.g. ":sex:M")
     if (subCol === '–' && item.fullKey) {
       const keyParts = item.fullKey.split(':');
       const sexIdx = keyParts.indexOf('sex');
@@ -624,8 +611,7 @@ export async function renderClusterCard(geneKey, rankKey = 'optimal') {
   }, 50);
 }
 
-
-export   function renderTopRoundedBarChart(containerId, parsed) {
+export function renderTopRoundedBarChart(containerId, parsed) {
     if (typeof Plotly === 'undefined') return;
     const { targetDiseases, variable, subgroupCategory, subgroupKey } = parsed;
     const xLabels = [];
@@ -714,17 +700,15 @@ export   function renderTopRoundedBarChart(containerId, parsed) {
     };
 
     Plotly.newPlot(containerId, [dummyTrace], layout, { responsive: true, displayModeBar: false });
-  }
+}
 
-
-export   function renderSurvivalPlot(containerId, targets) {
+export function renderSurvivalPlot(containerId, targets) {
     if (typeof Plotly === 'undefined') return;
     const traces = [];
     const maxXVals = [];
     const t = translations[currentLang].chart;
   
     targets.forEach((item, index) => {
-      // getCohortData will now automatically pick up item.subgroupCategory and item.subgroupKey
       const cohort = getCohortData(item);
       const km = cohort?.survival_km;
       
@@ -767,8 +751,7 @@ export   function renderSurvivalPlot(containerId, targets) {
       yaxis: { title: t.overallSurvivalRate, showgrid: false, range: [0, 1.05] }
     };
     Plotly.newPlot(containerId, traces, layout, { responsive: true, displayModeBar: false });
-  }
-
+}
 
 export function renderGroupedBarChart(containerId, parsed) {
     if (typeof Plotly === 'undefined') return;
@@ -792,7 +775,6 @@ export function renderGroupedBarChart(containerId, parsed) {
       categories = catT.treatments;
     }
 
-    // Step 1: Extract all yValues to compute global chart range max
     const tracesYValues = targetDiseases.map((d) => {
       const cohort = getCohortData(d);
       return keys.map(catKey => {
@@ -828,9 +810,8 @@ export function renderGroupedBarChart(containerId, parsed) {
     });
 
     const maxVal = Math.max(...tracesYValues.flat(), 1.0);
-    const threshold = maxVal * 0.10; // 10% of total range
+    const threshold = maxVal * 0.10;
 
-    // Step 2: Build Plotly traces with dynamic text positioning and colors
     const traces = targetDiseases.map((d, dIdx) => {
       const label = d.disease_name + (d.matchedGene ? ` (${d.matchedGene})` : '');
       const color = getD3Color(dIdx, targetDiseases.length);
@@ -855,13 +836,12 @@ export function renderGroupedBarChart(containerId, parsed) {
         
         textLabels.push(formattedVal);
 
-        // If bar height is less than 10% of total range, place above in black
         if (val < threshold) {
           textPositions.push('outside');
-          fontColors.push('#1f2937'); // Black / Dark Slate
+          fontColors.push('#1f2937');
         } else {
           textPositions.push('inside');
-          fontColors.push('#ffffff'); // White
+          fontColors.push('#ffffff');
         }
       });
 
@@ -877,7 +857,7 @@ export function renderGroupedBarChart(containerId, parsed) {
           size: 12,
           weight: 300
         },
-        insidetextanchor: 'end', // Positions white text just below the top edge inside the bar
+        insidetextanchor: 'end',
         marker: { color: color, cornerradius: 8 },
         hovertemplate: variable === 'variant_types' 
           ? `<b>%{x}</b><br>%{y:.1f}%<extra></extra>` 
@@ -886,9 +866,6 @@ export function renderGroupedBarChart(containerId, parsed) {
               : `<b>%{x}</b><br>%{y}<extra></extra>`)
       };
     });
-
-    const isVariantTypes = variable === 'variant_types';
-    const yAxisTitle = isVariantTypes ? (chartT.allele_percentage || 'Percentage of Alleles (%)') : chartT.counts;
 
     const layout = {
       barmode: 'group',
@@ -902,15 +879,14 @@ export function renderGroupedBarChart(containerId, parsed) {
         title: false, 
         showticklabels: false, 
         showgrid: false,
-        range: [0, maxVal * 1.15] // Extra padding at top for labels outside short bars
+        range: [0, maxVal * 1.15]
       }
     };
 
     Plotly.newPlot(containerId, traces, layout, { responsive: true, displayModeBar: false });
 }
 
-
-export   function renderBoxOrRangeChart(containerId, parsed) {
+export function renderBoxOrRangeChart(containerId, parsed) {
     if (typeof Plotly === 'undefined') return;
     const { targetDiseases = [], variable, subgroupCategory, subgroupKey } = parsed;
     const t = translations[currentLang].chart;
@@ -987,10 +963,9 @@ export   function renderBoxOrRangeChart(containerId, parsed) {
     };
   
     Plotly.newPlot(containerId, [trace], layout, { responsive: true, displayModeBar: false });
-  }
+}
 
-
-export  function renderInverseSurvivalPlot(containerId, parsed, subgroupCategory, subgroupKey) {
+export function renderInverseSurvivalPlot(containerId, parsed, subgroupCategory, subgroupKey) {
     if (typeof Plotly === 'undefined') return;
     const { targetDiseases } = parsed;
     const t = translations[currentLang].chart;
@@ -1022,10 +997,9 @@ export  function renderInverseSurvivalPlot(containerId, parsed, subgroupCategory
     };
 
     Plotly.newPlot(containerId, traces, layout, { responsive: true, displayModeBar: false });
-  }
+}
 
-
-export  function renderLongitudinalChart(containerId, targets, labVar, subgroupCategory, subgroupKey) {
+export function renderLongitudinalChart(containerId, targets, labVar, subgroupCategory, subgroupKey) {
     if (typeof Plotly === 'undefined') return;
     const traces = [];
     const t = translations[currentLang].chart;
@@ -1065,16 +1039,17 @@ export  function renderLongitudinalChart(containerId, targets, labVar, subgroupC
       yaxis: { title: `${labVar || t.labMetric}`, showgrid: true }
     };
     Plotly.newPlot(containerId, traces, layout, { responsive: true, displayModeBar: false });
-  }
+}
 
 export function renderCohortSignaturesChart(containerId, signaturesData, isFr) {
     const items = [...signaturesData].reverse();
 
     const yCategories = items.map(item => {
-        const rawLabel = getHpoLabel(item['HPO Code']) || item['Description']; 
+        const hpoCode = item['HPO Code'] || item['hpoCode'] || item['hpo_code'];
+        const rawLabel = getHpoLabel(hpoCode) || hpoCode || ''; 
         return typeof formatText === 'function' 
-            ? formatText(item['Description'], 30) 
-            : item['Description'];
+            ? formatText(rawLabel, 30) 
+            : rawLabel;
     });
 
     const xValues = items.map(item => parseFloat(item['Cohort Prevalence']) || 0);
@@ -1129,7 +1104,6 @@ export function renderCohortSignaturesChart(containerId, signaturesData, isFr) {
         });
     });
 
-    // Vertical baseline on the left (x=0) extended slightly for padding
     shapes.push({
         type: 'line',
         x0: 0,
@@ -1150,7 +1124,11 @@ export function renderCohortSignaturesChart(containerId, signaturesData, isFr) {
         mode: 'markers',
         marker: { opacity: 0 },
         hoverinfo: 'text',
-        hovertext: items.map(item => `<b>${item['Description']}</b><br>HPO: ${item['HPO Code']}<br>Prevalence: ${item['Cohort Prevalence']}<br>Level: ${item['Representation Level']}`)
+        hovertext: items.map(item => {
+            const hpoCode = item['HPO Code'] || item['hpoCode'] || item['hpo_code'];
+            const rawLabel = getHpoLabel(hpoCode) || hpoCode || '';
+            return `<b>${rawLabel}</b><br>HPO: ${hpoCode}<br>Prevalence: ${item['Cohort Prevalence']}<br>Level: ${item['Representation Level']}`;
+        })
     };
 
     const layout = {
@@ -1184,9 +1162,7 @@ export function renderCohortSignaturesChart(containerId, signaturesData, isFr) {
     Plotly.newPlot(containerId, [trace], layout, config);
 }
 
-
 export function renderClusterUMAP(plotId1, plotId2, clusters, dimensions) {
-    // 1. Separate valid clusters from noise to count valid clusters accurately for palette scaling
     const validClusters = clusters.filter(c => String(c.cluster_id) !== '-1');
 
     const buildTraces = (xKey, yKey) => {
@@ -1196,9 +1172,8 @@ export function renderClusterUMAP(plotId1, plotId2, clusters, dimensions) {
 
             let markerColor;
             if (isNoise) {
-                markerColor = '#cbd5e1'; // Light grey for noise points
+                markerColor = '#cbd5e1';
             } else {
-                // Determine index among valid clusters to ensure smooth color palette mapping
                 const validIdx = validClusters.findIndex(vc => String(vc.cluster_id) === String(c.cluster_id));
                 const colorIdx = validIdx !== -1 ? validIdx : 0;
                 markerColor = getD3Color(colorIdx, validClusters.length);
@@ -1218,7 +1193,7 @@ export function renderClusterUMAP(plotId1, plotId2, clusters, dimensions) {
     const baseLayout = {
         margin: { l: 50, r: 20, t: 10, b: 50 },
         autosize: true,
-        showlegend: false, // Legend removed
+        showlegend: false,
         paper_bgcolor: 'transparent',
         plot_bgcolor: 'transparent'
     };
@@ -1249,13 +1224,15 @@ export function renderClusterUMAP(plotId1, plotId2, clusters, dimensions) {
 export function renderSingleClusterSymptomChart(containerId, cluster, clusterIndex, totalClusters) {
     const isFr = currentLang === 'fr';
     const symptoms = (cluster.archetypal_signatures || []).slice(0, 10);
-    const labels = symptoms.map(s => getHpoLabel(s.hpo_code || s.hpoCode) || s.description);
+    const labels = symptoms.map(s => {
+        const hpoCode = s.hpoCode || s.hpo_code || s.hpo_id;
+        return getHpoLabel(hpoCode) || hpoCode || '';
+    });
     const wrappedLabels = labels.map(label => formatText(label, 15));
     const values = symptoms.map(s => s.prevalence_percent);
-    const color = getD3Color(clusterIndex, totalClusters);
 
     const strokeColor = getD3Color(clusterIndex, totalClusters);
-    const fillColor = hexToRgba(strokeColor, 0.45); // Semi-transparent fill
+    const fillColor = hexToRgba(strokeColor, 0.45);
 
     const trace = {
         x: wrappedLabels,
@@ -1268,7 +1245,7 @@ export function renderSingleClusterSymptomChart(containerId, cluster, clusterInd
                 color: strokeColor,
                 width: 2
             },
-            cornerradius: 6 // Rounded top corners
+            cornerradius: 6
         }
     };
 
@@ -1293,23 +1270,19 @@ export function renderGroupedClusterSymptomChart(containerId, cluster, clusterIn
     const allSymptoms = (cluster.archetypal_signatures || []).slice(0, 10);
     if (!allSymptoms.length) return;
 
-    // Determine if we need to split into 2 subplots
     const splitNeeded = allSymptoms.length > 5;
     const midIndex = Math.ceil(allSymptoms.length / 2);
     
-    // Divide symptoms: [[topChunk], [bottomChunk]] or [[allChunk]]
     const chunks = splitNeeded 
         ? [allSymptoms.slice(0, midIndex), allSymptoms.slice(midIndex)] 
         : [allSymptoms];
 
-    // Adjust DOM container height first to ensure full 1:1 vertical scaling per subplot
     const containerEl = document.getElementById(containerId);
     if (containerEl) {
         const baseHeightPerPlot = 320; 
         containerEl.style.height = `${baseHeightPerPlot * chunks.length}px`;
     }
 
-    // Extract cluster keys sorted as before
     const samplePrevalences = allSymptoms[0]?.cluster_prevalences || {};
     const rawClusterKeys = Object.keys(samplePrevalences);
     const clusterKeys = rawClusterKeys.sort((a, b) => {
@@ -1322,12 +1295,13 @@ export function renderGroupedClusterSymptomChart(containerId, cluster, clusterIn
 
     const traces = [];
 
-    // Loop over chunks to create top / bottom subplot traces
     chunks.forEach((chunkSymptoms, chunkIdx) => {
-        const labels = chunkSymptoms.map(s => s.description || s.hpo_code);
+        const labels = chunkSymptoms.map(s => {
+            const hpoCode = s.hpo_code || s.hpoCode || s.hpo_id;
+            return getHpoLabel(hpoCode) || hpoCode || '';
+        });
         const wrappedLabels = labels.map(label => formatText(label, 15));
         
-        // Plotly axis reference suffixes ('', '2', etc.)
         const axisSuffix = chunkIdx === 0 ? '' : `${chunkIdx + 1}`;
         const xAxisRef = `x${axisSuffix}`;
         const yAxisRef = `y${axisSuffix}`;
@@ -1368,11 +1342,17 @@ export function renderGroupedClusterSymptomChart(containerId, cluster, clusterIn
             });
         });
     });
-    // Pre-calculate wrapped labels for both chunks to feed the layout
-    const labelsTop = chunks[0].map(s => formatText(getHpoLabel(s.hpo_code || s.hpoCode) || s.description, 15));
-    const labelsBottom = splitNeeded ? chunks[1].map(s => formatText(getHpoLabel(s.hpo_code || s.hpoCode) || s.description, 15)) : [];
 
-    // Layout configuration
+    const labelsTop = chunks[0].map(s => {
+        const hpoCode = s.hpo_code || s.hpoCode || s.hpo_id;
+        return formatText(getHpoLabel(hpoCode) || hpoCode || '', 15);
+    });
+    
+    const labelsBottom = splitNeeded ? chunks[1].map(s => {
+        const hpoCode = s.hpo_code || s.hpoCode || s.hpo_id;
+        return formatText(getHpoLabel(hpoCode) || hpoCode || '', 15);
+    }) : [];
+
     const layout = {
         barmode: 'group',
         margin: { l: 50, r: 20, t: 30, b: 80 },
@@ -1427,10 +1407,11 @@ export function renderAssociatedSignaturesChart(containerId, associatedData, clu
     const items = [...associatedData].reverse();
 
     const yCategories = items.map(item => {
-        const rawLabel = getHpoLabel(item.hpo_code || item.hpoCode || item.hpo_id) || item.description;
+        const hpoCode = item.hpo_code || item.hpoCode || item.hpo_id;
+        const rawLabel = getHpoLabel(hpoCode) || hpoCode || '';
         return typeof formatText === 'function' 
-            ? formatText(item.description, 30) 
-            : item.description;
+            ? formatText(rawLabel, 30) 
+            : rawLabel;
     });
 
     const clusterValues = items.map(item => parseFloat(String(item.cluster_prevalence).replace('%', '')) || 0);
@@ -1482,7 +1463,6 @@ export function renderAssociatedSignaturesChart(containerId, associatedData, clu
                 });
             }
 
-            // Position label outside to the right if <= 10% (including 0%), otherwise inside to the left
             const isOutside = val <= 10;
 
             annotations.push({
@@ -1502,9 +1482,7 @@ export function renderAssociatedSignaturesChart(containerId, associatedData, clu
             });
         });
 
-        // P-Value Annotation placed after the highest extending label/bar of the pair
         const maxVal = Math.max(clusterValues[i], restValues[i]);
-        // Shift p-value extra to the right if the max value bar has an outside label
         const pValueShift = maxVal <= 10 ? 38 : 12;
 
         const pValText = String(item.p_value || '').startsWith('<') 
@@ -1549,12 +1527,14 @@ export function renderAssociatedSignaturesChart(containerId, associatedData, clu
         mode: 'markers',
         marker: { opacity: 0 },
         hoverinfo: 'text',
-        hovertext: items.map(item => 
-            `<b>${item.description}</b><br>` +
-            `${isFr ? 'Prévalence Cluster' : 'Cluster Prevalence'}: ${item.cluster_prevalence}<br>` +
-            `${isFr ? 'Prévalence Reste Cohorte' : 'Rest Cohort Prevalence'}: ${item.rest_cohort_prevalence}<br>` +
-            `p-value: ${item.p_value}`
-        )
+        hovertext: items.map(item => {
+            const hpoCode = item.hpo_code || item.hpoCode || item.hpo_id;
+            const rawLabel = getHpoLabel(hpoCode) || hpoCode || '';
+            return `<b>${rawLabel}</b><br>` +
+                `${isFr ? 'Prévalence Cluster' : 'Cluster Prevalence'}: ${item.cluster_prevalence}<br>` +
+                `${isFr ? 'Prévalence Reste Cohorte' : 'Rest Cohort Prevalence'}: ${item.rest_cohort_prevalence}<br>` +
+                `p-value: ${item.p_value}`;
+        })
     };
 
     const layout = {
@@ -1617,24 +1597,20 @@ export function renderSymptomResultCard(fullCode, descriptor, geneKey, matchedCl
 
   const bodyContainer = cardDiv.querySelector(`#symptom-results-body-${safeIdCode}`);
 
-  // 1. Gather all patient rows first (useful for total dataset and counting)
   const allPatientRows = [];
   matchedClusters.forEach(match => {
     if (match.patientRows && Array.isArray(match.patientRows)) {
-      // Inject clusterId into each row for the detail table counters
       const rowsWithCluster = match.patientRows.map(r => ({ ...r, cluster: match.clusterId }));
       allPatientRows.push(...rowsWithCluster);
     }
   });
 
-  // 2. CALL renderSymptomResultStatement HERE
   const textP = document.createElement('p');
   textP.style.fontSize = "0.9rem";
   textP.style.color = "#334155";
   textP.style.marginBottom = "1rem";
   textP.innerHTML = renderSymptomResultStatement(fullCode, descriptor, matchedClusters);
 
-  // 3. Bind click handlers to the generated cluster links
   textP.querySelectorAll('.cluster-link').forEach(link => {
     const clusterId = link.getAttribute('data-cluster');
     link.addEventListener('click', (e) => {
@@ -1647,11 +1623,9 @@ export function renderSymptomResultCard(fullCode, descriptor, geneKey, matchedCl
 
   bodyContainer.appendChild(textP);
 
-  // 4. Render Patient Details Table
   const tableContainer = document.createElement('div');
   bodyContainer.appendChild(tableContainer);
 
-  console.log("[DEBUG] allPatientRows data payload:", allPatientRows);  
   if (typeof renderPatientDetailsTable === 'function' && allPatientRows.length > 0) {
     tableContainer.innerHTML = renderPatientDetailsTable(allPatientRows);
   } else {
@@ -1662,7 +1636,6 @@ export function renderSymptomResultCard(fullCode, descriptor, geneKey, matchedCl
   if (stream) stream.scrollTop = stream.scrollHeight;
 }
 
-
 export function renderPatientDetailsTable(payload) {
   let dataRows = [];
   if (Array.isArray(payload)) {
@@ -1671,10 +1644,7 @@ export function renderPatientDetailsTable(payload) {
     dataRows = payload.patients || payload.records || [];
   }
 
-  // Track patient counters per cluster independently
   const clusterCounters = {};
-
-  // Group matching rows while preserving insertion order
   const groupedRows = new Map();
 
   dataRows.forEach((item) => {
@@ -1683,11 +1653,9 @@ export function renderPatientDetailsTable(payload) {
     const doi = item.doi || item.reference_doi || '–';
     const clusterNum = item.cluster || item.cluster_id || '1';
 
-    // Increment counter for this specific cluster to obtain individual patient index
     clusterCounters[clusterNum] = (clusterCounters[clusterNum] || 0) + 1;
     const counterVal = clusterCounters[clusterNum];
 
-    // Unique grouping key for cluster + gene + doi
     const groupKey = `${clusterNum}___${gene}___${doi}`;
 
     if (!groupedRows.has(groupKey)) {
@@ -1705,7 +1673,6 @@ export function renderPatientDetailsTable(payload) {
     group.patientIds.push(patientId);
   });
 
-  // Render table rows from grouped data
   let rowsHtml = Array.from(groupedRows.values()).map((group) => {
     const counterValStr = group.counterVals.join(', ');
     const patientIdStr = group.patientIds.join(', ');
@@ -1749,14 +1716,6 @@ export function renderPatientDetailsTable(payload) {
     </div>
   `;
 }
-
-
-
-
-
-
-
-
 
 export function renderSymptomResultStatement(code, descriptor, matchedClusters) {
   const clusterParts = matchedClusters.map(match => {
