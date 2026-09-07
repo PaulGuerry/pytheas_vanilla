@@ -1,7 +1,7 @@
 import { translations, currentLang } from '../i18n.js';
 import { parseAndRoute } from './queryParser.js';
-import { escapeHtml, parseHpo, loadHpoDescriptor } from './utils.js';
-import { loadClusterData, hpoDescriptors } from '../api.js';
+import { escapeHtml, parseHpo, loadHpoDescriptor, findRelatedClusterTerms } from './utils.js';
+import { loadClusterData, hpoDescriptors, loadHpoDag } from '../api.js';
 import { 
   renderSummaryTable, 
   renderSurvivalPlot, 
@@ -49,7 +49,6 @@ export function showClusterSystemMessage(messageHtml) {
   container.appendChild(msgDiv);
   if (stream) stream.scrollTop = stream.scrollHeight;
 }
-
 export async function submitQuery() {
   const input = document.getElementById('queryInput');
   if (!input) return;
@@ -59,14 +58,9 @@ export async function submitQuery() {
   input.value = '';
 
   const parsed = await parseAndRoute(query);
-  
-  // If the router handled it as a direct symptom query, exit early here!
-  if (parsed && parsed.isSymptomQuery) {
-    return;
-  }
+  const finalQueryText = parsed?.resolvedQuery || query;
 
-  const finalQueryText = parsed.resolvedQuery || query;
-
+  // Update query history before exiting
   if (queryHistory.length === 0 || queryHistory[queryHistory.length - 1] !== finalQueryText) {
     queryHistory.push(finalQueryText);
   }
@@ -74,6 +68,12 @@ export async function submitQuery() {
   currentDraft = "";
 
   appendUserMessage(finalQueryText);
+
+  // Exit early to prevent standard graph/table rendering for symptom queries
+  if (parsed && parsed.isSymptomQuery) {
+    return;
+  }
+
   appendAiResponse(finalQueryText, parsed);
 }
 
@@ -185,17 +185,6 @@ function appendAiResponse(query, parsed) {
   if (stream) stream.scrollTop = stream.scrollHeight;
 }
 
-// Global Event Delegation listener for cluster links
-document.addEventListener('click', (event) => {
-    const link = event.target.closest('.cluster-combo-link');
-    if (link) {
-        event.preventDefault();
-        const query = link.dataset.query;
-        if (query) {
-            parseAndRoute(query);
-        }
-    }
-});
 
 
 export async function handleSingleSymptomQuery(queryInput, descriptorsData = {}) {
@@ -276,13 +265,125 @@ export async function handleSingleSymptomQuery(queryInput, descriptorsData = {})
       matchedClusters.push({
         clusterId,
         pValue,
-        patientRows
+        patientRows,
+        totalClusterPatients: cluster.patients ? cluster.patients.length : 0
       });
     }
   });
 
   console.log(`[DEBUG] Total matched clusters for symptom:`, matchedClusters.length);
 
-  renderSymptomResultCard(fullCode, descriptor, targetGeneKey, matchedClusters);
+  // --- 1. DIRECT EXACT MATCH FOUND ---
+  if (matchedClusters.length > 0) {
+    renderSymptomResultCard(fullCode, descriptor, targetGeneKey, matchedClusters);
+    return true;
+  }
+
+  // --- 2. NO MATCH: DISPLAY LOADING SPINNER ---
+  showClusterSystemMessage(`
+    <div style="display: flex; align-items: center; gap: 10px; color: #4b5563;">
+      <div class="spinner" style="border: 3px solid #f3f3f3; border-top: 3px solid #2563eb; border-radius: 50%; width: 18px; height: 18px; animation: spin 1s linear infinite;"></div>
+      <span>No direct cluster matches found for <strong>${fullCode}</strong> (${descriptor}). Searching parent, child, and organ system terms...</span>
+    </div>
+  `);
+
+  // Allow browser thread to render spinner before running heavy DAG traversal
+  await new Promise(resolve => setTimeout(resolve, 50));
+
+  // --- 3. TRAVERSE HPO DAG ---
+  const dagData = await loadHpoDag();
+  const { ancestorMatches, descendantMatches, sameOrganMatches } = findRelatedClusterTerms(targetDigits, clusters, dagData);
+
+  // Helper to construct clickable HPO links
+  const formatTermLinks = (matches) => {
+    return matches.map(m => {
+      const termDesc = loadHpoDescriptor(hpoDescriptors, m.digits);
+      return `<a href="#" class="hpo-search-link" data-hpo="${m.fullCode}" style="color: #2563eb; text-decoration: underline; font-weight: 600;">${m.fullCode}</a> (${termDesc})`;
+    }).join(', ');
+  };
+
+  // --- 4. RENDER FALLBACK RESULTS CARD ---
+  let fallbackHtml = `Symptom "<strong>${fullCode}</strong>" (${descriptor}) was not found in associated signatures for any cluster in PytheasDB (all).<br><br>`;
+
+  const hasAnyMatches = ancestorMatches.length > 0 || descendantMatches.length > 0 || sameOrganMatches.length > 0;
+
+  if (!hasAnyMatches) {
+    fallbackHtml += `<em>No related parent, child, or organ system terms with cluster matches were found.</em>`;
+  } else {
+    if (ancestorMatches.length > 0) {
+      fallbackHtml += `<strong>Matching Broader/Parent Terms:</strong><br>${formatTermLinks(ancestorMatches)}<br><br>`;
+    }
+    if (descendantMatches.length > 0) {
+      fallbackHtml += `<strong>Matching Specific/Child Terms:</strong><br>${formatTermLinks(descendantMatches)}<br><br>`;
+    }
+    if (sameOrganMatches.length > 0) {
+      fallbackHtml += `<strong>Matching Terms in Same Organ System:</strong><br>${formatTermLinks(sameOrganMatches)}`;
+    }
+  }
+
+  showClusterSystemMessage(fallbackHtml);
   return true;
 }
+
+
+
+export function showHpoSuggestionsMessage(query, suggestions) {
+  const linksHtml = suggestions.map(s => `
+    <li style="margin-bottom: 6px;">
+      <a href="#" class="hpo-suggestion-link" data-hpo="${s.code}" style="color: #2563eb; font-weight: 600; text-decoration: underline; cursor: pointer;">
+        ${escapeHtml(s.term)}
+      </a>
+      <span style="color: #6b7280; font-size: 0.85em;">(${s.code})</span>
+    </li>
+  `).join('');
+
+  showClusterSystemMessage(`
+    <div>
+      <p style="margin-bottom: 8px;">No exact match found for symptom <strong>"${escapeHtml(query)}"</strong>. Did you mean one of these?</p>
+      <ul style="margin: 0; padding-left: 20px;">
+        ${linksHtml}
+      </ul>
+    </div>
+  `);
+}
+
+
+
+// Global Event Delegation listener for all interactive chat links
+document.addEventListener('click', async (event) => {
+  // 1. Cluster combo links
+  const clusterLink = event.target.closest('.cluster-combo-link');
+  if (clusterLink) {
+    event.preventDefault();
+    const query = clusterLink.dataset.query;
+    if (query) parseAndRoute(query);
+    return;
+  }
+
+  // 2. HPO suggestion links
+  const suggestionLink = event.target.closest('.hpo-suggestion-link');
+  if (suggestionLink) {
+    event.preventDefault();
+    const hpoCode = suggestionLink.dataset.hpo;
+    if (hpoCode) {
+      const input = document.getElementById('queryInput');
+      if (input) input.value = hpoCode;
+      submitQuery();
+    }
+    return;
+  }
+
+  // 3. Related HPO search links (parent/child/organ fallbacks)
+  const hpoSearchLink = event.target.closest('.hpo-search-link');
+  if (hpoSearchLink) {
+    event.preventDefault();
+    const hpoCode = hpoSearchLink.getAttribute('data-hpo');
+    if (hpoCode) {
+      console.log(`[DEBUG] Related HPO link clicked: ${hpoCode}`);
+      const chatInput = document.getElementById('queryInput') || document.getElementById('chat-input');
+      if (chatInput) chatInput.value = hpoCode;
+      await handleSingleSymptomQuery(hpoCode);
+    }
+    return;
+  }
+});

@@ -1717,14 +1717,19 @@ export function renderPatientDetailsTable(payload) {
   `;
 }
 
+
+
 export function renderSymptomResultStatement(code, descriptor, matchedClusters) {
   const clusterParts = matchedClusters.map(match => {
     const cId = match.clusterId;
     const pValStr = match.pValue ? match.pValue.toString().trim() : '< 0.001';
     const formattedP = pValStr.startsWith('<') ? pValStr : `= ${pValStr}`;
     const patientCount = match.patientRows ? match.patientRows.length : 0;
+    
+    // Retrieve total patients in cluster from match object (fallback to property or 'n')
+    const totalClusterPatients = match.totalClusterPatients ?? match.totalClusterSize ?? match.totalPatients ?? 'n';
 
-    return `<a href="#" class="cluster-link" data-cluster="${cId}" style="color: #2563eb; text-decoration: underline; font-weight: 600;">cluster ${cId}</a> (${patientCount} patients, p ${formattedP})`;
+    return `<a href="#" class="cluster-link" data-cluster="${cId}" style="color: #2563eb; text-decoration: underline; font-weight: 600;">cluster ${cId}</a> (in ${patientCount}/${totalClusterPatients} patients, p ${formattedP})`;
   });
 
   let clustersText = "";
@@ -1737,5 +1742,5 @@ export function renderSymptomResultStatement(code, descriptor, matchedClusters) 
     clustersText = `${clusterParts.join(', ')}, and ${last}`;
   }
 
-  return `Symptom "<strong>${code}</strong>", ${descriptor}, is significantly associated with ${clustersText}.`;
+  return `Symptom "<strong>${code}</strong>", ${descriptor}, is associated with ${clustersText}.`;
 }

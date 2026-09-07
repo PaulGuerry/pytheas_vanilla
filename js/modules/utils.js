@@ -167,3 +167,102 @@ export function loadHpoDescriptor(descriptorsData, targetDigits) {
 }
 
 
+/**
+ * Recursively collects all ancestor HPO digits (parents, grandparents, etc.)
+ */
+export function getAncestorDigits(startDigits, dagData) {
+  const ancestors = new Set();
+  const queue = [startDigits];
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+    const node = dagData[current];
+    if (node && Array.isArray(node.p)) {
+      node.p.forEach(parentDigits => {
+        if (!ancestors.has(parentDigits)) {
+          ancestors.add(parentDigits);
+          queue.push(parentDigits);
+        }
+      });
+    }
+  }
+  return ancestors;
+}
+
+/**
+ * Recursively collects all descendant HPO digits (children, grandchildren, etc.)
+ */
+export function getDescendantDigits(startDigits, dagData) {
+  const descendants = new Set();
+  const queue = [startDigits];
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+    const node = dagData[current];
+    if (node && Array.isArray(node.c)) {
+      node.c.forEach(childDigits => {
+        if (!descendants.has(childDigits)) {
+          descendants.add(childDigits);
+          queue.push(childDigits);
+        }
+      });
+    }
+  }
+  return descendants;
+}
+
+/**
+ * Traverses DAG to find terms present in cluster associated_signatures
+ */
+export function findRelatedClusterTerms(targetDigits, clusters, dagData) {
+  const targetNode = dagData[targetDigits];
+  if (!targetNode) return { ancestorMatches: [], descendantMatches: [], sameOrganMatches: [] };
+
+  const ancestorDigits = getAncestorDigits(targetDigits, dagData);
+  const descendantDigits = getDescendantDigits(targetDigits, dagData);
+  
+  // Normalize target organ ID (handles string or array format)
+  const rawOrgan = targetNode.o;
+  const targetOrgans = new Set(
+    Array.isArray(rawOrgan) ? rawOrgan : rawOrgan ? [rawOrgan] : []
+  );
+
+  // Collect all unique signatures present across optimal clusters
+  const activeSignatures = new Map();
+  clusters.forEach(cluster => {
+    (cluster.associated_signatures || []).forEach(sig => {
+      const rawCode = sig.hpo_code || sig.id || "";
+      const { digits, fullCode } = parseHpo(rawCode);
+      if (digits && !activeSignatures.has(digits)) {
+        activeSignatures.set(digits, {
+          digits,
+          fullCode,
+          pValue: sig.p_value || "N/A",
+          clusterId: cluster.cluster_id
+        });
+      }
+    });
+  });
+
+  const ancestorMatches = [];
+  const descendantMatches = [];
+  const sameOrganMatches = [];
+
+  activeSignatures.forEach((sigInfo, digits) => {
+    const node = dagData[digits];
+    
+    // Determine organ system overlay
+    const nodeOrgans = Array.isArray(node?.o) ? node.o : node?.o ? [node.o] : [];
+    const sharesOrganSystem = nodeOrgans.some(org => targetOrgans.has(org));
+
+    if (ancestorDigits.has(digits)) {
+      ancestorMatches.push(sigInfo);
+    } else if (descendantDigits.has(digits)) {
+      descendantMatches.push(sigInfo);
+    } else if (targetOrgans.size > 0 && sharesOrganSystem) {
+      sameOrganMatches.push(sigInfo);
+    }
+  });
+
+  return { ancestorMatches, descendantMatches, sameOrganMatches };
+}

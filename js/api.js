@@ -2,32 +2,75 @@ let clusterDataCache = null;
 
 export let diseasesIndex = {};
 export let hpoDescriptors = {};
-export let entityLexicon = null;
+let entityLexicon = null;
+let hpoDagCache = null;
+
+
+
+
+export async function loadHpoDag() {
+  if (hpoDagCache) return hpoDagCache;
+  try {
+    hpoDagCache = await fetchGzipOrJson('data/hpo_dag.json.gz');
+  } catch (err) {
+    console.warn("Could not load hpo_dag.json.gz:", err);
+    hpoDagCache = {};
+  }
+  return hpoDagCache;
+}
+
+/**
+ * Universal helper for GitHub Pages to intercept and 
+ * manually unzip raw .gz files via JavaScript.
+ */
+export async function fetchGzipOrJson(url) {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+  
+  // GitHub Pages won't send this header for .gz files, but we check just in case
+  const encoding = response.headers.get('Content-Encoding');
+  if (encoding === 'gzip' || encoding === 'deflate') {
+    return await response.json();
+  }
+
+  // Decompress manually if it's a .gz file and the browser supports it
+  if (url.includes('.gz') && typeof DecompressionStream !== 'undefined') {
+    const decompressedStream = response.body.pipeThrough(new DecompressionStream('gzip'));
+    const text = await new Response(decompressedStream).text();
+    return JSON.parse(text);
+  }
+
+  // Fallback for native uncompressed .json files
+  return await response.json();
+}
 
 export async function loadLexicon() {
   if (entityLexicon) return entityLexicon;
   try {
-    const res = await fetch('data/entity_lexicon.json');
-    entityLexicon = await res.json();
+    // Pointed directly to your new .gz file
+    entityLexicon = await fetchGzipOrJson('data/entity_lexicon.json.gz');
   } catch (err) {
-    console.warn("Could not load entity_lexicon.json, falling back to legacy parsing:", err);
-    entityLexicon = {};
+    console.warn("Could not load entity_lexicon.json.gz, falling back to legacy parsing:", err);
+    try {
+      entityLexicon = await fetchGzipOrJson('data/entity_lexicon.json');
+    } catch (e) {
+      entityLexicon = {};
+    }
   }
   return entityLexicon;
 }
 
 export async function initData() {
   try {
+    // Point both base assets to their .gz counterparts
     const [diseasesRes, hpoRes] = await Promise.all([
       fetchGzipOrJson('data/diseases_index.json.gz').catch(() => 
         fetchGzipOrJson('data/diseases_index.json')
       ),
-      fetch('data/hpo_descriptors.json')
-        .then(res => res.json())
-        .catch(err => {
-          console.warn("Could not load HPO descriptors", err);
-          return {};
-        })
+      fetchGzipOrJson('data/hpo_descriptors.json.gz').catch(err => {
+        console.warn("Could not load HPO descriptors .gz, trying raw fallback", err);
+        return fetchGzipOrJson('data/hpo_descriptors.json').catch(() => ({}));
+      })
     ]);
 
     diseasesIndex = diseasesRes || {};
@@ -81,47 +124,15 @@ export function getRandomComparisonTargets() {
   return [shuffled[0], shuffled[1]];
 }
 
-
-export  async function fetchGzipOrJson(url) {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-    
-    const encoding = response.headers.get('Content-Encoding');
-    if (encoding === 'gzip' || encoding === 'deflate') {
-      return await response.json();
-    }
-
-    if (url.endsWith('.gz') && typeof DecompressionStream !== 'undefined') {
-      const decompressedStream = response.body.pipeThrough(new DecompressionStream('gzip'));
-      const text = await new Response(decompressedStream).text();
-      return JSON.parse(text);
-    }
-
-    return await response.json();
-  }
-
-
 export async function loadClusterData() {
-    // Comment out or remove this line temporarily if you want to force fresh re-fetches without refreshing the page
     if (clusterDataCache) return clusterDataCache;
 
     try {
-        // Add ?t=${Date.now()} to the fetch URL
-        // Automatically append timestamp on localhost, but serve clean URL in production
         const isLocal = ['localhost', '127.0.0.1', ''].includes(window.location.hostname);
         const url = isLocal ? `data/cluster_data.json.gz?v=${Date.now()}` : 'data/cluster_data.json.gz';
         
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-        if ('DecompressionStream' in window) {
-            const decompressedStream = response.body.pipeThrough(new DecompressionStream('gzip'));
-            const decompressedText = await new Response(decompressedStream).text();
-            clusterDataCache = JSON.parse(decompressedText);
-        } else {
-            clusterDataCache = await response.json();
-        }
-
+        // Routed through the central helper to fix GitHub Pages downloads
+        clusterDataCache = await fetchGzipOrJson(url);
         return clusterDataCache;
     } catch (error) {
         console.error("Failed to load or decompress data/cluster_data.json.gz:", error);
@@ -129,36 +140,27 @@ export async function loadClusterData() {
     }
 }
 
-
-
-
 export function getCohortData(diseaseMatch) {
   console.log('[DEBUG] getCohortData called with item:', diseaseMatch);
   if (!diseaseMatch) return {};
-  // 1. ALWAYS trust fullKey first since it's the exact key resolved by the parser
   if (diseaseMatch.fullKey && diseasesIndex[diseaseMatch.fullKey]) {
     return diseasesIndex[diseaseMatch.fullKey];
   }
 
-  // 2. Fallback to pre-attached data payload if available
   if (diseaseMatch.data && Object.keys(diseaseMatch.data).length > 0) {
     return diseaseMatch.data;
   }
 
   const subCat = diseaseMatch.subgroupCategory || 'cadd';
   const subKey = diseaseMatch.subgroupKey;
-
   const diseaseKey = diseaseMatch.disease_name;
 
-  // Construct the specific gene key for this specific disease entity first
   const specificGeneKey = (diseaseKey && diseaseMatch.matchedGene) 
     ? `${diseaseKey}:gene:${diseaseMatch.matchedGene}` 
     : null;
 
-  // Fallback to fullKey or disease_name
   const geneKey = specificGeneKey || diseaseMatch.fullKey || diseaseKey;
 
-  // Look up base object in diseasesIndex prioritizing the specific disease-gene key
   const baseObj = (specificGeneKey && diseasesIndex[specificGeneKey]) 
     || diseasesIndex[geneKey] 
     || diseasesIndex[diseaseKey] 
@@ -191,5 +193,4 @@ export function getCohortData(diseaseMatch) {
 
   return baseObj;
 }
-
 

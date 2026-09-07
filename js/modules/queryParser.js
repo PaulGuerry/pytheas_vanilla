@@ -1,7 +1,72 @@
-import { diseasesIndex, getRandomComparisonTargets, loadClusterData, loadLexicon } from '../api.js';
-import { getLevenshteinDistance, normalizeQueryTypos, escapeRegExp, parseHpo, loadHpoDescriptor } from './utils.js';
+import { diseasesIndex, getRandomComparisonTargets, loadClusterData, loadLexicon, hpoDescriptors } from '../api.js';
+import { getLevenshteinDistance, normalizeQueryTypos, escapeRegExp, parseHpo, loadHpoDescriptor, escapeHtml } from './utils.js';
 import { PFIC_SUBTYPE_MAP } from '../constants.js';
-import { showClusterSystemMessage, handleSingleSymptomQuery } from './chatUI.js';
+import { showClusterSystemMessage, showHpoSuggestionsMessage, handleSingleSymptomQuery } from './chatUI.js';
+
+
+
+/**
+ * Resolves an HPO term or code using hpoDescriptors.
+ * Returns exact code match or a list of top candidate suggestions.
+ */
+export function resolveHpoQuery(queryStr) {
+  if (!queryStr) return { hpoCode: null, suggestions: [] };
+  const raw = queryStr.trim();
+  const normQuery = raw.toLowerCase();
+
+  // 1. Direct Code Check (e.g., "HP:0001141" or "0001141")
+  if (raw.toUpperCase().startsWith("HP:") || /^\d{7}$/.test(raw)) {
+    const { fullCode } = parseHpo(raw);
+    return { hpoCode: fullCode || raw.toUpperCase(), suggestions: [] };
+  }
+
+  let exactCode = null;
+  const suggestions = [];
+
+  // 2. Reverse Lookup & Fuzzy Scan in hpoDescriptors
+  const entries = Object.entries(hpoDescriptors || {});
+  for (const [code, term] of entries) {
+    if (!term || typeof term !== 'string') continue;
+    const normTerm = term.toLowerCase().trim();
+    const formattedCode = code.startsWith('HP:') ? code : `HP:${code.padStart(7, '0')}`;
+
+    // Exact Term Match
+    if (normTerm === normQuery) {
+      exactCode = formattedCode;
+      break;
+    }
+
+    // Collect Fuzzy / Substring Matches for Suggestions
+    if (normTerm.includes(normQuery) || normQuery.includes(normTerm)) {
+      const score = Math.abs(normTerm.length - normQuery.length);
+      suggestions.push({ code: formattedCode, term, score });
+    } else {
+      const dist = getLevenshteinDistance(normQuery, normTerm);
+      const maxLen = Math.max(normQuery.length, normTerm.length);
+      if (dist <= 4 || (dist / maxLen) < 0.45) {
+        suggestions.push({ code: formattedCode, term, score: dist + 10 });
+      }
+    }
+  }
+
+  if (exactCode) {
+    return { hpoCode: exactCode, suggestions: [] };
+  }
+
+  // Deduplicate and rank top 5 suggestions
+  suggestions.sort((a, b) => a.score - b.score);
+  const uniqueSuggestions = [];
+  const seenCodes = new Set();
+  for (const item of suggestions) {
+    if (!seenCodes.has(item.code)) {
+      seenCodes.add(item.code);
+      uniqueSuggestions.push(item);
+    }
+    if (uniqueSuggestions.length >= 5) break;
+  }
+
+  return { hpoCode: null, suggestions: uniqueSuggestions };
+}
 
 
 
@@ -366,14 +431,21 @@ export async function parseAndRoute(query) {
     if (!query) return { isMatched: false };
     const rawQueryStr = query.toString().trim();
 
-    // --- Intercept symptom-only / HPO queries immediately ---
-    if (rawQueryStr.toUpperCase().startsWith("HP:") || /^\d{7}$/.test(rawQueryStr)) {
-        const handled = await handleSingleSymptomQuery(rawQueryStr);
+    
+    // --- 1. Intercept HPO Code OR Exact Term Queries ---
+    const hpoResult = resolveHpoQuery(rawQueryStr);
+    if (hpoResult.hpoCode) {
+        const handled = await handleSingleSymptomQuery(hpoResult.hpoCode);
         if (handled) {
-            return { isSymptomQuery: true, isMatched: true };
+            return { 
+                rawQuery: rawQueryStr,
+                resolvedQuery: hpoResult.hpoCode,
+                isSymptomQuery: true, 
+                isMatched: true 
+            };
         }
     }
-    // --------------------------------------------------------   
+    // ---------------------------------------------------
 
     const origNorm = rawQueryStr.toLowerCase();
     let norm = normalizeQueryTypos(origNorm.replace(/\bpfic\s+(\d+)\b/gi, 'pfic$1'));
@@ -477,6 +549,18 @@ export async function parseAndRoute(query) {
       
     });
 
+    // --- Fallback 3: Close-Matching HPO Term Suggestions ---
+    // Triggered only if no gene/disease targets were resolved
+    if (targetObjects.length === 0 && hpoResult?.suggestions?.length > 0) {
+      showHpoSuggestionsMessage(rawQueryStr, hpoResult.suggestions);
+      return {
+        rawQuery: rawQueryStr,
+        resolvedQuery: rawQueryStr,
+        isSymptomQuery: true,
+        isMatched: true
+      };
+    }
+
     return {
       rawQuery: query,
       targets: targetObjects.map(t => t.fullKey),
@@ -488,6 +572,7 @@ export async function parseAndRoute(query) {
       isMatched: targetObjects.length > 0
     };
 }
+
 
 export async function handleClusterQuery(inputString) {
     const rawTokens = inputString.trim().split(/\s+/);
