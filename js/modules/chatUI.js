@@ -1,7 +1,7 @@
 import { translations, currentLang } from '../i18n.js';
 import { parseAndRoute } from './queryParser.js';
 import { escapeHtml, parseHpo, loadHpoDescriptor, findRelatedClusterTerms } from './utils.js';
-import { loadClusterData, hpoDescriptors, loadHpoDag } from '../api.js';
+import { loadClusterData, idToTerm, loadHpoDag, loadSymptomIndex } from '../api.js';
 import { 
   renderSummaryTable, 
   renderSurvivalPlot, 
@@ -10,7 +10,8 @@ import {
   renderBoxOrRangeChart, 
   renderInverseSurvivalPlot, 
   renderLongitudinalChart,
-  renderSymptomResultCard 
+  renderSymptomResultCard,
+  renderSymptomGeneAssociationCard 
 } from './chartRenderer.js';
 
 let queryHistory = [];
@@ -186,7 +187,6 @@ function appendAiResponse(query, parsed) {
 }
 
 
-
 export async function handleSingleSymptomQuery(queryInput, descriptorsData = {}) {
   console.log(`[DEBUG] handleSingleSymptomQuery received input: "${queryInput}"`);
   
@@ -222,34 +222,31 @@ export async function handleSingleSymptomQuery(queryInput, descriptorsData = {})
   const clusters = clusteringResults.clusters || [];
   console.log(`[DEBUG] Total clusters found in optimal results:`, clusters.length);
   
-  const descriptor = loadHpoDescriptor(hpoDescriptors, targetDigits);
+  const descriptor = loadHpoDescriptor(idToTerm, targetDigits);
   const matchedClusters = [];
 
   clusters.forEach(cluster => {
     const clusterId = cluster.cluster_id;
     const assocSigs = cluster.associated_signatures || [];
 
-    let matchedSig = null;
-    for (const sig of assocSigs) {
-      const sigRaw = sig.hpo_code || sig.id || "";
-      const { digits: sigDigits } = parseHpo(sigRaw);
-      if (sigDigits === targetDigits) {
-        matchedSig = sig;
-        break;
-      }
-    }
+    // Standardized signature matching using parseHpo fullCode across all HPO key variants
+    const matchedSig = assocSigs.find(sig => {
+      const sigRaw = sig.hpo_code || sig.hpoCode || sig.id || sig.hpo_id || "";
+      return parseHpo(sigRaw).fullCode === fullCode;
+    });
 
     if (matchedSig) {
       const pValue = matchedSig.p_value || "N/A";
       const patientRows = [];
 
       (cluster.patients || []).forEach(patient => {
+        const patientSymptomsFull = (patient.symptoms || []).map(s => parseHpo(s).fullCode);
         const patientSymptomsDigits = (patient.symptoms || []).map(s => parseHpo(s).digits);
 
         console.log(`[DEBUG] Patient ID:`, patient.patients, `Symptoms array:`, patient.symptoms);
         console.log(`[DEBUG] Mapped patient digits:`, patientSymptomsDigits, `Target digits:`, targetDigits);
         
-        if (patientSymptomsDigits.includes(targetDigits)) {
+        if (patientSymptomsFull.includes(fullCode)) {
           let doi = patient.doi || "";
           if (doi && !doi.startsWith("http")) {
             doi = `https://doi.org/${doi}`;
@@ -297,7 +294,7 @@ export async function handleSingleSymptomQuery(queryInput, descriptorsData = {})
   // Helper to construct clickable HPO links
   const formatTermLinks = (matches) => {
     return matches.map(m => {
-      const termDesc = loadHpoDescriptor(hpoDescriptors, m.digits);
+      const termDesc = loadHpoDescriptor(idToTerm, m.digits);
       return `<a href="#" class="hpo-search-link" data-hpo="${m.fullCode}" style="color: #2563eb; text-decoration: underline; font-weight: 600;">${m.fullCode}</a> (${termDesc})`;
     }).join(', ');
   };
@@ -386,4 +383,136 @@ document.addEventListener('click', async (event) => {
     }
     return;
   }
+
+  // 4. Symptom exploration branch choice buttons
+  const branchBtn = event.target.closest('.symptom-branch-btn');
+  if (branchBtn) {
+    event.preventDefault();
+    const mode = branchBtn.dataset.mode;
+    const hpoCode = branchBtn.dataset.hpo;
+    const descriptor = branchBtn.dataset.desc;
+
+    // Disable buttons after selection
+    const parentContainer = branchBtn.parentElement;
+    if (parentContainer) {
+      parentContainer.querySelectorAll('.symptom-branch-btn').forEach(btn => btn.disabled = true);
+    }
+
+    if (mode === 'phenotype') {
+      // Option (b): Existing workflow
+      await handleSingleSymptomQuery(hpoCode);
+    } else if (mode === 'gene') {
+      // Option (a): New symptom-gene association workflow
+      await handleSymptomGeneAssociations(hpoCode, descriptor);
+    }
+    return;
+  }
 });
+
+
+export function promptSymptomBranchChoice(hpoCode, descriptor) {
+  const container = document.getElementById('messagesContainer');
+  const stream = document.getElementById('chatStream');
+  if (!container) return;
+
+  const msgDiv = document.createElement('div');
+  msgDiv.className = 'message ai';
+  msgDiv.innerHTML = `
+    <div class="ai-card">
+      <div class="ai-card-header">
+        <img src="data/PYTHEAS_Logo.svg" alt="Pytheas" class="small-logo" onerror="this.src='https://via.placeholder.com/24x24?text=P'" />
+        <span class="ai-card-title">Symptom query</span>
+      </div>
+      <p style="margin-bottom: 12px; color: #334155; font-size: 0.95rem;">
+        Identified symptom <strong>${hpoCode}</strong> (${descriptor}). Select an exploration mode:
+      </p>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button class="symptom-branch-btn" data-mode="gene" data-hpo="${hpoCode}" data-desc="${descriptor}"
+          style="padding: 8px 14px; background-color: #2563eb; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+          Explore symptom-gene associations
+        </button>
+        <button class="symptom-branch-btn" data-mode="phenotype" data-hpo="${hpoCode}" data-desc="${descriptor}"
+          style="padding: 8px 14px; background-color: #0d9488; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+          Explore symptom-gene-phenotype associations (cluster analysis). 
+        </button>
+      </div>
+    </div>
+  `;
+
+  container.appendChild(msgDiv);
+  if (stream) stream.scrollTop = stream.scrollHeight;
+}
+
+
+
+
+export async function handleSymptomGeneAssociations(hpoCode, descriptor) {
+  const indexData = await loadSymptomIndex();
+  if (!indexData) return;
+
+  const geneTotals = indexData.meta?.gene_totals || {};
+  const patientMap = indexData.meta?.patients || {};
+
+  const cleanInput = hpoCode.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
+  const dataContainer = indexData.symptoms || indexData.data || indexData;
+
+  const containerKeys = Object.keys(dataContainer);
+  const matchedKey = containerKeys.find(
+    k => k.trim().toLowerCase() === cleanInput.toLowerCase() ||
+         k.trim().toLowerCase() === cleanInput.replace(':', '_').toLowerCase()
+  );
+
+  const symptomData = matchedKey ? dataContainer[matchedKey] : null;
+
+  if (!symptomData) {
+    console.warn(`⚠️ No entry found for "${cleanInput}".`);
+    return;
+  }
+
+  const summaryRows = [];
+
+  for (const [gene, patientKeys] of Object.entries(symptomData)) {
+    const totalPatientsForGene = geneTotals[gene] || 0;
+    const patientList = Array.isArray(patientKeys) ? patientKeys : [];
+    const freq = patientList.length;
+    const percentage = totalPatientsForGene > 0 ? (freq / totalPatientsForGene) * 100 : 0;
+
+    const doiGroupMap = new Map();
+
+    patientList.forEach(pKey => {
+      const patientMeta = patientMap[pKey];
+      
+      if (Array.isArray(patientMeta)) {
+        const [rawDoi, rawPid] = patientMeta;
+
+        // Force rawDoi to a primitive String so chartRenderer.js can safely use .startsWith()
+        const doi = (rawDoi != null && rawDoi !== '') ? String(rawDoi) : 'Unknown DOI';
+
+        if (!doiGroupMap.has(doi)) {
+          doiGroupMap.set(doi, []);
+        }
+
+        if (rawPid != null && rawPid !== '') {
+          doiGroupMap.get(doi).push(String(rawPid));
+        }
+      }
+    });
+
+    const doiDetails = Array.from(doiGroupMap.entries()).map(([doi, pids]) => ({
+      doi, // Guaranteed to be a string
+      pids: pids.length > 0 ? pids.join(', ') : 'N/A'
+    }));
+
+    summaryRows.push({
+      gene,
+      frequency: freq,
+      totalPatients: totalPatientsForGene,
+      percentage,
+      doiDetails
+    });
+  }
+
+  summaryRows.sort((a, b) => b.percentage - a.percentage);
+
+  renderSymptomGeneAssociationCard(hpoCode, descriptor, summaryRows);
+}

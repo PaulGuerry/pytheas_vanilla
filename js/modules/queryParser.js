@@ -1,12 +1,12 @@
-import { diseasesIndex, getRandomComparisonTargets, loadClusterData, loadLexicon, hpoDescriptors } from '../api.js';
+import { diseasesIndex, getRandomComparisonTargets, loadClusterData, loadLexicon, idToTerm, loadSymptomIndex } from '../api.js';
 import { getLevenshteinDistance, normalizeQueryTypos, escapeRegExp, parseHpo, loadHpoDescriptor, escapeHtml } from './utils.js';
 import { PFIC_SUBTYPE_MAP } from '../constants.js';
-import { showClusterSystemMessage, showHpoSuggestionsMessage, handleSingleSymptomQuery } from './chatUI.js';
+import { showClusterSystemMessage, showHpoSuggestionsMessage, handleSingleSymptomQuery, promptSymptomBranchChoice } from './chatUI.js';
 
 
 
 /**
- * Resolves an HPO term or code using hpoDescriptors.
+ * Resolves an HPO term or code using idToTerm.
  * Returns exact code match or a list of top candidate suggestions.
  */
 export function resolveHpoQuery(queryStr) {
@@ -14,58 +14,39 @@ export function resolveHpoQuery(queryStr) {
   const raw = queryStr.trim();
   const normQuery = raw.toLowerCase();
 
-  // 1. Direct Code Check (e.g., "HP:0001141" or "0001141")
-  if (raw.toUpperCase().startsWith("HP:") || /^\d{7}$/.test(raw)) {
+  // Direct Code Match (e.g., "HP:0001141", "0001141", "hp:1141")
+  if (raw.toUpperCase().startsWith("HP:") || /^\d+$/.test(raw)) {
     const { fullCode } = parseHpo(raw);
-    return { hpoCode: fullCode || raw.toUpperCase(), suggestions: [] };
+    if (fullCode) return { hpoCode: fullCode, suggestions: [] };
   }
 
   let exactCode = null;
   const suggestions = [];
 
-  // 2. Reverse Lookup & Fuzzy Scan in hpoDescriptors
-  const entries = Object.entries(hpoDescriptors || {});
+  // Reverse Lookup & Fuzzy Scan using parseHpo
+  const entries = Object.entries(idToTerm || {});
   for (const [code, term] of entries) {
     if (!term || typeof term !== 'string') continue;
     const normTerm = term.toLowerCase().trim();
-    const formattedCode = code.startsWith('HP:') ? code : `HP:${code.padStart(7, '0')}`;
+    const { fullCode: formattedCode } = parseHpo(code);
 
-    // Exact Term Match
+    if (!formattedCode) continue;
+
     if (normTerm === normQuery) {
       exactCode = formattedCode;
       break;
     }
 
-    // Collect Fuzzy / Substring Matches for Suggestions
     if (normTerm.includes(normQuery) || normQuery.includes(normTerm)) {
       const score = Math.abs(normTerm.length - normQuery.length);
       suggestions.push({ code: formattedCode, term, score });
-    } else {
-      const dist = getLevenshteinDistance(normQuery, normTerm);
-      const maxLen = Math.max(normQuery.length, normTerm.length);
-      if (dist <= 4 || (dist / maxLen) < 0.45) {
-        suggestions.push({ code: formattedCode, term, score: dist + 10 });
-      }
     }
   }
 
-  if (exactCode) {
-    return { hpoCode: exactCode, suggestions: [] };
-  }
+  if (exactCode) return { hpoCode: exactCode, suggestions: [] };
 
-  // Deduplicate and rank top 5 suggestions
   suggestions.sort((a, b) => a.score - b.score);
-  const uniqueSuggestions = [];
-  const seenCodes = new Set();
-  for (const item of suggestions) {
-    if (!seenCodes.has(item.code)) {
-      seenCodes.add(item.code);
-      uniqueSuggestions.push(item);
-    }
-    if (uniqueSuggestions.length >= 5) break;
-  }
-
-  return { hpoCode: null, suggestions: uniqueSuggestions };
+  return { hpoCode: null, suggestions: suggestions.slice(0, 5) };
 }
 
 
@@ -430,20 +411,23 @@ const VALID_VARIABLES = [
 export async function parseAndRoute(query) {
     if (!query) return { isMatched: false };
     const rawQueryStr = query.toString().trim();
-
     
     // --- 1. Intercept HPO Code OR Exact Term Queries ---
     const hpoResult = resolveHpoQuery(rawQueryStr);
     if (hpoResult.hpoCode) {
-        const handled = await handleSingleSymptomQuery(hpoResult.hpoCode);
-        if (handled) {
-            return { 
-                rawQuery: rawQueryStr,
-                resolvedQuery: hpoResult.hpoCode,
-                isSymptomQuery: true, 
-                isMatched: true 
-            };
-        }
+        // Resolve descriptor label for UI prompt
+        const { digits } = parseHpo(hpoResult.hpoCode);
+        const descriptor = loadHpoDescriptor(idToTerm, digits);
+
+        // Prompt user to choose exploration mode (a vs b)
+        promptSymptomBranchChoice(hpoResult.hpoCode, descriptor);
+
+        return { 
+            rawQuery: rawQueryStr,
+            resolvedQuery: hpoResult.hpoCode,
+            isSymptomQuery: true, 
+            isMatched: true 
+        };
     }
     // ---------------------------------------------------
 

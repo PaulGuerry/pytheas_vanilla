@@ -1,10 +1,27 @@
 let clusterDataCache = null;
 
 export let diseasesIndex = {};
-export let hpoDescriptors = {};
+export let idToTerm = {};
 let entityLexicon = null;
 let hpoDagCache = null;
+let symptomIndexCache = null;
 
+
+
+export async function loadSymptomIndex() {
+  if (symptomIndexCache) return symptomIndexCache;
+
+  try {
+    const isLocal = ['localhost', '127.0.0.1', ''].includes(window.location.hostname);
+    const url = isLocal ? `data/symptom_index.json.gz?v=${Date.now()}` : 'data/symptom_index.json.gz';
+
+    symptomIndexCache = await fetchGzipOrJson(url);
+    return symptomIndexCache;
+  } catch (error) {
+    console.error("Failed to load or decompress data/symptom_index.json.gz:", error);
+    return null;
+  }
+}
 
 
 
@@ -67,14 +84,14 @@ export async function initData() {
       fetchGzipOrJson('data/diseases_index.json.gz').catch(() => 
         fetchGzipOrJson('data/diseases_index.json')
       ),
-      fetchGzipOrJson('data/hpo_descriptors.json.gz').catch(err => {
+      fetchGzipOrJson('data/id_to_term.json.gz').catch(err => {
         console.warn("Could not load HPO descriptors .gz, trying raw fallback", err);
-        return fetchGzipOrJson('data/hpo_descriptors.json').catch(() => ({}));
+        return fetchGzipOrJson('data/id_to_term.json').catch(() => ({}));
       })
     ]);
 
     diseasesIndex = diseasesRes || {};
-    hpoDescriptors = hpoRes || {};
+    idToTerm = hpoRes || {};
   } catch (e) {
     console.warn("Could not load application initial data", e);
   }
@@ -83,7 +100,7 @@ export async function initData() {
 
 export function getHpoLabel(hpoCode) {
   if (!hpoCode) return '';
-  return hpoDescriptors[hpoCode] || hpoCode;
+  return idToTerm[hpoCode] || hpoCode;
 }
 
 export function getRandomComparisonTargets() {

@@ -1,7 +1,14 @@
-import { getLevenshteinDistance } from './utils.js';
 import { currentLang, translations } from '../i18n.js';
 import { getCohortData, loadClusterData, getHpoLabel } from '../api.js';
 import { ABBREVIATIONS, REMOVAL_WORDS } from '../constants.js';
+import { parseHpo } from './utils.js';
+
+// Attach to window for global inline event handling if needed:
+if (typeof window !== 'undefined') {
+  window.renderClusterCard = renderClusterCard;
+}
+
+
 
 // Color utility definitions
 const D3_CATEGORY10 = [
@@ -1045,7 +1052,8 @@ export function renderCohortSignaturesChart(containerId, signaturesData, isFr) {
     const items = [...signaturesData].reverse();
 
     const yCategories = items.map(item => {
-        const hpoCode = item['HPO Code'] || item['hpoCode'] || item['hpo_code'];
+        const rawCode = item['HPO Code'] || item['hpoCode'] || item['hpo_code'];
+        const hpoCode = parseHpo(rawCode).fullCode || rawCode;
         const rawLabel = getHpoLabel(hpoCode) || hpoCode || ''; 
         return typeof formatText === 'function' 
             ? formatText(rawLabel, 30) 
@@ -1225,7 +1233,8 @@ export function renderSingleClusterSymptomChart(containerId, cluster, clusterInd
     const isFr = currentLang === 'fr';
     const symptoms = (cluster.archetypal_signatures || []).slice(0, 10);
     const labels = symptoms.map(s => {
-        const hpoCode = s.hpoCode || s.hpo_code || s.hpo_id;
+        const rawCode = s.hpoCode || s.hpo_code || s.hpo_id;
+        const hpoCode = parseHpo(rawCode).fullCode || rawCode;
         return getHpoLabel(hpoCode) || hpoCode || '';
     });
     const wrappedLabels = labels.map(label => formatText(label, 15));
@@ -1297,7 +1306,8 @@ export function renderGroupedClusterSymptomChart(containerId, cluster, clusterIn
 
     chunks.forEach((chunkSymptoms, chunkIdx) => {
         const labels = chunkSymptoms.map(s => {
-            const hpoCode = s.hpo_code || s.hpoCode || s.hpo_id;
+            const rawCode = s.hpo_code || s.hpoCode || s.hpo_id;
+            const hpoCode = parseHpo(rawCode).fullCode || rawCode;
             return getHpoLabel(hpoCode) || hpoCode || '';
         });
         const wrappedLabels = labels.map(label => formatText(label, 15));
@@ -1407,7 +1417,8 @@ export function renderAssociatedSignaturesChart(containerId, associatedData, clu
     const items = [...associatedData].reverse();
 
     const yCategories = items.map(item => {
-        const hpoCode = item.hpo_code || item.hpoCode || item.hpo_id;
+        const rawCode = item.hpo_code || item.hpoCode || item.hpo_id;
+        const hpoCode = parseHpo(rawCode).fullCode || rawCode;
         const rawLabel = getHpoLabel(hpoCode) || hpoCode || '';
         return typeof formatText === 'function' 
             ? formatText(rawLabel, 30) 
@@ -1743,4 +1754,97 @@ export function renderSymptomResultStatement(code, descriptor, matchedClusters) 
   }
 
   return `Symptom "<strong>${code}</strong>", ${descriptor}, is associated with ${clustersText}.`;
+}
+
+
+export function renderSymptomGeneAssociationCard(hpoCode, descriptor, summaryRows) {
+  const container = document.getElementById('messagesContainer');
+  if (!container) return;
+
+  const chartId = `symptom-gene-chart-${Date.now()}`;
+  const cardDiv = document.createElement('div');
+  cardDiv.className = 'message ai';
+
+  // Build Table HTML with row blocks per gene
+  let tableRowsHtml = summaryRows.map(row => {
+    const doiLines = row.doiDetails.map(d => `
+      <a href="${d.doi.startsWith('http') ? d.doi : 'https://doi.org/' + d.doi}" target="_blank" rel="noopener">${d.doi}</a>
+    `).join('<br>');
+
+    const pidLines = row.doiDetails.map(d => d.pids).join('<br>');
+
+    return `
+      <tr style="border-bottom: 1px solid #e2e8f0;">
+        <td style="font-weight: 600;" class="gene-name">${row.gene}</td>
+        <td>${row.frequency} / ${row.totalPatients}</td>
+        <td>${row.percentage.toFixed(1)}%</td>
+        <td>${doiLines || '–'}</td>
+        <td>${pidLines || '–'}</td>
+      </tr>
+    `;
+  }).join('');
+
+  cardDiv.innerHTML = `
+    <div class="ai-card">
+      <div style="font-weight: 600; font-size: 0.95rem; color: #334155; margin-bottom: 0.75rem;">
+        Symptom-Gene Associations — ${hpoCode} (${descriptor})
+      </div>
+      <div class="data-table-container" style="max-height: 380px; overflow-y: auto; margin-bottom: 1rem;">
+        <table class="data-table" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <thead>
+            <tr>
+              <th>Gene</th>
+              <th>Frequency</th>
+              <th>Percentage</th>
+              <th>DOI</th>
+              <th>Patient ID</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableRowsHtml}
+          </tbody>
+        </table>
+      </div>
+      <div id="${chartId}" class="chart-container" style="height: 340px;"></div>
+    </div>
+  `;
+
+  container.appendChild(cardDiv);
+
+  // Render Bar Chart respecting frontend guardrails
+  renderSymptomGeneBarChart(chartId, summaryRows);
+
+  const stream = document.getElementById('chatStream');
+  if (stream) stream.scrollTop = stream.scrollHeight;
+}
+
+export function renderSymptomGeneBarChart(containerId, summaryRows) {
+  if (typeof Plotly === 'undefined') return;
+
+  const xGenes = summaryRows.map(r => r.gene);
+  const yValues = summaryRows.map(r => parseFloat(r.percentage.toFixed(1)));
+  const textLabels = yValues.map(v => `${v}%`);
+
+  const trace = {
+    x: xGenes,
+    y: yValues,
+    type: 'bar',
+    text: textLabels,
+    textposition: 'outside',
+    marker: {
+      color: summaryRows.map((_, idx) => getD3Color(idx, summaryRows.length)),
+      cornerradius: 6
+    },
+    hovertemplate: '<b>%{x}</b><br>Reportedness: %{y}%<extra></extra>'
+  };
+
+  const layout = {
+    margin: { t: 30, l: 50, r: 20, b: 50 },
+    paper_bgcolor: '#ffffff',
+    plot_bgcolor: '#ffffff',
+    xaxis: { title: 'Gene', showgrid: false },
+    yaxis: { title: 'Reportedness (%)', showgrid: true, range: [0, Math.max(...yValues, 10) * 1.15] }
+  };
+
+  Plotly.newPlot(containerId, [trace], layout, { responsive: true, displayModeBar: false });
 }
