@@ -2,6 +2,7 @@ let clusterDataCache = null;
 
 export let diseasesIndex = {};
 export let idToTerm = {};
+export let termToId = {};
 let entityLexicon = null;
 let hpoDagCache = null;
 let symptomIndexCache = null;
@@ -80,18 +81,23 @@ export async function loadLexicon() {
 export async function initData() {
   try {
     // Point both base assets to their .gz counterparts
-    const [diseasesRes, hpoRes] = await Promise.all([
+    const [diseasesRes, id2tRes, t2idRes] = await Promise.all([
       fetchGzipOrJson('data/diseases_index.json.gz').catch(() => 
         fetchGzipOrJson('data/diseases_index.json')
       ),
       fetchGzipOrJson('data/id_to_term.json.gz').catch(err => {
-        console.warn("Could not load HPO descriptors .gz, trying raw fallback", err);
+        console.warn("Could not load id_to_term.json.gz, trying raw fallback", err);
         return fetchGzipOrJson('data/id_to_term.json').catch(() => ({}));
+      }),
+      fetchGzipOrJson('data/term_to_id.json.gz').catch(err => {
+        console.warn("Could not load term_to_id.json.gz, trying raw fallback", err);
+        return fetchGzipOrJson('data/term_to_id.json').catch(() => ({}));
       })
     ]);
 
     diseasesIndex = diseasesRes || {};
-    idToTerm = hpoRes || {};
+    idToTerm = id2tRes || {};
+    termToId = t2idRes || {};
   } catch (e) {
     console.warn("Could not load application initial data", e);
   }

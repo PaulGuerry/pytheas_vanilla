@@ -273,3 +273,60 @@ export function findRelatedClusterTerms(targetDigits, clusters, dagData) {
 
   return { ancestorMatches, descendantMatches, sameOrganMatches };
 }
+
+
+/**
+ * Traverses DAG to find terms present in the symptom index (symptom_index.json)
+ */
+export function findRelatedSymptomTerms(targetDigits, symptomIndex, dagData) {
+  const targetNode = dagData[targetDigits];
+  if (!targetNode || !symptomIndex) {
+    return { ancestorMatches: [], descendantMatches: [], sameOrganMatches: [] };
+  }
+
+  const ancestorDigits = getAncestorDigits(targetDigits, dagData);
+  const descendantDigits = getDescendantDigits(targetDigits, dagData);
+
+  // Normalize target organ ID
+  const rawOrgan = targetNode.o;
+  const targetOrgans = new Set(
+    Array.isArray(rawOrgan) ? rawOrgan : rawOrgan ? [rawOrgan] : []
+  );
+
+  const dataContainer = symptomIndex.symptoms || symptomIndex.data || symptomIndex;
+
+  // Collect all unique HPO codes/digits present in symptomIndex
+  const activeSymptoms = new Map();
+  Object.keys(dataContainer).forEach(key => {
+    if (key === 'meta') return;
+    const { digits, fullCode } = parseHpo(key);
+    if (digits && !activeSymptoms.has(digits)) {
+      activeSymptoms.set(digits, {
+        digits,
+        fullCode
+      });
+    }
+  });
+
+  const ancestorMatches = [];
+  const descendantMatches = [];
+  const sameOrganMatches = [];
+
+  activeSymptoms.forEach((symInfo, digits) => {
+    if (digits === targetDigits) return; // Exclude the target term itself
+
+    const node = dagData[digits];
+    const nodeOrgans = Array.isArray(node?.o) ? node.o : node?.o ? [node.o] : [];
+    const sharesOrganSystem = nodeOrgans.some(org => targetOrgans.has(org));
+
+    if (ancestorDigits.has(digits)) {
+      ancestorMatches.push(symInfo);
+    } else if (descendantDigits.has(digits)) {
+      descendantMatches.push(symInfo);
+    } else if (targetOrgans.size > 0 && sharesOrganSystem) {
+      sameOrganMatches.push(symInfo);
+    }
+  });
+
+  return { ancestorMatches, descendantMatches, sameOrganMatches };
+}

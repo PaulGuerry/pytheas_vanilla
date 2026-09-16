@@ -1,6 +1,6 @@
 import { translations, currentLang } from '../i18n.js';
 import { parseAndRoute } from './queryParser.js';
-import { escapeHtml, parseHpo, loadHpoDescriptor, findRelatedClusterTerms } from './utils.js';
+import { escapeHtml, parseHpo, loadHpoDescriptor, findRelatedClusterTerms, findRelatedSymptomTerms } from './utils.js';
 import { loadClusterData, idToTerm, loadHpoDag, loadSymptomIndex } from '../api.js';
 import { 
   renderSummaryTable, 
@@ -407,6 +407,20 @@ document.addEventListener('click', async (event) => {
     }
     return;
   }
+
+  // 5. Symptom gene fallback links
+  const symptomGeneLink = event.target.closest('.symptom-gene-link');
+  if (symptomGeneLink) {
+    event.preventDefault();
+    const hpoCode = symptomGeneLink.getAttribute('data-hpo');
+    const descriptor = symptomGeneLink.getAttribute('data-desc');
+    if (hpoCode) {
+      console.log(`[DEBUG] Related symptom-gene link clicked: ${hpoCode}`);
+      await handleSymptomGeneAssociations(hpoCode, descriptor);
+    }
+    return;
+  }
+
 });
 
 
@@ -444,8 +458,6 @@ export function promptSymptomBranchChoice(hpoCode, descriptor) {
 }
 
 
-
-
 export async function handleSymptomGeneAssociations(hpoCode, descriptor) {
   const indexData = await loadSymptomIndex();
   if (!indexData) return;
@@ -464,11 +476,54 @@ export async function handleSymptomGeneAssociations(hpoCode, descriptor) {
 
   const symptomData = matchedKey ? dataContainer[matchedKey] : null;
 
+  // --- DAG FALLBACK TRAVERSAL IF NO DATA FOUND ---
   if (!symptomData) {
-    console.warn(`⚠️ No entry found for "${cleanInput}".`);
+    const { fullCode, digits: targetDigits } = parseHpo(cleanInput);
+    const effectiveCode = fullCode || cleanInput;
+
+    // Display loading spinner while DAG processing runs
+    showClusterSystemMessage(`
+      <div style="display: flex; align-items: center; gap: 10px; color: #4b5563;">
+        <div class="spinner" style="border: 3px solid #f3f3f3; border-top: 3px solid #2563eb; border-radius: 50%; width: 18px; height: 18px; animation: spin 1s linear infinite;"></div>
+        <span>No symptom-gene association data found for <strong>${effectiveCode}</strong> (${descriptor || 'Unknown'}). Searching parent, child, and organ system terms...</span>
+      </div>
+    `);
+
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    const dagData = await loadHpoDag();
+    const { ancestorMatches, descendantMatches, sameOrganMatches } = findRelatedSymptomTerms(targetDigits, indexData, dagData);
+
+    const formatTermLinks = (matches) => {
+      return matches.map(m => {
+        const termDesc = loadHpoDescriptor(idToTerm, m.digits);
+        return `<a href="#" class="symptom-gene-link" data-hpo="${m.fullCode}" data-desc="${escapeHtml(termDesc)}" style="color: #2563eb; text-decoration: underline; font-weight: 600;">${m.fullCode}</a> (${termDesc})`;
+      }).join(', ');
+    };
+
+    let fallbackHtml = `Symptom "<strong>${effectiveCode}</strong>" (${descriptor || 'Unknown'}) has no direct gene association data in the symptom index.<br><br>`;
+
+    const hasAnyMatches = ancestorMatches.length > 0 || descendantMatches.length > 0 || sameOrganMatches.length > 0;
+
+    if (!hasAnyMatches) {
+      fallbackHtml += `<em>No related parent, child, or organ system terms with symptom data were found.</em>`;
+    } else {
+      if (ancestorMatches.length > 0) {
+        fallbackHtml += `<strong>Matching Broader/Parent Terms:</strong><br>${formatTermLinks(ancestorMatches)}<br><br>`;
+      }
+      if (descendantMatches.length > 0) {
+        fallbackHtml += `<strong>Matching Specific/Child Terms:</strong><br>${formatTermLinks(descendantMatches)}<br><br>`;
+      }
+      if (sameOrganMatches.length > 0) {
+        fallbackHtml += `<strong>Matching Terms in Same Organ System:</strong><br>${formatTermLinks(sameOrganMatches)}`;
+      }
+    }
+
+    showClusterSystemMessage(fallbackHtml);
     return;
   }
 
+  // --- DATA PROCESSING & RENDERING FOR MATCHED SYMPTOM ---
   const summaryRows = [];
 
   for (const [gene, patientKeys] of Object.entries(symptomData)) {
@@ -484,8 +539,6 @@ export async function handleSymptomGeneAssociations(hpoCode, descriptor) {
       
       if (Array.isArray(patientMeta)) {
         const [rawDoi, rawPid] = patientMeta;
-
-        // Force rawDoi to a primitive String so chartRenderer.js can safely use .startsWith()
         const doi = (rawDoi != null && rawDoi !== '') ? String(rawDoi) : 'Unknown DOI';
 
         if (!doiGroupMap.has(doi)) {
@@ -499,7 +552,7 @@ export async function handleSymptomGeneAssociations(hpoCode, descriptor) {
     });
 
     const doiDetails = Array.from(doiGroupMap.entries()).map(([doi, pids]) => ({
-      doi, // Guaranteed to be a string
+      doi,
       pids: pids.length > 0 ? pids.join(', ') : 'N/A'
     }));
 
@@ -516,3 +569,5 @@ export async function handleSymptomGeneAssociations(hpoCode, descriptor) {
 
   renderSymptomGeneAssociationCard(hpoCode, descriptor, summaryRows);
 }
+
+

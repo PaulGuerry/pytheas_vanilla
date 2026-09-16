@@ -1,49 +1,49 @@
-import { diseasesIndex, getRandomComparisonTargets, loadClusterData, loadLexicon, idToTerm, loadSymptomIndex } from '../api.js';
+import { diseasesIndex, getRandomComparisonTargets, loadClusterData, loadLexicon, idToTerm, termToId } from '../api.js';
 import { getLevenshteinDistance, normalizeQueryTypos, escapeRegExp, parseHpo, loadHpoDescriptor, escapeHtml } from './utils.js';
 import { PFIC_SUBTYPE_MAP } from '../constants.js';
 import { showClusterSystemMessage, showHpoSuggestionsMessage, handleSingleSymptomQuery, promptSymptomBranchChoice } from './chatUI.js';
 
-
-
-/**
- * Resolves an HPO term or code using idToTerm.
- * Returns exact code match or a list of top candidate suggestions.
- */
 export function resolveHpoQuery(queryStr) {
   if (!queryStr) return { hpoCode: null, suggestions: [] };
   const raw = queryStr.trim();
   const normQuery = raw.toLowerCase();
 
-  // Direct Code Match (e.g., "HP:0001141", "0001141", "hp:1141")
+  // 1. Direct Code Match (e.g., "HP:0001141", "0001141", "hp:1141")
   if (raw.toUpperCase().startsWith("HP:") || /^\d+$/.test(raw)) {
     const { fullCode } = parseHpo(raw);
     if (fullCode) return { hpoCode: fullCode, suggestions: [] };
   }
 
-  let exactCode = null;
-  const suggestions = [];
-
-  // Reverse Lookup & Fuzzy Scan using parseHpo
-  const entries = Object.entries(idToTerm || {});
-  for (const [code, term] of entries) {
-    if (!term || typeof term !== 'string') continue;
-    const normTerm = term.toLowerCase().trim();
-    const { fullCode: formattedCode } = parseHpo(code);
-
-    if (!formattedCode) continue;
-
-    if (normTerm === normQuery) {
-      exactCode = formattedCode;
-      break;
-    }
-
-    if (normTerm.includes(normQuery) || normQuery.includes(normTerm)) {
-      const score = Math.abs(normTerm.length - normQuery.length);
-      suggestions.push({ code: formattedCode, term, score });
-    }
+  // 2. Direct O(1) Exact Term Lookup via termToId
+  const directMatchCode = termToId?.[raw] || termToId?.[normQuery];
+  if (directMatchCode) {
+    const { fullCode } = parseHpo(directMatchCode);
+    if (fullCode) return { hpoCode: fullCode, suggestions: [] };
   }
 
-  if (exactCode) return { hpoCode: exactCode, suggestions: [] };
+  const suggestions = [];
+
+  // 3. Scan termToId for case-insensitive exact or substring candidate suggestions
+  const entries = Object.entries(termToId || {});
+  for (const [term, code] of entries) {
+    if (!term || typeof term !== 'string') continue;
+    const normTerm = term.toLowerCase().trim();
+
+    // Check case-insensitive exact match
+    if (normTerm === normQuery) {
+      const { fullCode } = parseHpo(code);
+      if (fullCode) return { hpoCode: fullCode, suggestions: [] };
+    }
+
+    // Partial/Fuzzy Match
+    if (normTerm.includes(normQuery) || normQuery.includes(normTerm)) {
+      const { fullCode: formattedCode } = parseHpo(code);
+      if (formattedCode) {
+        const score = Math.abs(normTerm.length - normQuery.length);
+        suggestions.push({ code: formattedCode, term, score });
+      }
+    }
+  }
 
   suggestions.sort((a, b) => a.score - b.score);
   return { hpoCode: null, suggestions: suggestions.slice(0, 5) };
