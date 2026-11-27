@@ -99,7 +99,9 @@ export function legend(items, x, y, maxWidth) {
   for (const it of items) {
     const w = 22 + textWidth(it.label, 12) + 16;
     if (cx + w > x + maxWidth && cx > x) { cx = x; cy += 18; }
-    s += it.shape === 'box'
+    s += it.shape === 'ring'
+      ? `<circle cx="${cx + 6}" cy="${cy - 4}" r="4" fill="none" stroke="${it.colour}" stroke-width="1.2"/>`
+      : it.shape === 'box'
       ? `<rect x="${cx}" y="${cy - 9}" width="12" height="10" rx="2" fill="${it.colour}"/>`
       : `<line x1="${cx}" x2="${cx + 16}" y1="${cy - 4}" y2="${cy - 4}" stroke="${it.colour}" stroke-width="2.5"${it.dash ? ' stroke-dasharray="4 3"' : ''}/>`;
     s += `<text x="${cx + 22}" y="${cy}" fill="${INK}" font-size="12">${esc(it.label)}</text>`;

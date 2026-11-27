@@ -6,6 +6,11 @@
   "n_patients": 1771,
   "n_articles": 371,
   "hpo": "hpo_dag.json.gz + id_to_term.json.gz",
-  "built": "2026-11-27T14:32:58"
+  "built": "2026-11-27T14:32:58",
+  "alphi": {
+   "version": "12403d1",
+   "runs": 25,
+   "built": "2026-11-27T16:40:13"
+  }
  }
 ]

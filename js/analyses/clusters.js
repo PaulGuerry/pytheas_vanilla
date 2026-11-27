@@ -49,23 +49,22 @@ async function section(q, s, ci, nCohorts) {
   const nQuery = [...by.values()].reduce((a, g) => a + g.query.length, 0);
   const minSym = (run.settings.match(/--min-symptoms[\s=]+(\d+)/) || [])[1];
 
-  // figure 1: UMAP
-  const others = [];
+  // figure 1: UMAP; every patient of the run coloured by cluster, those outside the query as rings
   const series = ids.map((id) => {
     const g = by.get(id);
-    const pts = [];
-    for (const { pp, xy } of g.all) {
-      if (!xy) continue;
-      const pt = { x: xy[0], y: xy[1], title: `${pp.p.id} · ${clusterName(id)} · ${(pp.p.gene || []).join(', ')} · ${(pp.p.dis || []).join(', ')}` };
-      (inQuery.has(pp.p.id) ? pts : others).push(pt);
-    }
-    return { label: `${clusterName(id)} (${g.all.length})`, colour: colourOf(id), points: pts, tag: id >= 0 ? String(id) : null, opacity: id < 0 ? 0.6 : 0.8 };
+    const pts = g.all.filter(({ xy }) => xy).map(({ pp, xy }) => ({ x: xy[0], y: xy[1], open: subset && !inQuery.has(pp.p.id),
+      title: `${pp.p.id} · ${clusterName(id)} · ${(pp.p.gene || []).join(', ')} · ${(pp.p.dis || []).join(', ')}` }));
+    return { label: `${clusterName(id)} (${subset ? `${g.query.length}/` : ''}${g.all.length})`, colour: colourOf(id), points: pts,
+      tag: id >= 0 ? String(id) : null, opacity: id < 0 ? 0.6 : 0.8 };
   });
-  if (others.length) series.unshift({ label: T('other patients of the run', 'autres patients de l’analyse'), colour: '#dcdcdc', points: others, opacity: 0.9, r: 2.6 });
   const title = `${runLabel(run)} · k = ${rank.k}`;
-  const figures = [{ name: `alphi_${run.key.slice(0, 60)}_k${rank.k}_umap`, svg: embedding({ series, title }),
-    note: T('Each point is a patient, placed by the UMAP embedding of ALPHI; colours: clusters of the clustering shown, grey: noise.',
-      'Chaque point est un patient, placé selon la projection UMAP d’ALPHI ; couleurs : groupes de la partition affichée, gris : bruit.') }];
+  const figures = [{ name: `alphi_${run.key.slice(0, 60)}_k${rank.k}_umap`,
+    svg: embedding({ series, title, openLabel: T('not in the query', 'hors de la requête') }),
+    note: subset
+      ? T('Each point is a patient, placed by the UMAP embedding of ALPHI and coloured by cluster (grey: noise); filled: patients of the query, rings: the other patients of the run. Legend: patients of the query / of the cluster.',
+        'Chaque point est un patient, placé selon la projection UMAP d’ALPHI et coloré par groupe (gris : bruit) ; pleins : patients de la requête, cercles : les autres patients de l’analyse. Légende : patients de la requête / du groupe.')
+      : T('Each point is a patient, placed by the UMAP embedding of ALPHI and coloured by cluster (grey: noise).',
+        'Chaque point est un patient, placé selon la projection UMAP d’ALPHI et coloré par groupe (gris : bruit).') }];
 
   // figure 2: phenomeprints of the clusters (all their patients: the clusters as ALPHI found them)
   const layout = ctx.release.layout;
@@ -124,6 +123,7 @@ async function section(q, s, ci, nCohorts) {
       `Patients de la cohorte dans l’analyse : ${nQuery} sur ${s.members.length} ; les autres n’étaient pas dans l’entrée de l’analyse${minSym ? ` (moins de ${minSym} symptômes, ou autres gènes)` : ''}.`) : '',
     T('Stability: mean Jaccard recovery of the cluster over resampled runs (≥ 0.75 stable, ≤ 0.5 not supported); dissolved: share of resamples in which the cluster was not found. ⚑: separated from its closest cluster by few symptoms.',
       'Stabilité : recouvrement de Jaccard moyen du groupe sur les rééchantillonnages (≥ 0,75 stable, ≤ 0,5 non soutenu) ; dissous : part des rééchantillonnages où le groupe n’est pas retrouvé. ⚑ : séparé du groupe le plus proche par peu de symptômes.'),
+    `${T('Clustering shown', 'Partition affichée')}: ${rank.column || '–'}${rank.same_as ? ` (${T('same partition as', 'même partition que')} ${rank.same_as.join(', ')}${rank.stability_from ? `; ${T('stability of', 'stabilité de')} ${rank.stability_from}` : ''})` : ''}.`,
     `${T('Settings of the run', 'Paramètres de l’analyse')}: ${run.settings || '–'}${ctx.release.clusters?.alphi ? ` · ALPHI ${ctx.release.clusters.alphi}` : ''}.`,
   ];
   return { figures, before: head, after: table(headers, rows, 'clusters') + `<h4>${T('Genes by cluster', 'Gènes par groupe')}</h4>` + gTable + tail, csv, notes };

@@ -70,6 +70,45 @@ def write_gz(path, obj):
         json.dump(obj, fh, separators=(",", ":"))
 
 
+def same_partition(a, b):
+    """Cluster map a -> b when the two labellings are the same partition (noise to noise), else None."""
+    fwd, back = {}, {}
+    for x, y in zip(a, b):
+        if (x is None) != (y is None):
+            return None
+        if x is None:
+            continue
+        if fwd.setdefault(x, y) != y or back.setdefault(y, x) != x or (x == -1) != (y == -1):
+            return None
+    return fwd
+
+
+def merge_duplicates(m_ranks, d_ranks, report):
+    """Keep one clustering per partition. The hybrid clustering of the latent class check has no stability of its
+    own: when it equals an HDBSCAN clustering (LCA concordant), it takes that clustering's stability."""
+    i = 0
+    while i < len(m_ranks):
+        j = i + 1
+        while j < len(m_ranks):
+            fwd = same_partition(m_ranks[i]["labels"], m_ranks[j]["labels"])
+            if fwd is None:
+                j += 1
+                continue
+            keep, dup = m_ranks[i], m_ranks[j]
+            src = {c["id"]: c for c in dup["clusters"]}
+            if all(c["stability"] is None for c in keep["clusters"]) and any(c["stability"] is not None for c in dup["clusters"]):
+                for c in keep["clusters"]:
+                    o = src.get(fwd.get(c["id"]))
+                    if o:
+                        c["stability"], c["dissolved"] = o["stability"], o["dissolved"]
+                keep["stability_k_counts"] = keep["stability_k_counts"] or dup["stability_k_counts"]
+                keep["stability_from"] = dup["column"]
+            keep.setdefault("same_as", []).append(dup["column"])
+            report.setdefault("merged", []).append(f"{dup['column']} = {keep['column']}")
+            del m_ranks[j], d_ranks[j]
+        i += 1
+
+
 def read_run(path, release_ids, report):
     """One ALPHI result -> (manifest entry, detail payload)."""
     J = json.loads(path.read_text(encoding="utf-8"))
@@ -135,6 +174,7 @@ def read_run(path, release_ids, report):
         d_ranks.append({"clusters": sorted(d_cl, key=lambda c: c["id"])})
     if not m_ranks:
         raise ValueError("no clustering lists its patients")
+    merge_duplicates(m_ranks, d_ranks, report)
     m_ranks[0]["primary"] = True
     archetypal = [[hp(s.get("hpo_code") or s.get("HPO Code")), num(s.get("prevalence_percent") or s.get("Cohort Prevalence"))]
                   for s in J.get("cohort_archetypal_symptoms") or J.get("cohort_archetypal_signatures") or []]
@@ -198,7 +238,7 @@ def main():
         ks = ", ".join(str(r["k"]) for r in m["ranks"])
         miss = ", ".join(rep["missing"][:5]) + (" …" if len(rep["missing"]) > 5 else "")
         lines.append(f"| {key} | {len(m['ids'])} | {ks} | {len(rep['missing'])}{f' ({miss})' if miss else ''} | {not_clustered} of {len(of_genes)} | "
-                     f"{', '.join(rep.get('skipped_ranks', [])) or '–'} |")
+                     f"{', '.join(rep.get('skipped_ranks', [])) or '–'} | {'; '.join(rep.get('merged', [])) or '–'} |")
         print(f"  {key}: {len(m['ids'])} patients, k = {ks}" + (f"; {len(rep['missing'])} ids not in the release" if rep["missing"] else ""))
 
     built = datetime.datetime.now().isoformat(timespec="seconds")
@@ -208,8 +248,9 @@ def main():
         f"# ALPHI results of release {release}\n\nBuilt {built} from {Path(args.runs).expanduser()}"
         f"{f' (ALPHI {args.alphi_version})' if args.alphi_version else ''}.\n\n"
         "| Cohort | Patients | k of the eligible clusterings (first: shown by default) | Ids not in the release | "
-        f"Patients of the genes not clustered (without {args.exclude_disease}) | Clusterings left out (no patient list) |\n"
-        "| --- | --- | --- | --- | --- | --- |\n" + "\n".join(lines) + "\n", encoding="utf-8")
+        f"Patients of the genes not clustered (without {args.exclude_disease}) | Clusterings left out (no patient list) | "
+        "Identical clusterings merged |\n"
+        "| --- | --- | --- | --- | --- | --- | --- |\n" + "\n".join(lines) + "\n", encoding="utf-8")
     entry["alphi"] = {"version": args.alphi_version, "runs": len(runs), "built": built}
     rel_path.write_text(json.dumps(releases, indent=1), encoding="utf-8")
     size = sum(p.stat().st_size for p in dest.glob("*.gz"))

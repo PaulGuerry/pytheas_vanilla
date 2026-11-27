@@ -147,10 +147,14 @@ export function rangeChart({ rows, xLabel, format = (v) => +v.toPrecision(3), ti
 
 export { GREY };
 
-/** Patients on a 2-D embedding (UMAP), one series per cluster; labels at the cluster medians. Units are arbitrary: no ticks. */
-export function embedding({ series, xLabel = 'UMAP 1', yLabel = 'UMAP 2', title = '', height = 420 }) {
+/** Patients on a 2-D embedding (UMAP), one series per cluster; labels at the cluster medians. Units are arbitrary: no ticks.
+ *  Points with open: true are drawn as rings (e.g. patients of the run outside the query); openLabel names them in the legend. */
+export function embedding({ series, xLabel = 'UMAP 1', yLabel = 'UMAP 2', title = '', height = 420, openLabel = '' }) {
   const m = { l: 40, r: 24, t: 14, b: 40 };
-  const leg = legend(series.filter((s) => s.legend !== false).map((s) => ({ label: s.label, colour: s.colour, shape: 'box' })), m.l, 0, W - m.l - m.r);
+  const anyOpen = series.some((s) => s.points.some((p) => p.open));
+  const items = series.filter((s) => s.legend !== false).map((s) => ({ label: s.label, colour: s.colour, shape: 'box' }));
+  if (anyOpen && openLabel) items.push({ label: openLabel, colour: MUTED, shape: 'ring' });
+  const leg = legend(items, m.l, 0, W - m.l - m.r);
   const H = m.t + height + m.b + 14 + leg.height;
   const pts = series.flatMap((s) => s.points);
   if (!pts.length) return svgDoc(W, m.t + 40, `<text x="${m.l}" y="${m.t + 20}" fill="${MUTED}" font-size="12">–</text>`, title);
@@ -162,7 +166,10 @@ export function embedding({ series, xLabel = 'UMAP 1', yLabel = 'UMAP 2', title 
   body += `<text x="${(m.l + W - m.r) / 2}" y="${m.t + height + 22}" text-anchor="middle" fill="${MUTED}" font-size="12">${esc(xLabel)}</text>`;
   body += `<text transform="translate(${m.l - 14},${m.t + height / 2}) rotate(-90)" text-anchor="middle" fill="${MUTED}" font-size="12">${esc(yLabel)}</text>`;
   for (const s of series) {
-    for (const p of s.points) body += `<circle cx="${X(p.x).toFixed(1)}" cy="${Y(p.y).toFixed(1)}" r="${s.r || 3.2}" fill="${s.colour}" fill-opacity="${s.opacity ?? 0.75}"><title>${esc(p.title || '')}</title></circle>`;
+    for (const p of s.points) {
+      const look = p.open ? `fill="none" stroke="${s.colour}" stroke-width="1.2" stroke-opacity="0.8"` : `fill="${s.colour}" fill-opacity="${s.opacity ?? 0.8}"`;
+      body += `<circle cx="${X(p.x).toFixed(1)}" cy="${Y(p.y).toFixed(1)}" r="${s.r || 3.2}" ${look}><title>${esc(p.title || '')}</title></circle>`;
+    }
   }
   const med = (v) => { const a = [...v].sort((p, q) => p - q); return a[Math.floor(a.length / 2)]; };
   for (const s of series) {
