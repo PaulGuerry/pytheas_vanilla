@@ -1,6 +1,6 @@
 # Build report, release 261013
 
-Export `261013_pytheasDB.json`: 1784 records; 1771 patients in the release, 13 left out. HPO: hpo_dag.json.gz + id_to_term.json.gz. Built 2026-11-27T13:33:13.
+Export `261013_pytheasDB.json`: 1784 records; 1771 patients in the release, 13 left out. HPO: hpo_dag.json.gz + id_to_term.json.gz. Built 2026-11-27T14:32:58.
 
 ## Records left out (13)
 

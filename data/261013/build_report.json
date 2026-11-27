@@ -6,7 +6,7 @@
   "n_patients": 1771,
   "n_articles": 371,
   "hpo_source": "hpo_dag.json.gz + id_to_term.json.gz",
-  "built": "2026-11-27T13:33:13"
+  "built": "2026-11-27T14:32:58"
  },
  "excluded": [
   {
