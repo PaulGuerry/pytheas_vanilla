@@ -98,3 +98,21 @@ h4 { font-size: 14px; margin: 16px 0 4px; color: var(--muted); font-weight: 600;
 table.crosstab td, table.crosstab th { text-align: right; }
 table.crosstab td:first-child, table.crosstab th:first-child { text-align: left; }
 table.clusters td:last-child { white-space: normal; min-width: 260px; }
+
+/* pages */
+header.top { display: flex; align-items: center; gap: 24px; }
+nav.pages { display: flex; gap: 18px; flex: 1; font-size: 15px; }
+nav.pages a { color: var(--muted); text-decoration: none; padding: 4px 0; border-bottom: 2px solid transparent; }
+nav.pages a:hover { color: var(--ink, #111); }
+nav.pages a.active { color: var(--ink, #111); border-bottom-color: var(--accent); }
+.page { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 20px 24px; margin: 24px 0; }
+.page h2 { margin: 0 0 8px; font-size: 22px; }
+.page h3 { margin: 24px 0 6px; font-size: 16px; }
+.page ul { padding-left: 18px; }
+.page li { margin: 4px 0; }
+.page code { background: #f3f4f6; border-radius: 4px; padding: 0 4px; font-size: 13px; }
+.browse-filter { width: 100%; max-width: 420px; font: inherit; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; margin: 8px 0; }
+table.syntax td:nth-child(3) { white-space: normal; }
+.page table.data td { white-space: normal; }
+.sponsors img { height: 40px; margin-right: 24px; vertical-align: middle; }
+.sponsors img.ipsen { height: 150px; margin: -56px -32px; }

@@ -9,13 +9,17 @@
 </head>
 <body>
   <header class="top">
-    <a href="./" class="brand"><img src="data/PYTHEAS_Logo.svg" alt="PytheasDB" class="logo"></a>
+    <a href="./" class="brand" data-page="query"><img src="img/PYTHEAS_Logo.svg" alt="PytheasDB" class="logo"></a>
+    <nav class="pages">
+      <a href="./" data-page="query" id="nav-query"></a><a href="?p=browse" data-page="browse" id="nav-browse"></a><a href="?p=syntax" data-page="syntax" id="nav-syntax"></a><a href="?p=about" data-page="about" id="nav-about"></a>
+    </nav>
     <nav class="lang">
       <button type="button" class="lang-btn" data-lang="en">EN</button><span>|</span><button type="button" class="lang-btn" data-lang="fr">FR</button>
     </nav>
   </header>
 
   <main>
+    <div id="view-query">
     <section class="bar">
       <div class="input-wrap">
         <input id="query" type="text" autocomplete="off" spellcheck="false" aria-label="Query">
@@ -27,6 +31,8 @@
     </section>
     <div id="error-slot"></div>
     <section id="cards"></section>
+    </div>
+    <div id="view-page" hidden></div>
   </main>
 
   <footer class="foot">

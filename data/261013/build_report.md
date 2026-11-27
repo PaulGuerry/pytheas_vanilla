@@ -1,6 +1,8 @@
 # Build report, release 261013
 
-Export `261013_pytheasDB.json`: 1784 records; 1771 patients in the release, 13 left out. HPO: hpo_dag.json.gz + id_to_term.json.gz. Built 2026-11-27T14:32:58.
+Export `261013_pytheasDB.json`: 1784 records; 1771 patients in the release, 13 left out. HPO: hpo_dag.json.gz + id_to_term.json.gz. Built 2026-11-27T14:31:06.
+
+Phenomeprint layout: 602 nodes (239 terminal) in 19 organ systems, from 28 diseases of at least 10 patients, levels 1-8; parents not drawn: 0. Widths (fixed shares, then setmax): Nervous system 15°, Head and neck 15°, Eye 13°, Ear 12°, Growth 15°, Musculoskeletal 15°, Limbs 8°, Integument 15°, Prenatal and birth 9°, Digestive 90°, Metabolism 15°, Respiratory 15°, Cardiovascular 14°, Blood 15°, Immune 15°, Endocrine 8°, Genitourinary 15°, Constitutional 8°, Cellular 8°.
 
 ## Records left out (13)
 

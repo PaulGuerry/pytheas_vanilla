@@ -10,7 +10,7 @@ build_report.md, build_report.json and phenomeprint_layout.json; data/releases.j
 is taken from the leading digits of the export file name unless --release is given.
 
 HPO input: --hpo-json (an obographs file such as hp.json), or by default the site's
-data/hpo_dag.json.gz, data/id_to_term.json.gz and data/term_to_id.json.gz. The edges
+build/hpo/hpo_dag.json.gz, build/hpo/id_to_term.json.gz and build/hpo/term_to_id.json.gz. The edges
 listed in build/tables/hpo_edges.tsv are then added or removed.
 
 Patient record in patients.json.gz (a key is left out when its value is empty):
@@ -77,9 +77,9 @@ def parse_args():
     ap.add_argument("--tables", default=str(ROOT / "build" / "tables"), help="folder of the curation tables")
     ap.add_argument("--out", default=str(ROOT / "data"), help="data folder of the site")
     ap.add_argument("--hpo-json", help="HPO graph in obographs JSON (hp.json); overrides the three files below")
-    ap.add_argument("--hpo-dag", default=str(ROOT / "data" / "hpo_dag.json.gz"))
-    ap.add_argument("--hpo-labels", default=str(ROOT / "data" / "id_to_term.json.gz"))
-    ap.add_argument("--hpo-synonyms", default=str(ROOT / "data" / "term_to_id.json.gz"))
+    ap.add_argument("--hpo-dag", default=str(ROOT / "build" / "hpo" / "hpo_dag.json.gz"))
+    ap.add_argument("--hpo-labels", default=str(ROOT / "build" / "hpo" / "id_to_term.json.gz"))
+    ap.add_argument("--hpo-synonyms", default=str(ROOT / "build" / "hpo" / "term_to_id.json.gz"))
     pp = ap.add_argument_group("phenomeprint layout (shared by every cohort drawn on the site)")
     pp.add_argument("--pp-max-level", type=int, default=8, help="deepest HPO level drawn (organ systems = 1)")
     pp.add_argument("--pp-min-freq", type=float, default=0.25, help="share of a disease carrying a term for it to be drawn")

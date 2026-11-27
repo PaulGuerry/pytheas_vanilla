@@ -83,6 +83,27 @@ export const FIELDS = {
   term: { prefixes: ['hp', 'hpo'] },
 };
 
+/** French form of queries (display only; the canonical form and the URL stay in English). Each word reads back. */
+export const FRENCH = {
+  operators: { vs: 'contre', among: 'parmi', by: 'par', with: 'avec', without: 'sans' },
+  all: 'tous', example: 'exemple',
+  prefixes: { disease: 'maladie', gene: 'gène', sex: 'sexe', zyg: 'zygotie', onset: 'début', status: 'statut',
+              cons: 'consanguinité', tx: 'traitement', cluster: 'groupe', year: 'année' },
+  values: {
+    sex: { M: 'garçons', F: 'filles' },
+    zyg: { homozygous: 'homozygotes', compound: 'hétérozygotes composites', heterozygous: 'hétérozygotes' },
+    var: { missense: 'faux-sens', nonsense: 'non-sens', frameshift: 'décalage du cadre', splicing: 'épissage', silent: 'silencieux' },
+    onset: { newborn: 'nouveau-nés', infancy: 'nourrissons', preschool: 'préscolaire', childhood: 'enfance', adolescence: 'adolescents', adult: 'adultes' },
+    status: { dead: 'décédés', alive: 'vivants' },
+    cons: { yes: 'consanguins', no: 'non' },
+  },
+  facets: { gene: 'gène', disease: 'maladie', sex: 'sexe', zygosity: 'zygotie', variant: 'type de variant', cadd: 'cadd', onset: 'début',
+            status: 'statut', consanguinity: 'consanguinité', cluster: 'groupe', decade: 'décennie' },
+  analyses: { overview: 'aperçu', phenomeprint: 'phenomeprint', survival: 'survie', onset: 'début', symptoms: 'symptômes', variants: 'types de variants',
+              zygosity: 'zygotie', cadd: 'scores cadd', sex: 'sexe', birth: 'naissance', treatments: 'traitements', patients: 'patients',
+              articles: 'articles', clusters: 'groupes alphi', help: 'aide' },
+};
+
 /** Order of the fields in the canonical form. */
 export const FIELD_ORDER = ['disease', 'gene', 'sex', 'zyg', 'var', 'cadd', 'onset', 'status', 'cons', 'tx', 'cluster', 'year', 'doi', 'term'];
 

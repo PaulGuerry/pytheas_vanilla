@@ -5,7 +5,7 @@
 ```bash
 # from the root of the site repository
 build/build_release.py -f ~/GITHUB/ALPHI/261013_pytheasDB.json
-# with the curator's HPO graph (obographs JSON) instead of data/hpo_dag.json.gz
+# with the curator's HPO graph (obographs JSON) instead of build/hpo/hpo_dag.json.gz
 build/build_release.py -f ~/GITHUB/ALPHI/261013_pytheasDB.json --hpo-json ~/HPO/hp_pg.json
 ```
 

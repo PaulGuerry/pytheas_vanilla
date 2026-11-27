@@ -9,6 +9,8 @@ import { FACETS, OPTIONS } from '../query/vocab.js';
 import { esc, describeFilters, analysisTitle, groupLabel } from './describe.js';
 import { runAnalysis } from '../analyses/index.js';
 import { downloadCSV, downloadSVG, downloadPNG } from './export.js';
+import { canonical } from '../query/format.js';
+import { parse } from '../query/parse.js';
 
 function shell(title, canon, L, actions = true) {
   const S = strings();
@@ -23,7 +25,11 @@ function shell(title, canon, L, actions = true) {
     </header>
     ${canon ? '<div class="card-query pills"></div>' : ''}
     <div class="card-body"></div>`;
-  if (canon) renderPills(el.querySelector('.card-query'), tokenize(canon, L), L);
+  if (canon) {                                   // pills in the language of the page; the card keeps the canonical form
+    const a = parse(canon, L);
+    const shown = (a.ok && canonical(a, L, getLang())) || canon;
+    renderPills(el.querySelector('.card-query'), tokenize(shown, L), L);
+  }
   return el;
 }
 
@@ -67,7 +73,8 @@ function helpCard(ast, L) {
     <p>${esc(H.operators)}</p><p>${esc(H.prefixes)}</p>
     <p><strong>${esc(H.analyses)}</strong>: ${names}</p>
     <p><strong>${esc(H.facets)}</strong>: ${facets}</p>
-    <p><strong>${esc(H.options)}</strong>: ${Object.keys(OPTIONS).map((k) => `<code>${k}=</code>`).join(' ')}</p>`;
+    <p><strong>${esc(H.options)}</strong>: ${Object.keys(OPTIONS).map((k) => `<code>${k}=</code>`).join(' ')}</p>
+    <p>${esc(S.fullSyntax)} <a href="?p=syntax" data-page="syntax">${esc(S.nav.syntax)}</a>.</p>`;
   return el;
 }
 
@@ -104,8 +111,6 @@ export function resultCard(ast, canon, ctx, L) {
     res.then(fill, (e) => { body.innerHTML = `<p class="warning">${esc(S.loadFailed)} (${esc(e.message)})</p>`; });
   } else fill(res);
   el.addEventListener('click', (e) => {
-    const a = e.target.closest('a[data-q]');
-    if (a) { e.preventDefault(); el.dispatchEvent(new CustomEvent('pytheas:query', { detail: a.dataset.q, bubbles: true })); return; }
     const b = e.target.closest('button[data-act]');
     if (!b || !['csv', 'svg', 'png'].includes(b.dataset.act)) return;
     const i = +b.dataset.i;

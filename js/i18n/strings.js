@@ -38,6 +38,7 @@ const S = {
     or: 'or',
     clusterLater: 'No ALPHI run of this release holds these patients.',
     loading: 'Loading…', loadFailed: 'The data of this card could not be loaded',
+    nav: { query: 'Query', browse: 'Browse', syntax: 'Syntax', about: 'About' }, fullSyntax: 'Full syntax, with every field, analysis and option:',
     notClustered: 'not in the ALPHI run', noise: 'unclustered (noise)', clusterWord: 'cluster',
     alphiNote: (run, n, rank, how, kMissing, kAsked) => `ALPHI clusters: run ${run.label.en} (${run.n} patients${how === 'most' ? ', the run holding most patients of the cohort' : ''}); clustering with k = ${rank.k}${rank === run.ranks[0] ? ' (ALPHI’s choice)' : ''}${kMissing ? `; no eligible clustering with k = ${kAsked}` : ''}. Patients of the cohort in the run: ${n}.`,
     diag: {
@@ -106,6 +107,7 @@ const S = {
     or: 'ou',
     clusterLater: 'Aucune analyse ALPHI de cette version ne contient ces patients.',
     loading: 'Chargement…', loadFailed: 'Les données de cette carte n’ont pas pu être chargées',
+    nav: { query: 'Requêtes', browse: 'Parcourir', syntax: 'Syntaxe', about: 'À propos' }, fullSyntax: 'Syntaxe complète, avec chaque champ, analyse et option :',
     notClustered: 'hors de l’analyse ALPHI', noise: 'non regroupés (bruit)', clusterWord: 'groupe',
     alphiNote: (run, n, rank, how, kMissing, kAsked) => `Groupes ALPHI : analyse ${run.label.fr} (${run.n} patients${how === 'most' ? ', l’analyse qui contient le plus de patients de la cohorte' : ''}) ; partition à k = ${rank.k}${rank === run.ranks[0] ? ' (choix d’ALPHI)' : ''}${kMissing ? ` ; aucune partition éligible à k = ${kAsked}` : ''}. Patients de la cohorte dans l’analyse : ${n}.`,
     diag: {
