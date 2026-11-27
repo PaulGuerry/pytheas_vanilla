@@ -1,0 +1,45 @@
+# raw_variable + raw_unit as in the export (empty unit = none given). variable, unit, factor: value on the site = raw value x factor.
+# A row with an empty variable is left out of the release (reported by the build).
+raw_variable	raw_unit	n	variable	unit	factor	note
+GGT	U/l	130	GGT	U/l	1
+GGT	IU/L	27	GGT	U/l	1
+GGT	IU/l	1	GGT	U/l	1
+GGT	U/L	1	GGT	U/l	1
+ALT	U/l	124	ALT	U/l	1
+ALT	IU/L	25	ALT	U/l	1
+ALT	IU/l	1	ALT	U/l	1
+AST	U/l	51	AST	U/l	1
+AST	IU/L	23	AST	U/l	1
+AST	IU/l	1	AST	U/l	1
+ALP	U/l	28	ALP	U/l	1
+SBA	umol/l	113	SBA	µmol/l	1
+TB	umol/l	89	TB	µmol/l	1
+TB	mg/dl	50	TB	µmol/l	17.1	bilirubin: 1 mg/dl = 17.1 µmol/l
+CB	umol/l	40	CB	µmol/l	1
+CB	mg/dl	39	CB	µmol/l	17.1
+CB	mg/dL	1	CB	µmol/l	17.1
+AFP	ng/ml	50	AFP	ng/ml	1
+ALB	g/l	17	ALB	g/l	1
+Cholesterol	mmol/l	36	cholesterol	mmol/l	1
+Cholesterol	mg/dl	1	cholesterol	mmol/l	0.02586
+PTA	%	37	PTA	%	1	prothrombin activity (TP)
+PTA		2	PTA	%	1	unit missing, % assumed
+FV	%	34	FV	%	1	factor V
+PTINR		36	INR		1
+INR		8	INR		1
+PT	s	1	PT	s	1
+PLT	K/uL	9	PLT	10^9/l	1
+PLT	K/ul	6	PLT	10^9/l	1
+WBC	K/ul	1	WBC	10^9/l	1
+RBC	M/ul	1	RBC	10^12/l	1
+TPROT	g/dl	1	total protein	g/l	10
+TIG	g/dl	1	total immunoglobulins	g/l	10
+CA199	U/l	1	CA 19-9	U/ml	1	U/l in the export; CA 19-9 is usually given in U/ml
+weight	kg	83	weight	kg	1
+height	cm	36	height	cm	1
+hsds		24	height SDS		1
+wsds		7	weight SDS		1
+head circumference	cm	2	head circumference	cm	1
+headcirc	cm	2	head circumference	cm	1
+head circumference	SDS	3	head circumference SDS		1
+HCC		16				event, not a measurement: left out

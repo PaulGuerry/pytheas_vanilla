@@ -1,0 +1,4045 @@
+{
+ "release": "261013",
+ "n_patients": 1771,
+ "by_disease": {
+  "AARS1 deficiency": 20,
+  "ARC syndrome": 171,
+  "Aagenaes syndrome": 16,
+  "CARS1 deficiency": 4,
+  "CDG2P": 9,
+  "DARS1 deficiency": 18,
+  "EOSRD": 7,
+  "EPRS1 deficiency": 4,
+  "FARSA deficiency": 8,
+  "FARSB deficiency": 16,
+  "FHC": 12,
+  "FHL5": 20,
+  "FOCADS": 14,
+  "GARS1 deficiency": 3,
+  "HARS1 deficiency": 6,
+  "HBSL": 18,
+  "IARS1 deficiency": 8,
+  "KARS1 deficiency": 43,
+  "LARS1 deficiency": 25,
+  "LSR deficiency": 12,
+  "MARS1 deficiency": 39,
+  "MARS1 deficiency TTD": 1,
+  "MVID": 111,
+  "MVID+PFIC": 39,
+  "NARS1 deficiency": 38,
+  "O2HE": 1,
+  "O2HE syndrome": 5,
+  "PFIC": 822,
+  "PFIC2-DCDC2NSC": 1,
+  "QARS1 deficiency": 19,
+  "RARS1 deficiency": 23,
+  "SARS1 deficiency": 9,
+  "STX3 deficiency": 12,
+  "STXBP2 deficiency": 20,
+  "TARS1 deficiency": 2,
+  "THES": 29,
+  "THES1": 80,
+  "THES2": 90,
+  "TJP2": 1,
+  "TNC": 1,
+  "TTD": 5,
+  "UNC45A deficiency": 29,
+  "Unclear": 1,
+  "VARS1 deficiency": 21,
+  "WARS1 deficiency": 8,
+  "YARS1 deficiency": 24,
+  "mixed": 30,
+  "primary biliary cholangitis": 1,
+  "primary sclerosing cholangitis": 1
+ },
+ "by_gene": {
+  "AARS1": 20,
+  "ABCB11": 328,
+  "ABCB4": 133,
+  "ATP8B1": 117,
+  "CARS1": 4,
+  "DARS1": 18,
+  "EPRS1": 4,
+  "FARSA": 8,
+  "FARSB": 16,
+  "FOCAD": 14,
+  "GARS1": 3,
+  "HARS1": 6,
+  "IARS1": 8,
+  "KARS1": 43,
+  "KIF12": 12,
+  "LARS1": 25,
+  "LSR": 12,
+  "MARS1": 40,
+  "MYO5B": 210,
+  "NARS1": 38,
+  "NR1H4": 9,
+  "PQBP1": 1,
+  "QARS1": 19,
+  "RARS1": 23,
+  "SARS1": 9,
+  "SEMA7A": 1,
+  "SKIC2": 90,
+  "SKIC3": 80,
+  "SLC51A": 4,
+  "STX3": 12,
+  "STXBP2": 20,
+  "TARS1": 2,
+  "TJP2": 69,
+  "TMEM199": 9,
+  "UNC45A": 29,
+  "USP53": 70,
+  "VARS1": 21,
+  "VIPAS39": 8,
+  "VPS33B": 90,
+  "WARS1": 8,
+  "YARS1": 24,
+  "ZFYVE19": 10
+ },
+ "by_disease_gene": {
+  "AARS1 deficiency|AARS1": 20,
+  "ARC syndrome|VIPAS39": 8,
+  "ARC syndrome|VPS33B": 90,
+  "Aagenaes syndrome|UNC45A": 16,
+  "CARS1 deficiency|CARS1": 4,
+  "CDG2P|TMEM199": 9,
+  "DARS1 deficiency|DARS1": 18,
+  "EOSRD|STX3": 7,
+  "EPRS1 deficiency|EPRS1": 4,
+  "FARSA deficiency|FARSA": 8,
+  "FARSB deficiency|FARSB": 16,
+  "FHC|TJP2": 12,
+  "FHL5|STXBP2": 20,
+  "FOCADS|FOCAD": 14,
+  "GARS1 deficiency|GARS1": 3,
+  "HARS1 deficiency|HARS1": 6,
+  "HBSL|DARS1": 18,
+  "IARS1 deficiency|IARS1": 8,
+  "KARS1 deficiency|KARS1": 43,
+  "LARS1 deficiency|LARS1": 25,
+  "LSR deficiency|LSR": 12,
+  "LSR deficiency|PQBP1": 1,
+  "MARS1 deficiency TTD|MARS1": 1,
+  "MARS1 deficiency|MARS1": 39,
+  "MVID+PFIC|MYO5B": 38,
+  "MVID|MYO5B": 99,
+  "MVID|STX3": 12,
+  "NARS1 deficiency|NARS1": 38,
+  "O2HE syndrome|UNC45A": 5,
+  "O2HE|UNC45A": 1,
+  "PFIC2-DCDC2NSC|ABCB11": 1,
+  "PFIC|ABCB11": 327,
+  "PFIC|ABCB4": 131,
+  "PFIC|ATP8B1": 117,
+  "PFIC|KIF12": 12,
+  "PFIC|LSR": 12,
+  "PFIC|MYO5B": 73,
+  "PFIC|NR1H4": 9,
+  "PFIC|PQBP1": 1,
+  "PFIC|SEMA7A": 1,
+  "PFIC|SLC51A": 4,
+  "PFIC|TJP2": 56,
+  "PFIC|USP53": 70,
+  "PFIC|ZFYVE19": 10,
+  "QARS1 deficiency|QARS1": 19,
+  "RARS1 deficiency|RARS1": 23,
+  "SARS1 deficiency|SARS1": 9,
+  "STX3 deficiency|STX3": 12,
+  "STXBP2 deficiency|STXBP2": 20,
+  "TARS1 deficiency|TARS1": 2,
+  "THES1|SKIC3": 80,
+  "THES2|SKIC2": 90,
+  "TJP2|TJP2": 1,
+  "TTD|AARS1": 3,
+  "TTD|TARS1": 2,
+  "UNC45A deficiency|UNC45A": 29,
+  "VARS1 deficiency|VARS1": 21,
+  "WARS1 deficiency|WARS1": 8,
+  "YARS1 deficiency|YARS1": 24,
+  "mixed|MYO5B": 30,
+  "primary biliary cholangitis|ABCB4": 1,
+  "primary sclerosing cholangitis|ABCB4": 1
+ },
+ "sex": {
+  "AARS1 deficiency": {
+   "F": 14,
+   "M": 6
+  },
+  "ARC syndrome": {
+   "M": 90,
+   "F": 81
+  },
+  "Aagenaes syndrome": {
+   "M": 6,
+   "F": 10
+  },
+  "CARS1 deficiency": {
+   "M": 2,
+   "F": 2
+  },
+  "CDG2P": {
+   "M": 7,
+   "F": 2
+  },
+  "DARS1 deficiency": {
+   "M": 9,
+   "F": 7,
+   "unknown": 2
+  },
+  "EOSRD": {
+   "F": 5,
+   "M": 2
+  },
+  "EPRS1 deficiency": {
+   "M": 1,
+   "F": 3
+  },
+  "FARSA deficiency": {
+   "F": 5,
+   "M": 3
+  },
+  "FARSB deficiency": {
+   "M": 6,
+   "F": 10
+  },
+  "FHC": {
+   "unknown": 12
+  },
+  "FHL5": {
+   "F": 11,
+   "M": 9
+  },
+  "FOCADS": {
+   "M": 11,
+   "F": 3
+  },
+  "GARS1 deficiency": {
+   "F": 3
+  },
+  "HARS1 deficiency": {
+   "unknown": 3,
+   "M": 1,
+   "F": 2
+  },
+  "HBSL": {
+   "M": 9,
+   "F": 7,
+   "unknown": 2
+  },
+  "IARS1 deficiency": {
+   "M": 6,
+   "F": 2
+  },
+  "KARS1 deficiency": {
+   "M": 25,
+   "F": 18
+  },
+  "LARS1 deficiency": {
+   "F": 9,
+   "M": 16
+  },
+  "LSR deficiency": {
+   "M": 5,
+   "F": 7
+  },
+  "MARS1 deficiency": {
+   "F": 12,
+   "M": 27
+  },
+  "MARS1 deficiency TTD": {
+   "F": 1
+  },
+  "MVID": {
+   "F": 50,
+   "unknown": 11,
+   "M": 50
+  },
+  "MVID+PFIC": {
+   "F": 18,
+   "M": 21
+  },
+  "NARS1 deficiency": {
+   "F": 18,
+   "M": 20
+  },
+  "O2HE": {
+   "M": 1
+  },
+  "O2HE syndrome": {
+   "F": 4,
+   "M": 1
+  },
+  "PFIC": {
+   "F": 283,
+   "M": 366,
+   "unknown": 173
+  },
+  "PFIC2-DCDC2NSC": {
+   "M": 1
+  },
+  "QARS1 deficiency": {
+   "M": 10,
+   "F": 9
+  },
+  "RARS1 deficiency": {
+   "F": 10,
+   "M": 11,
+   "unknown": 2
+  },
+  "SARS1 deficiency": {
+   "M": 4,
+   "F": 5
+  },
+  "STX3 deficiency": {
+   "F": 7,
+   "M": 5
+  },
+  "STXBP2 deficiency": {
+   "F": 11,
+   "M": 9
+  },
+  "TARS1 deficiency": {
+   "unknown": 1,
+   "F": 1
+  },
+  "THES": {
+   "F": 11,
+   "M": 10,
+   "unknown": 8
+  },
+  "THES1": {
+   "M": 30,
+   "F": 26,
+   "unknown": 24
+  },
+  "THES2": {
+   "M": 29,
+   "F": 41,
+   "unknown": 20
+  },
+  "TJP2": {
+   "F": 1
+  },
+  "TNC": {
+   "M": 1
+  },
+  "TTD": {
+   "F": 3,
+   "M": 1,
+   "unknown": 1
+  },
+  "UNC45A deficiency": {
+   "F": 20,
+   "M": 9
+  },
+  "Unclear": {
+   "M": 1
+  },
+  "VARS1 deficiency": {
+   "M": 10,
+   "F": 11
+  },
+  "WARS1 deficiency": {
+   "F": 3,
+   "M": 5
+  },
+  "YARS1 deficiency": {
+   "M": 11,
+   "F": 12,
+   "unknown": 1
+  },
+  "mixed": {
+   "F": 14,
+   "M": 16
+  },
+  "primary biliary cholangitis": {
+   "F": 1
+  },
+  "primary sclerosing cholangitis": {
+   "F": 1
+  }
+ },
+ "survival": {
+  "AARS1 deficiency": {
+   "available": 20,
+   "deaths": 4
+  },
+  "ARC syndrome": {
+   "available": 168,
+   "deaths": 138
+  },
+  "Aagenaes syndrome": {
+   "available": 16,
+   "deaths": 7
+  },
+  "CARS1 deficiency": {
+   "available": 4,
+   "deaths": 0
+  },
+  "CDG2P": {
+   "available": 9,
+   "deaths": 0
+  },
+  "DARS1 deficiency": {
+   "available": 18,
+   "deaths": 0
+  },
+  "EOSRD": {
+   "available": 7,
+   "deaths": 2
+  },
+  "EPRS1 deficiency": {
+   "available": 4,
+   "deaths": 1
+  },
+  "FARSA deficiency": {
+   "available": 8,
+   "deaths": 2
+  },
+  "FARSB deficiency": {
+   "available": 16,
+   "deaths": 7
+  },
+  "FHC": {
+   "available": 7,
+   "deaths": 0
+  },
+  "FHL5": {
+   "available": 20,
+   "deaths": 7
+  },
+  "FOCADS": {
+   "available": 14,
+   "deaths": 6
+  },
+  "GARS1 deficiency": {
+   "available": 3,
+   "deaths": 0
+  },
+  "HARS1 deficiency": {
+   "available": 3,
+   "deaths": 0
+  },
+  "HBSL": {
+   "available": 18,
+   "deaths": 0
+  },
+  "IARS1 deficiency": {
+   "available": 8,
+   "deaths": 1
+  },
+  "KARS1 deficiency": {
+   "available": 41,
+   "deaths": 7
+  },
+  "LARS1 deficiency": {
+   "available": 25,
+   "deaths": 5
+  },
+  "LSR deficiency": {
+   "available": 12,
+   "deaths": 1
+  },
+  "MARS1 deficiency": {
+   "available": 39,
+   "deaths": 15
+  },
+  "MARS1 deficiency TTD": {
+   "available": 1,
+   "deaths": 0
+  },
+  "MVID": {
+   "available": 100,
+   "deaths": 48
+  },
+  "MVID+PFIC": {
+   "available": 39,
+   "deaths": 16
+  },
+  "NARS1 deficiency": {
+   "available": 38,
+   "deaths": 9
+  },
+  "O2HE": {
+   "available": 1,
+   "deaths": 0
+  },
+  "O2HE syndrome": {
+   "available": 5,
+   "deaths": 2
+  },
+  "PFIC": {
+   "available": 798,
+   "deaths": 70
+  },
+  "PFIC2-DCDC2NSC": {
+   "available": 1,
+   "deaths": 0
+  },
+  "QARS1 deficiency": {
+   "available": 19,
+   "deaths": 0
+  },
+  "RARS1 deficiency": {
+   "available": 23,
+   "deaths": 5
+  },
+  "SARS1 deficiency": {
+   "available": 9,
+   "deaths": 3
+  },
+  "STX3 deficiency": {
+   "available": 12,
+   "deaths": 3
+  },
+  "STXBP2 deficiency": {
+   "available": 20,
+   "deaths": 7
+  },
+  "TARS1 deficiency": {
+   "available": 2,
+   "deaths": 0
+  },
+  "THES": {
+   "available": 29,
+   "deaths": 11
+  },
+  "THES1": {
+   "available": 79,
+   "deaths": 21
+  },
+  "THES2": {
+   "available": 82,
+   "deaths": 14
+  },
+  "TJP2": {
+   "available": 1,
+   "deaths": 0
+  },
+  "TTD": {
+   "available": 5,
+   "deaths": 1
+  },
+  "UNC45A deficiency": {
+   "available": 29,
+   "deaths": 9
+  },
+  "Unclear": {
+   "available": 1,
+   "deaths": 0
+  },
+  "VARS1 deficiency": {
+   "available": 21,
+   "deaths": 7
+  },
+  "WARS1 deficiency": {
+   "available": 8,
+   "deaths": 0
+  },
+  "YARS1 deficiency": {
+   "available": 22,
+   "deaths": 4
+  },
+  "mixed": {
+   "available": 30,
+   "deaths": 12
+  },
+  "primary biliary cholangitis": {
+   "available": 1,
+   "deaths": 0
+  },
+  "primary sclerosing cholangitis": {
+   "available": 1,
+   "deaths": 0
+  }
+ },
+ "onset": {
+  "AARS1 deficiency": {
+   "available": 20,
+   "median_m": 0.55
+  },
+  "ARC syndrome": {
+   "available": 170,
+   "median_m": 0.0
+  },
+  "Aagenaes syndrome": {
+   "available": 16,
+   "median_m": 0.1
+  },
+  "CARS1 deficiency": {
+   "available": 4,
+   "median_m": 0.3
+  },
+  "CDG2P": {
+   "available": 9,
+   "median_m": 24.0
+  },
+  "DARS1 deficiency": {
+   "available": 16,
+   "median_m": 10.0
+  },
+  "EOSRD": {
+   "available": 7,
+   "median_m": 0.1
+  },
+  "EPRS1 deficiency": {
+   "available": 4,
+   "median_m": 24.0
+  },
+  "FARSA deficiency": {
+   "available": 8,
+   "median_m": 0.55
+  },
+  "FARSB deficiency": {
+   "available": 16,
+   "median_m": 0.1
+  },
+  "FHL5": {
+   "available": 20,
+   "median_m": 2.0
+  },
+  "FOCADS": {
+   "available": 13,
+   "median_m": 1.5
+  },
+  "GARS1 deficiency": {
+   "available": 3,
+   "median_m": 72.0
+  },
+  "HARS1 deficiency": {
+   "available": 3,
+   "median_m": 0.1
+  },
+  "HBSL": {
+   "available": 16,
+   "median_m": 10.0
+  },
+  "IARS1 deficiency": {
+   "available": 8,
+   "median_m": 0.1
+  },
+  "KARS1 deficiency": {
+   "available": 39,
+   "median_m": 3.0
+  },
+  "LARS1 deficiency": {
+   "available": 25,
+   "median_m": 0.1
+  },
+  "LSR deficiency": {
+   "available": 10,
+   "median_m": 5.04
+  },
+  "MARS1 deficiency": {
+   "available": 39,
+   "median_m": 2.0
+  },
+  "MARS1 deficiency TTD": {
+   "available": 1,
+   "median_m": 0.1
+  },
+  "MVID": {
+   "available": 78,
+   "median_m": 0.1
+  },
+  "MVID+PFIC": {
+   "available": 36,
+   "median_m": 0.1
+  },
+  "NARS1 deficiency": {
+   "available": 37,
+   "median_m": 8.0
+  },
+  "O2HE": {
+   "available": 1,
+   "median_m": 0.12
+  },
+  "O2HE syndrome": {
+   "available": 5,
+   "median_m": 0.1
+  },
+  "PFIC": {
+   "available": 644,
+   "median_m": 6.0
+  },
+  "PFIC2-DCDC2NSC": {
+   "available": 1,
+   "median_m": 0.9
+  },
+  "QARS1 deficiency": {
+   "available": 19,
+   "median_m": 0.1
+  },
+  "RARS1 deficiency": {
+   "available": 23,
+   "median_m": 3.0
+  },
+  "SARS1 deficiency": {
+   "available": 9,
+   "median_m": 3.0
+  },
+  "STX3 deficiency": {
+   "available": 12,
+   "median_m": 0.1
+  },
+  "STXBP2 deficiency": {
+   "available": 20,
+   "median_m": 2.0
+  },
+  "TARS1 deficiency": {
+   "available": 2,
+   "median_m": 0.1
+  },
+  "THES": {
+   "available": 29,
+   "median_m": 0.7
+  },
+  "THES1": {
+   "available": 62,
+   "median_m": 1.05
+  },
+  "THES2": {
+   "available": 81,
+   "median_m": 20.04
+  },
+  "TJP2": {
+   "available": 1,
+   "median_m": 96.0
+  },
+  "TTD": {
+   "available": 5,
+   "median_m": 0.1
+  },
+  "UNC45A deficiency": {
+   "available": 29,
+   "median_m": 0.1
+  },
+  "Unclear": {
+   "available": 1,
+   "median_m": 3.0
+  },
+  "VARS1 deficiency": {
+   "available": 21,
+   "median_m": 1.0
+  },
+  "WARS1 deficiency": {
+   "available": 8,
+   "median_m": 6.0
+  },
+  "YARS1 deficiency": {
+   "available": 12,
+   "median_m": 0.1
+  },
+  "mixed": {
+   "available": 27,
+   "median_m": 0.1
+  },
+  "primary biliary cholangitis": {
+   "available": 1,
+   "median_m": 660.0
+  },
+  "primary sclerosing cholangitis": {
+   "available": 1,
+   "median_m": 648.0
+  }
+ },
+ "cadd_tiers_alleles": {
+  "AARS1 deficiency": {
+   "all": {
+    "PP3_Supporting": 7,
+    "Indeterminate": 9,
+    "PP3_Moderate": 12,
+    "BP4_Supporting": 1
+   },
+   "missense": {
+    "PP3_Supporting": 7,
+    "Indeterminate": 9,
+    "PP3_Moderate": 10,
+    "BP4_Supporting": 1
+   }
+  },
+  "ARC syndrome": {
+   "all": {
+    "BP4_Moderate": 41,
+    "PP3_Moderate": 6,
+    "Indeterminate": 6,
+    "BP4_Strong": 3,
+    "BP4_Supporting": 5,
+    "PP3_Supporting": 13
+   },
+   "missense": {
+    "BP4_Moderate": 4,
+    "PP3_Moderate": 6,
+    "Indeterminate": 4,
+    "BP4_Supporting": 4,
+    "PP3_Supporting": 11
+   }
+  },
+  "CARS1 deficiency": {
+   "all": {
+    "BP4_Moderate": 3,
+    "PP3_Moderate": 1,
+    "Indeterminate": 2
+   },
+   "missense": {
+    "BP4_Moderate": 3,
+    "Indeterminate": 2
+   }
+  },
+  "DARS1 deficiency": {
+   "all": {
+    "Indeterminate": 8,
+    "BP4_Moderate": 10,
+    "PP3_Moderate": 13,
+    "PP3_Supporting": 1,
+    "BP4_Supporting": 3
+   },
+   "missense": {
+    "Indeterminate": 8,
+    "BP4_Moderate": 10,
+    "PP3_Moderate": 13,
+    "PP3_Supporting": 1,
+    "BP4_Supporting": 3
+   }
+  },
+  "EPRS1 deficiency": {
+   "all": {
+    "PP3_Moderate": 2,
+    "PP3_Supporting": 2
+   },
+   "missense": {
+    "PP3_Moderate": 1,
+    "PP3_Supporting": 2
+   }
+  },
+  "FARSA deficiency": {
+   "all": {
+    "PP3_Moderate": 10,
+    "Indeterminate": 1,
+    "PP3_Supporting": 1,
+    "BP4_Strong": 4
+   },
+   "missense": {
+    "PP3_Moderate": 10,
+    "Indeterminate": 1,
+    "PP3_Supporting": 1,
+    "BP4_Strong": 4
+   }
+  },
+  "FARSB deficiency": {
+   "all": {
+    "PP3_Supporting": 4,
+    "PP3_Moderate": 3,
+    "BP4_Supporting": 2,
+    "Indeterminate": 2,
+    "BP4_Moderate": 16
+   },
+   "missense": {
+    "PP3_Supporting": 4,
+    "PP3_Moderate": 2,
+    "BP4_Supporting": 2,
+    "Indeterminate": 2,
+    "BP4_Moderate": 16
+   }
+  },
+  "FHC": {
+   "all": {
+    "PP3_Supporting": 23
+   },
+   "missense": {
+    "PP3_Supporting": 23
+   }
+  },
+  "FHL5": {
+   "all": {
+    "BP4_Moderate": 1,
+    "PP3_Moderate": 7,
+    "Indeterminate": 3,
+    "BP4_Supporting": 2
+   },
+   "missense": {
+    "PP3_Moderate": 7,
+    "Indeterminate": 3,
+    "BP4_Supporting": 2
+   }
+  },
+  "FOCADS": {
+   "all": {
+    "BP4_Moderate": 9,
+    "PP3_Supporting": 1,
+    "BP4_Supporting": 2,
+    "PP3_Moderate": 2
+   },
+   "missense": {
+    "PP3_Supporting": 1,
+    "BP4_Supporting": 2,
+    "PP3_Moderate": 2
+   }
+  },
+  "GARS1 deficiency": {
+   "all": {
+    "Indeterminate": 1,
+    "BP4_Moderate": 1,
+    "PP3_Moderate": 3
+   },
+   "missense": {
+    "Indeterminate": 1,
+    "BP4_Moderate": 1,
+    "PP3_Moderate": 3
+   }
+  },
+  "HARS1 deficiency": {
+   "all": {
+    "Indeterminate": 6,
+    "PP3_Moderate": 1,
+    "PP3_Supporting": 2
+   },
+   "missense": {
+    "Indeterminate": 6,
+    "PP3_Moderate": 1,
+    "PP3_Supporting": 2
+   }
+  },
+  "HBSL": {
+   "all": {
+    "Indeterminate": 8,
+    "BP4_Moderate": 10,
+    "PP3_Moderate": 13,
+    "PP3_Supporting": 1,
+    "BP4_Supporting": 3
+   },
+   "missense": {
+    "Indeterminate": 8,
+    "BP4_Moderate": 10,
+    "PP3_Moderate": 13,
+    "PP3_Supporting": 1,
+    "BP4_Supporting": 3
+   }
+  },
+  "IARS1 deficiency": {
+   "all": {
+    "PP3_Moderate": 7,
+    "Indeterminate": 2,
+    "BP4_Moderate": 1,
+    "BP4_Strong": 2,
+    "PP3_Supporting": 1
+   },
+   "missense": {
+    "PP3_Moderate": 5,
+    "Indeterminate": 2,
+    "BP4_Moderate": 1,
+    "BP4_Strong": 2,
+    "PP3_Supporting": 1
+   }
+  },
+  "KARS1 deficiency": {
+   "all": {
+    "Indeterminate": 11,
+    "PP3_Supporting": 16,
+    "BP4_Supporting": 9,
+    "PP3_Moderate": 23,
+    "BP4_Moderate": 16
+   },
+   "missense": {
+    "Indeterminate": 11,
+    "PP3_Supporting": 16,
+    "BP4_Supporting": 9,
+    "PP3_Moderate": 23,
+    "BP4_Moderate": 16
+   }
+  },
+  "LARS1 deficiency": {
+   "all": {
+    "PP3_Moderate": 12,
+    "BP4_Moderate": 1,
+    "PP3_Supporting": 21,
+    "Indeterminate": 5,
+    "BP4_Supporting": 1
+   },
+   "missense": {
+    "PP3_Moderate": 8,
+    "BP4_Moderate": 1,
+    "PP3_Supporting": 21,
+    "Indeterminate": 5,
+    "BP4_Supporting": 1
+   }
+  },
+  "LSR deficiency": {
+   "all": {
+    "BP4_Supporting": 3,
+    "PP3_Moderate": 8,
+    "BP4_Moderate": 3,
+    "PP3_Supporting": 3
+   },
+   "missense": {
+    "BP4_Supporting": 3,
+    "PP3_Moderate": 6,
+    "BP4_Moderate": 3,
+    "PP3_Supporting": 3
+   }
+  },
+  "MARS1 deficiency": {
+   "all": {
+    "PP3_Supporting": 7,
+    "BP4_Moderate": 1,
+    "Indeterminate": 4,
+    "PP3_Moderate": 12
+   },
+   "missense": {
+    "PP3_Supporting": 7,
+    "BP4_Moderate": 1,
+    "Indeterminate": 4,
+    "PP3_Moderate": 11
+   }
+  },
+  "MARS1 deficiency TTD": {
+   "all": {
+    "PP3_Moderate": 2
+   },
+   "missense": {
+    "PP3_Moderate": 2
+   }
+  },
+  "MVID": {
+   "all": {
+    "BP4_Moderate": 30,
+    "PP3_Moderate": 35,
+    "BP4_Supporting": 1,
+    "Indeterminate": 1,
+    "BP4_Strong": 2
+   },
+   "missense": {
+    "PP3_Moderate": 27,
+    "BP4_Supporting": 1,
+    "Indeterminate": 1,
+    "BP4_Moderate": 8,
+    "BP4_Strong": 2
+   }
+  },
+  "MVID+PFIC": {
+   "all": {
+    "BP4_Moderate": 13,
+    "PP3_Supporting": 9,
+    "PP3_Moderate": 13,
+    "Indeterminate": 2
+   },
+   "missense": {
+    "BP4_Moderate": 3,
+    "PP3_Supporting": 9,
+    "PP3_Moderate": 11,
+    "Indeterminate": 2
+   }
+  },
+  "NARS1 deficiency": {
+   "all": {
+    "PP3_Supporting": 8,
+    "Indeterminate": 4,
+    "PP3_Moderate": 47,
+    "BP4_Supporting": 5
+   },
+   "missense": {
+    "PP3_Supporting": 8,
+    "Indeterminate": 4,
+    "PP3_Moderate": 40,
+    "BP4_Supporting": 5
+   }
+  },
+  "O2HE": {
+   "all": {
+    "PP3_Moderate": 1
+   },
+   "missense": {
+    "PP3_Moderate": 1
+   }
+  },
+  "O2HE syndrome": {
+   "all": {
+    "Indeterminate": 7,
+    "PP3_Moderate": 3
+   },
+   "missense": {
+    "Indeterminate": 7,
+    "PP3_Moderate": 1
+   }
+  },
+  "PFIC": {
+   "all": {
+    "PP3_Moderate": 336,
+    "BP4_Supporting": 113,
+    "BP4_Moderate": 212,
+    "PP3_Supporting": 117,
+    "BP4_Strong": 30,
+    "Indeterminate": 145
+   },
+   "missense": {
+    "PP3_Moderate": 293,
+    "PP3_Supporting": 112,
+    "BP4_Supporting": 100,
+    "Indeterminate": 126,
+    "BP4_Moderate": 109,
+    "BP4_Strong": 18
+   }
+  },
+  "PFIC2-DCDC2NSC": {
+   "all": {
+    "BP4_Moderate": 2
+   },
+   "missense": {
+    "BP4_Moderate": 2
+   }
+  },
+  "QARS1 deficiency": {
+   "all": {
+    "PP3_Moderate": 15,
+    "Indeterminate": 6,
+    "PP3_Supporting": 5,
+    "BP4_Moderate": 1,
+    "BP4_Supporting": 1
+   },
+   "missense": {
+    "PP3_Moderate": 12,
+    "Indeterminate": 6,
+    "PP3_Supporting": 5,
+    "BP4_Moderate": 1,
+    "BP4_Supporting": 1
+   }
+  },
+  "RARS1 deficiency": {
+   "all": {
+    "PP3_Supporting": 2,
+    "Indeterminate": 4,
+    "PP3_Moderate": 6,
+    "BP4_Moderate": 4
+   },
+   "missense": {
+    "PP3_Supporting": 2,
+    "Indeterminate": 4,
+    "PP3_Moderate": 6,
+    "BP4_Moderate": 4
+   }
+  },
+  "SARS1 deficiency": {
+   "all": {
+    "PP3_Moderate": 18
+   },
+   "missense": {
+    "PP3_Moderate": 18
+   }
+  },
+  "STX3 deficiency": {
+   "all": {
+    "PP3_Moderate": 4
+   },
+   "missense": {}
+  },
+  "STXBP2 deficiency": {
+   "all": {
+    "BP4_Moderate": 1,
+    "PP3_Moderate": 7,
+    "Indeterminate": 3,
+    "BP4_Supporting": 2
+   },
+   "missense": {
+    "PP3_Moderate": 7,
+    "Indeterminate": 3,
+    "BP4_Supporting": 2
+   }
+  },
+  "TARS1 deficiency": {
+   "all": {
+    "PP3_Supporting": 1,
+    "PP3_Moderate": 1,
+    "BP4_Moderate": 2
+   },
+   "missense": {
+    "PP3_Supporting": 1,
+    "BP4_Moderate": 2
+   }
+  },
+  "THES": {
+   "all": {
+    "Indeterminate": 1
+   },
+   "missense": {
+    "Indeterminate": 1
+   }
+  },
+  "THES1": {
+   "all": {
+    "BP4_Moderate": 9,
+    "PP3_Supporting": 2,
+    "PP3_Moderate": 3,
+    "Indeterminate": 1
+   },
+   "missense": {
+    "PP3_Supporting": 2,
+    "PP3_Moderate": 2,
+    "Indeterminate": 1,
+    "BP4_Moderate": 2
+   }
+  },
+  "THES2": {
+   "all": {
+    "PP3_Moderate": 2,
+    "BP4_Supporting": 2,
+    "BP4_Moderate": 7
+   },
+   "missense": {
+    "PP3_Moderate": 2,
+    "BP4_Supporting": 2
+   }
+  },
+  "TNC": {
+   "all": {
+    "PP3_Moderate": 1
+   },
+   "missense": {
+    "PP3_Moderate": 1
+   }
+  },
+  "TTD": {
+   "all": {
+    "PP3_Supporting": 4,
+    "Indeterminate": 2,
+    "PP3_Moderate": 2,
+    "BP4_Moderate": 2
+   },
+   "missense": {
+    "PP3_Supporting": 4,
+    "Indeterminate": 2,
+    "PP3_Moderate": 1,
+    "BP4_Moderate": 2
+   }
+  },
+  "UNC45A deficiency": {
+   "all": {
+    "PP3_Moderate": 11,
+    "Indeterminate": 7,
+    "BP4_Moderate": 1
+   },
+   "missense": {
+    "PP3_Moderate": 5,
+    "Indeterminate": 7,
+    "BP4_Moderate": 1
+   }
+  },
+  "VARS1 deficiency": {
+   "all": {
+    "BP4_Strong": 2,
+    "PP3_Moderate": 18,
+    "Indeterminate": 4,
+    "PP3_Supporting": 13
+   },
+   "missense": {
+    "BP4_Strong": 2,
+    "PP3_Moderate": 17,
+    "Indeterminate": 4,
+    "PP3_Supporting": 13
+   }
+  },
+  "WARS1 deficiency": {
+   "all": {
+    "PP3_Moderate": 10,
+    "Indeterminate": 2
+   },
+   "missense": {
+    "PP3_Moderate": 10,
+    "Indeterminate": 2
+   }
+  },
+  "YARS1 deficiency": {
+   "all": {
+    "PP3_Moderate": 4,
+    "Indeterminate": 18
+   },
+   "missense": {
+    "PP3_Moderate": 4,
+    "Indeterminate": 18
+   }
+  },
+  "mixed": {
+   "all": {
+    "BP4_Moderate": 13,
+    "PP3_Supporting": 9,
+    "PP3_Moderate": 8
+   },
+   "missense": {
+    "BP4_Moderate": 3,
+    "PP3_Supporting": 9,
+    "PP3_Moderate": 8
+   }
+  },
+  "primary biliary cholangitis": {
+   "all": {
+    "Indeterminate": 1
+   },
+   "missense": {
+    "Indeterminate": 1
+   }
+  }
+ },
+ "top_terms": {
+  "PFIC": [
+   {
+    "hp": "HP:0001396",
+    "present": 820,
+    "present_exact": 817,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002904",
+    "present": 480,
+    "present_exact": 480,
+    "absent": 31
+   },
+   {
+    "hp": "HP:0000989",
+    "present": 404,
+    "present_exact": 404,
+    "absent": 45
+   },
+   {
+    "hp": "HP:0000952",
+    "present": 366,
+    "present_exact": 366,
+    "absent": 52
+   },
+   {
+    "hp": "HP:0031964",
+    "present": 323,
+    "present_exact": 323,
+    "absent": 62
+   },
+   {
+    "hp": "HP:0002908",
+    "present": 289,
+    "present_exact": 289,
+    "absent": 44
+   },
+   {
+    "hp": "HP:0002240",
+    "present": 287,
+    "present_exact": 287,
+    "absent": 38
+   },
+   {
+    "hp": "HP:0031956",
+    "present": 281,
+    "present_exact": 281,
+    "absent": 46
+   },
+   {
+    "hp": "HP:0012202",
+    "present": 269,
+    "present_exact": 269,
+    "absent": 8
+   },
+   {
+    "hp": "HP:0001395",
+    "present": 219,
+    "present_exact": 208,
+    "absent": 20
+   }
+  ],
+  "THES1": [
+   {
+    "hp": "HP:0001999",
+    "present": 66,
+    "present_exact": 66,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001595",
+    "present": 70,
+    "present_exact": 50,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002041",
+    "present": 49,
+    "present_exact": 49,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0011473",
+    "present": 37,
+    "present_exact": 37,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0009886",
+    "present": 35,
+    "present_exact": 35,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002715",
+    "present": 62,
+    "present_exact": 31,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002028",
+    "present": 29,
+    "present_exact": 29,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001511",
+    "present": 23,
+    "present_exact": 23,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001249",
+    "present": 17,
+    "present_exact": 17,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001263",
+    "present": 16,
+    "present_exact": 16,
+    "absent": 0
+   }
+  ],
+  "THES2": [
+   {
+    "hp": "HP:0000951",
+    "present": 67,
+    "present_exact": 66,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002028",
+    "present": 61,
+    "present_exact": 61,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001999",
+    "present": 59,
+    "present_exact": 59,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001595",
+    "present": 75,
+    "present_exact": 57,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002041",
+    "present": 30,
+    "present_exact": 30,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000953",
+    "present": 29,
+    "present_exact": 29,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001508",
+    "present": 21,
+    "present_exact": 21,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001511",
+    "present": 18,
+    "present_exact": 18,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002224",
+    "present": 18,
+    "present_exact": 18,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0100626",
+    "present": 8,
+    "present_exact": 8,
+    "absent": 0
+   }
+  ],
+  "Unclear": [
+   {
+    "hp": "HP:0001396",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001402",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   }
+  ],
+  "primary sclerosing cholangitis": [
+   {
+    "hp": "HP:0030153",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   }
+  ],
+  "primary biliary cholangitis": [],
+  "TNC": [
+   {
+    "hp": "HP:0001396",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   }
+  ],
+  "PFIC2-DCDC2NSC": [
+   {
+    "hp": "HP:0000952",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001394",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001396",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001744",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002240",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   }
+  ],
+  "FHC": [
+   {
+    "hp": "HP:0001928",
+    "present": 9,
+    "present_exact": 9,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000989",
+    "present": 8,
+    "present_exact": 8,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001508",
+    "present": 8,
+    "present_exact": 8,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002205",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000952",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002904",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   }
+  ],
+  "MVID": [
+   {
+    "hp": "HP:0033995",
+    "present": 108,
+    "present_exact": 108,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0001508",
+    "present": 94,
+    "present_exact": 94,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0033994",
+    "present": 91,
+    "present_exact": 91,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0011473",
+    "present": 85,
+    "present_exact": 85,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002028",
+    "present": 55,
+    "present_exact": 55,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002041",
+    "present": 52,
+    "present_exact": 52,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002024",
+    "present": 49,
+    "present_exact": 46,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001944",
+    "present": 38,
+    "present_exact": 38,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0005208",
+    "present": 37,
+    "present_exact": 37,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0033996",
+    "present": 37,
+    "present_exact": 37,
+    "absent": 0
+   }
+  ],
+  "MVID+PFIC": [
+   {
+    "hp": "HP:0033995",
+    "present": 38,
+    "present_exact": 38,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001508",
+    "present": 37,
+    "present_exact": 37,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0033994",
+    "present": 37,
+    "present_exact": 37,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001396",
+    "present": 37,
+    "present_exact": 35,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002028",
+    "present": 29,
+    "present_exact": 29,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0011473",
+    "present": 29,
+    "present_exact": 29,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001944",
+    "present": 11,
+    "present_exact": 11,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001622",
+    "present": 9,
+    "present_exact": 9,
+    "absent": 21
+   },
+   {
+    "hp": "HP:0002024",
+    "present": 9,
+    "present_exact": 9,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002041",
+    "present": 9,
+    "present_exact": 9,
+    "absent": 0
+   }
+  ],
+  "mixed": [
+   {
+    "hp": "HP:0001396",
+    "present": 30,
+    "present_exact": 29,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002028",
+    "present": 29,
+    "present_exact": 29,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0011473",
+    "present": 29,
+    "present_exact": 29,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0033995",
+    "present": 29,
+    "present_exact": 29,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001508",
+    "present": 28,
+    "present_exact": 28,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0033994",
+    "present": 28,
+    "present_exact": 28,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001622",
+    "present": 8,
+    "present_exact": 8,
+    "absent": 21
+   },
+   {
+    "hp": "HP:0000121",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000010",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000083",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   }
+  ],
+  "CDG2P": [
+   {
+    "hp": "HP:0002910",
+    "present": 9,
+    "present_exact": 9,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0003107",
+    "present": 9,
+    "present_exact": 9,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0031886",
+    "present": 9,
+    "present_exact": 9,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001397",
+    "present": 6,
+    "present_exact": 6,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002240",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0010837",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0040081",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001395",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001744",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0010838",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   }
+  ],
+  "THES": [
+   {
+    "hp": "HP:0001518",
+    "present": 23,
+    "present_exact": 23,
+    "absent": 4
+   },
+   {
+    "hp": "HP:0002041",
+    "present": 23,
+    "present_exact": 23,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0011473",
+    "present": 18,
+    "present_exact": 18,
+    "absent": 7
+   },
+   {
+    "hp": "HP:0001508",
+    "present": 16,
+    "present_exact": 16,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002721",
+    "present": 16,
+    "present_exact": 16,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000316",
+    "present": 15,
+    "present_exact": 15,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0009886",
+    "present": 14,
+    "present_exact": 14,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0000445",
+    "present": 12,
+    "present_exact": 12,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0011220",
+    "present": 12,
+    "present_exact": 12,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000293",
+    "present": 11,
+    "present_exact": 11,
+    "absent": 0
+   }
+  ],
+  "FOCADS": [
+   {
+    "hp": "HP:0001511",
+    "present": 12,
+    "present_exact": 12,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0000007",
+    "present": 11,
+    "present_exact": 11,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001508",
+    "present": 10,
+    "present_exact": 10,
+    "absent": 4
+   },
+   {
+    "hp": "HP:0002240",
+    "present": 10,
+    "present_exact": 10,
+    "absent": 3
+   },
+   {
+    "hp": "HP:0002910",
+    "present": 10,
+    "present_exact": 10,
+    "absent": 4
+   },
+   {
+    "hp": "HP:0003073",
+    "present": 10,
+    "present_exact": 10,
+    "absent": 4
+   },
+   {
+    "hp": "HP:0003270",
+    "present": 10,
+    "present_exact": 10,
+    "absent": 4
+   },
+   {
+    "hp": "HP:0001394",
+    "present": 9,
+    "present_exact": 9,
+    "absent": 4
+   },
+   {
+    "hp": "HP:0001744",
+    "present": 9,
+    "present_exact": 9,
+    "absent": 5
+   },
+   {
+    "hp": "HP:0002028",
+    "present": 8,
+    "present_exact": 8,
+    "absent": 6
+   }
+  ],
+  "ARC syndrome": [
+   {
+    "hp": "HP:0002804",
+    "present": 151,
+    "present_exact": 151,
+    "absent": 11
+   },
+   {
+    "hp": "HP:0001508",
+    "present": 141,
+    "present_exact": 141,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0002904",
+    "present": 137,
+    "present_exact": 137,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001396",
+    "present": 158,
+    "present_exact": 136,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002908",
+    "present": 105,
+    "present_exact": 105,
+    "absent": 4
+   },
+   {
+    "hp": "HP:0008064",
+    "present": 100,
+    "present_exact": 100,
+    "absent": 9
+   },
+   {
+    "hp": "HP:0001994",
+    "present": 81,
+    "present_exact": 81,
+    "absent": 10
+   },
+   {
+    "hp": "HP:0000952",
+    "present": 75,
+    "present_exact": 75,
+    "absent": 4
+   },
+   {
+    "hp": "HP:0003076",
+    "present": 64,
+    "present_exact": 64,
+    "absent": 7
+   },
+   {
+    "hp": "HP:0003155",
+    "present": 57,
+    "present_exact": 57,
+    "absent": 9
+   }
+  ],
+  "TJP2": [
+   {
+    "hp": "HP:0000952",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000989",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001396",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001508",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001903",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002904",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002908",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0003073",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0003084",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0031956",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   }
+  ],
+  "AARS1 deficiency": [
+   {
+    "hp": "HP:0001263",
+    "present": 18,
+    "present_exact": 18,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0001508",
+    "present": 17,
+    "present_exact": 17,
+    "absent": 3
+   },
+   {
+    "hp": "HP:0000252",
+    "present": 14,
+    "present_exact": 13,
+    "absent": 3
+   },
+   {
+    "hp": "HP:0001250",
+    "present": 14,
+    "present_exact": 12,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0001285",
+    "present": 10,
+    "present_exact": 10,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0002015",
+    "present": 10,
+    "present_exact": 10,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0002071",
+    "present": 10,
+    "present_exact": 10,
+    "absent": 4
+   },
+   {
+    "hp": "HP:0008936",
+    "present": 9,
+    "present_exact": 9,
+    "absent": 4
+   },
+   {
+    "hp": "HP:0001298",
+    "present": 12,
+    "present_exact": 8,
+    "absent": 4
+   },
+   {
+    "hp": "HP:0002376",
+    "present": 8,
+    "present_exact": 8,
+    "absent": 3
+   }
+  ],
+  "TTD": [
+   {
+    "hp": "HP:0001263",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001508",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002224",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0008064",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001249",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002299",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002421",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0034354",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0045055",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0045075",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   }
+  ],
+  "MARS1 deficiency TTD": [
+   {
+    "hp": "HP:0000218",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000286",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000324",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000689",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001156",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001249",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001251",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001263",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001265",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001508",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   }
+  ],
+  "TARS1 deficiency": [
+   {
+    "hp": "HP:0008064",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0045055",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001263",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001508",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002205",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0003328",
+    "present": 2,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0007479",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0032152",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0034354",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   }
+  ],
+  "DARS1 deficiency": [
+   {
+    "hp": "HP:0002061",
+    "present": 16,
+    "present_exact": 16,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0003487",
+    "present": 16,
+    "present_exact": 16,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001270",
+    "present": 13,
+    "present_exact": 13,
+    "absent": 4
+   },
+   {
+    "hp": "HP:0002395",
+    "present": 13,
+    "present_exact": 13,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0006808",
+    "present": 13,
+    "present_exact": 13,
+    "absent": 3
+   },
+   {
+    "hp": "HP:0020029",
+    "present": 13,
+    "present_exact": 13,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0002500",
+    "present": 17,
+    "present_exact": 12,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0030890",
+    "present": 14,
+    "present_exact": 12,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002191",
+    "present": 11,
+    "present_exact": 11,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002352",
+    "present": 10,
+    "present_exact": 10,
+    "absent": 0
+   }
+  ],
+  "HBSL": [
+   {
+    "hp": "HP:0002061",
+    "present": 16,
+    "present_exact": 16,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0003487",
+    "present": 16,
+    "present_exact": 16,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001270",
+    "present": 13,
+    "present_exact": 13,
+    "absent": 4
+   },
+   {
+    "hp": "HP:0002395",
+    "present": 13,
+    "present_exact": 13,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0006808",
+    "present": 13,
+    "present_exact": 13,
+    "absent": 3
+   },
+   {
+    "hp": "HP:0020029",
+    "present": 13,
+    "present_exact": 13,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0002500",
+    "present": 17,
+    "present_exact": 12,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0030890",
+    "present": 14,
+    "present_exact": 12,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002191",
+    "present": 11,
+    "present_exact": 11,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002352",
+    "present": 10,
+    "present_exact": 10,
+    "absent": 0
+   }
+  ],
+  "EPRS1 deficiency": [
+   {
+    "hp": "HP:0001332",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002059",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002415",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0030890",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0033044",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0033725",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000648",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0001251",
+    "present": 4,
+    "present_exact": 3,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002015",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002540",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 1
+   }
+  ],
+  "RARS1 deficiency": [
+   {
+    "hp": "HP:0030890",
+    "present": 20,
+    "present_exact": 20,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0006808",
+    "present": 19,
+    "present_exact": 19,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0001263",
+    "present": 18,
+    "present_exact": 17,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0001270",
+    "present": 17,
+    "present_exact": 17,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0000639",
+    "present": 15,
+    "present_exact": 15,
+    "absent": 7
+   },
+   {
+    "hp": "HP:0002059",
+    "present": 15,
+    "present_exact": 15,
+    "absent": 3
+   },
+   {
+    "hp": "HP:0002540",
+    "present": 15,
+    "present_exact": 15,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0001250",
+    "present": 11,
+    "present_exact": 11,
+    "absent": 5
+   },
+   {
+    "hp": "HP:0010864",
+    "present": 11,
+    "present_exact": 11,
+    "absent": 3
+   },
+   {
+    "hp": "HP:0033454",
+    "present": 11,
+    "present_exact": 11,
+    "absent": 4
+   }
+  ],
+  "SARS1 deficiency": [
+   {
+    "hp": "HP:0001263",
+    "present": 9,
+    "present_exact": 9,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000718",
+    "present": 6,
+    "present_exact": 6,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0001324",
+    "present": 6,
+    "present_exact": 6,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000252",
+    "present": 5,
+    "present_exact": 5,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002066",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 5
+   },
+   {
+    "hp": "HP:0002197",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002342",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0007164",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0011476",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000486",
+    "present": 4,
+    "present_exact": 3,
+    "absent": 0
+   }
+  ],
+  "NARS1 deficiency": [
+   {
+    "hp": "HP:0001263",
+    "present": 34,
+    "present_exact": 34,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000252",
+    "present": 34,
+    "present_exact": 31,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0000750",
+    "present": 29,
+    "present_exact": 24,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0006863",
+    "present": 21,
+    "present_exact": 21,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0010864",
+    "present": 20,
+    "present_exact": 20,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0031936",
+    "present": 18,
+    "present_exact": 18,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002197",
+    "present": 18,
+    "present_exact": 17,
+    "absent": 7
+   },
+   {
+    "hp": "HP:0001290",
+    "present": 15,
+    "present_exact": 15,
+    "absent": 6
+   },
+   {
+    "hp": "HP:0025336",
+    "present": 11,
+    "present_exact": 11,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002066",
+    "present": 9,
+    "present_exact": 9,
+    "absent": 7
+   }
+  ],
+  "HARS1 deficiency": [
+   {
+    "hp": "HP:0000408",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0000505",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0000510",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000543",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000556",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000613",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000618",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0000648",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000666",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0000750",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 0
+   }
+  ],
+  "YARS1 deficiency": [
+   {
+    "hp": "HP:0000252",
+    "present": 21,
+    "present_exact": 21,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001263",
+    "present": 19,
+    "present_exact": 19,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0001508",
+    "present": 19,
+    "present_exact": 19,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000490",
+    "present": 14,
+    "present_exact": 14,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0004322",
+    "present": 15,
+    "present_exact": 13,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001249",
+    "present": 13,
+    "present_exact": 12,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0001290",
+    "present": 12,
+    "present_exact": 12,
+    "absent": 3
+   },
+   {
+    "hp": "HP:0006863",
+    "present": 12,
+    "present_exact": 12,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0011352",
+    "present": 12,
+    "present_exact": 12,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0004870",
+    "present": 9,
+    "present_exact": 9,
+    "absent": 0
+   }
+  ],
+  "FARSB deficiency": [
+   {
+    "hp": "HP:0001508",
+    "present": 15,
+    "present_exact": 15,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0006530",
+    "present": 16,
+    "present_exact": 13,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000252",
+    "present": 10,
+    "present_exact": 10,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0004887",
+    "present": 10,
+    "present_exact": 10,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002878",
+    "present": 9,
+    "present_exact": 9,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001533",
+    "present": 8,
+    "present_exact": 8,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0003199",
+    "present": 8,
+    "present_exact": 8,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0003546",
+    "present": 8,
+    "present_exact": 8,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0004322",
+    "present": 8,
+    "present_exact": 8,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001903",
+    "present": 7,
+    "present_exact": 7,
+    "absent": 1
+   }
+  ],
+  "FARSA deficiency": [
+   {
+    "hp": "HP:0001508",
+    "present": 8,
+    "present_exact": 8,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0003073",
+    "present": 8,
+    "present_exact": 8,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0006530",
+    "present": 8,
+    "present_exact": 8,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001217",
+    "present": 7,
+    "present_exact": 7,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0004322",
+    "present": 7,
+    "present_exact": 7,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0007552",
+    "present": 6,
+    "present_exact": 6,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0031956",
+    "present": 6,
+    "present_exact": 6,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0031964",
+    "present": 6,
+    "present_exact": 6,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0033364",
+    "present": 6,
+    "present_exact": 6,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0033542",
+    "present": 6,
+    "present_exact": 6,
+    "absent": 0
+   }
+  ],
+  "VARS1 deficiency": [
+   {
+    "hp": "HP:0000252",
+    "present": 20,
+    "present_exact": 19,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001263",
+    "present": 18,
+    "present_exact": 18,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002353",
+    "present": 14,
+    "present_exact": 14,
+    "absent": 3
+   },
+   {
+    "hp": "HP:0001344",
+    "present": 11,
+    "present_exact": 11,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002197",
+    "present": 11,
+    "present_exact": 11,
+    "absent": 5
+   },
+   {
+    "hp": "HP:0001348",
+    "present": 10,
+    "present_exact": 10,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0004322",
+    "present": 10,
+    "present_exact": 10,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0033725",
+    "present": 10,
+    "present_exact": 10,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002120",
+    "present": 9,
+    "present_exact": 9,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0000750",
+    "present": 19,
+    "present_exact": 8,
+    "absent": 0
+   }
+  ],
+  "IARS1 deficiency": [
+   {
+    "hp": "HP:0000252",
+    "present": 7,
+    "present_exact": 7,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001508",
+    "present": 7,
+    "present_exact": 7,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0031956",
+    "present": 7,
+    "present_exact": 7,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0031964",
+    "present": 7,
+    "present_exact": 7,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001511",
+    "present": 6,
+    "present_exact": 6,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001518",
+    "present": 6,
+    "present_exact": 6,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0011968",
+    "present": 7,
+    "present_exact": 6,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001263",
+    "present": 6,
+    "present_exact": 5,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0001290",
+    "present": 5,
+    "present_exact": 5,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0003073",
+    "present": 5,
+    "present_exact": 5,
+    "absent": 0
+   }
+  ],
+  "LARS1 deficiency": [
+   {
+    "hp": "HP:0001508",
+    "present": 24,
+    "present_exact": 24,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0003073",
+    "present": 24,
+    "present_exact": 24,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0031956",
+    "present": 23,
+    "present_exact": 23,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0031964",
+    "present": 23,
+    "present_exact": 23,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0001518",
+    "present": 22,
+    "present_exact": 22,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001290",
+    "present": 17,
+    "present_exact": 17,
+    "absent": 5
+   },
+   {
+    "hp": "HP:0004840",
+    "present": 17,
+    "present_exact": 17,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0005437",
+    "present": 17,
+    "present_exact": 17,
+    "absent": 4
+   },
+   {
+    "hp": "HP:0006554",
+    "present": 16,
+    "present_exact": 16,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0001622",
+    "present": 15,
+    "present_exact": 15,
+    "absent": 9
+   }
+  ],
+  "KARS1 deficiency": [
+   {
+    "hp": "HP:0001263",
+    "present": 30,
+    "present_exact": 23,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0011476",
+    "present": 19,
+    "present_exact": 19,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0000252",
+    "present": 18,
+    "present_exact": 18,
+    "absent": 3
+   },
+   {
+    "hp": "HP:0030890",
+    "present": 17,
+    "present_exact": 17,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0031936",
+    "present": 16,
+    "present_exact": 16,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0001290",
+    "present": 15,
+    "present_exact": 15,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0001344",
+    "present": 14,
+    "present_exact": 14,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0002500",
+    "present": 28,
+    "present_exact": 14,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0001250",
+    "present": 27,
+    "present_exact": 13,
+    "absent": 3
+   },
+   {
+    "hp": "HP:0000407",
+    "present": 32,
+    "present_exact": 12,
+    "absent": 0
+   }
+  ],
+  "QARS1 deficiency": [
+   {
+    "hp": "HP:0000252",
+    "present": 19,
+    "present_exact": 18,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002119",
+    "present": 16,
+    "present_exact": 16,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0033725",
+    "present": 16,
+    "present_exact": 16,
+    "absent": 3
+   },
+   {
+    "hp": "HP:0002133",
+    "present": 14,
+    "present_exact": 14,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0034295",
+    "present": 14,
+    "present_exact": 14,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0011344",
+    "present": 12,
+    "present_exact": 12,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0012448",
+    "present": 12,
+    "present_exact": 12,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0001344",
+    "present": 10,
+    "present_exact": 10,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0025336",
+    "present": 10,
+    "present_exact": 10,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002540",
+    "present": 8,
+    "present_exact": 8,
+    "absent": 0
+   }
+  ],
+  "MARS1 deficiency": [
+   {
+    "hp": "HP:0006517",
+    "present": 30,
+    "present_exact": 30,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0001508",
+    "present": 29,
+    "present_exact": 29,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0002094",
+    "present": 29,
+    "present_exact": 29,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0002240",
+    "present": 27,
+    "present_exact": 27,
+    "absent": 5
+   },
+   {
+    "hp": "HP:0031956",
+    "present": 24,
+    "present_exact": 24,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0030948",
+    "present": 21,
+    "present_exact": 21,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0031964",
+    "present": 19,
+    "present_exact": 19,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0002206",
+    "present": 15,
+    "present_exact": 15,
+    "absent": 4
+   },
+   {
+    "hp": "HP:0012418",
+    "present": 14,
+    "present_exact": 14,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0001394",
+    "present": 10,
+    "present_exact": 10,
+    "absent": 4
+   }
+  ],
+  "WARS1 deficiency": [
+   {
+    "hp": "HP:0000252",
+    "present": 7,
+    "present_exact": 7,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001263",
+    "present": 7,
+    "present_exact": 6,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001344",
+    "present": 6,
+    "present_exact": 6,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0004322",
+    "present": 6,
+    "present_exact": 6,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001290",
+    "present": 5,
+    "present_exact": 5,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0004325",
+    "present": 6,
+    "present_exact": 5,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0031936",
+    "present": 5,
+    "present_exact": 5,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0009748",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0010864",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0025336",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   }
+  ],
+  "CARS1 deficiency": [
+   {
+    "hp": "HP:0001263",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002213",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002311",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002463",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0045055",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001508",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000252",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000545",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001256",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001397",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   }
+  ],
+  "GARS1 deficiency": [
+   {
+    "hp": "HP:0002151",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0003546",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000218",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000252",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000286",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000316",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000319",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000325",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000337",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001105",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   }
+  ],
+  "UNC45A deficiency": [
+   {
+    "hp": "HP:0001396",
+    "present": 26,
+    "present_exact": 25,
+    "absent": 3
+   },
+   {
+    "hp": "HP:0000952",
+    "present": 22,
+    "present_exact": 22,
+    "absent": 3
+   },
+   {
+    "hp": "HP:0002904",
+    "present": 22,
+    "present_exact": 22,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0011985",
+    "present": 20,
+    "present_exact": 20,
+    "absent": 3
+   },
+   {
+    "hp": "HP:0040319",
+    "present": 17,
+    "present_exact": 17,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0031956",
+    "present": 13,
+    "present_exact": 13,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0000989",
+    "present": 12,
+    "present_exact": 12,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001892",
+    "present": 13,
+    "present_exact": 12,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002908",
+    "present": 12,
+    "present_exact": 12,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0004322",
+    "present": 11,
+    "present_exact": 11,
+    "absent": 0
+   }
+  ],
+  "O2HE syndrome": [
+   {
+    "hp": "HP:0001396",
+    "present": 5,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000952",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002028",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002904",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0005208",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0025156",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001508",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002659",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002908",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0011473",
+    "present": 2,
+    "present_exact": 2,
+    "absent": 0
+   }
+  ],
+  "Aagenaes syndrome": [
+   {
+    "hp": "HP:0000952",
+    "present": 16,
+    "present_exact": 16,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001396",
+    "present": 16,
+    "present_exact": 16,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002904",
+    "present": 16,
+    "present_exact": 16,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0011985",
+    "present": 16,
+    "present_exact": 16,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0040319",
+    "present": 16,
+    "present_exact": 16,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001892",
+    "present": 12,
+    "present_exact": 12,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000682",
+    "present": 9,
+    "present_exact": 9,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000989",
+    "present": 9,
+    "present_exact": 9,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002024",
+    "present": 9,
+    "present_exact": 9,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002155",
+    "present": 9,
+    "present_exact": 9,
+    "absent": 0
+   }
+  ],
+  "STX3 deficiency": [
+   {
+    "hp": "HP:0002028",
+    "present": 12,
+    "present_exact": 12,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0011473",
+    "present": 11,
+    "present_exact": 11,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0033995",
+    "present": 11,
+    "present_exact": 11,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0033996",
+    "present": 9,
+    "present_exact": 9,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0025156",
+    "present": 8,
+    "present_exact": 8,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001141",
+    "present": 7,
+    "present_exact": 7,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0000639",
+    "present": 6,
+    "present_exact": 6,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001270",
+    "present": 6,
+    "present_exact": 6,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001942",
+    "present": 6,
+    "present_exact": 5,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0008323",
+    "present": 5,
+    "present_exact": 5,
+    "absent": 0
+   }
+  ],
+  "EOSRD": [
+   {
+    "hp": "HP:0002028",
+    "present": 7,
+    "present_exact": 7,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0011473",
+    "present": 7,
+    "present_exact": 7,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0033995",
+    "present": 7,
+    "present_exact": 7,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0033996",
+    "present": 7,
+    "present_exact": 7,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000639",
+    "present": 6,
+    "present_exact": 6,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001141",
+    "present": 6,
+    "present_exact": 6,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001270",
+    "present": 6,
+    "present_exact": 6,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0025156",
+    "present": 5,
+    "present_exact": 5,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0008323",
+    "present": 4,
+    "present_exact": 4,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000510",
+    "present": 3,
+    "present_exact": 3,
+    "absent": 1
+   }
+  ],
+  "STXBP2 deficiency": [
+   {
+    "hp": "HP:0001744",
+    "present": 18,
+    "present_exact": 18,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001945",
+    "present": 19,
+    "present_exact": 18,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001876",
+    "present": 17,
+    "present_exact": 17,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002155",
+    "present": 17,
+    "present_exact": 17,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0003281",
+    "present": 17,
+    "present_exact": 17,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0011900",
+    "present": 17,
+    "present_exact": 17,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002028",
+    "present": 16,
+    "present_exact": 16,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0033429",
+    "present": 7,
+    "present_exact": 7,
+    "absent": 5
+   },
+   {
+    "hp": "HP:0011840",
+    "present": 6,
+    "present_exact": 6,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0025807",
+    "present": 6,
+    "present_exact": 6,
+    "absent": 0
+   }
+  ],
+  "FHL5": [
+   {
+    "hp": "HP:0001744",
+    "present": 18,
+    "present_exact": 18,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001945",
+    "present": 19,
+    "present_exact": 18,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001876",
+    "present": 17,
+    "present_exact": 17,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002155",
+    "present": 17,
+    "present_exact": 17,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0003281",
+    "present": 17,
+    "present_exact": 17,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0011900",
+    "present": 17,
+    "present_exact": 17,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002028",
+    "present": 16,
+    "present_exact": 16,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0033429",
+    "present": 7,
+    "present_exact": 7,
+    "absent": 5
+   },
+   {
+    "hp": "HP:0011840",
+    "present": 6,
+    "present_exact": 6,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0025807",
+    "present": 6,
+    "present_exact": 6,
+    "absent": 0
+   }
+  ],
+  "LSR deficiency": [
+   {
+    "hp": "HP:0000989",
+    "present": 12,
+    "present_exact": 12,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001396",
+    "present": 12,
+    "present_exact": 12,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0012202",
+    "present": 10,
+    "present_exact": 10,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0031956",
+    "present": 10,
+    "present_exact": 10,
+    "absent": 1
+   },
+   {
+    "hp": "HP:0031964",
+    "present": 9,
+    "present_exact": 9,
+    "absent": 2
+   },
+   {
+    "hp": "HP:0001406",
+    "present": 8,
+    "present_exact": 8,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002904",
+    "present": 8,
+    "present_exact": 8,
+    "absent": 4
+   },
+   {
+    "hp": "HP:0000252",
+    "present": 7,
+    "present_exact": 7,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0000750",
+    "present": 7,
+    "present_exact": 7,
+    "absent": 3
+   },
+   {
+    "hp": "HP:0000952",
+    "present": 7,
+    "present_exact": 7,
+    "absent": 1
+   }
+  ],
+  "O2HE": [
+   {
+    "hp": "HP:0000952",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001396",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0001406",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002041",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002240",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002904",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0002908",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0011410",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0012202",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   },
+   {
+    "hp": "HP:0030948",
+    "present": 1,
+    "present_exact": 1,
+    "absent": 0
+   }
+  ]
+ },
+ "rules": "counts per disease label; a patient with two labels counts under both. top_terms = the 10 terms most often reported as such. present = term or a subterm reported present; present_exact = the term itself; absent = the term or an ancestor reported absent, and the term not present"
+}

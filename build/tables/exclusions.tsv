@@ -1,0 +1,15 @@
+# field: disease, gene or symptom. value: exact text, or re: followed by a regular expression.
+# action: drop_patient (record left out of the release) or remove_value (value removed from the list).
+field	value	action	note
+disease	EXCLUDE	drop_patient	marked for exclusion
+disease	re:^Exclude\(	drop_patient	marked for exclusion
+gene	EXCLUDE	drop_patient	marked for exclusion
+gene	re:^Exclude\(	drop_patient	marked for exclusion
+gene	ABCB11_duplicate	drop_patient	duplicate record: to be checked
+gene	Not tested	remove_value	decision of 27 Nov 2026: Not tested + MYO5B counts as MYO5B
+gene	Not found	remove_value	no gene
+gene	Not identified	remove_value	no gene
+gene	Unclear	remove_value	no gene
+gene	ABCB11/ATP8B1	remove_value	ambiguous gene: to be checked
+gene	MVID	remove_value	disease label in the gene field (with Not tested): MYO5B? to be checked
+symptom	0000000	remove_value	not an HPO code

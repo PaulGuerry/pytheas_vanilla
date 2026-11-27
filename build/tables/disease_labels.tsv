@@ -1,0 +1,51 @@
+# Disease labels as in the export. replacement: spelling fix applied by the build (empty = label kept). No labels are merged.
+label	n	replacement	note
+PFIC	822		
+ARC syndrome	171		
+MVID	111		
+THES2	90		
+THES1	80		
+KARS1 deficiency	43		
+MARS1 deficiency	39		
+MVID+PFIC	39		
+NARS1 deficiency	38		
+mixed	30		same patients as MVID+PFIC (30 of 39); kept separate (decision of 27 Nov 2026)
+THES	29		
+UNC45A deficiency	29		
+LARS1 deficiency	25		
+YARS1 deficiency	24		
+RARS1 deficiency	23		
+VARS1 deficiency	21		
+AARS1 deficiency	20		
+FHL5	20		same patients as STXBP2 deficiency; kept separate
+STXBP2 deficiency	20		
+QARS1 deficiency	19		
+DARS1 deficiency	18		
+HBSL	18		same patients as DARS1 deficiency; kept separate
+Aagenaes syndrome	16		
+FARSB deficiency	16		
+FOCADS	14		
+FHC	12		
+LSR deficiency	12		
+STX3 deficiency	12		
+CDG2P	9		
+SARS1 deficiency	9		
+FARSA deficiency	8		
+IARS1 deficiency	8		
+WARS1 deficiency	8		
+EOSRD	7		
+HARS1 deficiency	6		
+O2HE syndrome	5		also written "O2HE" (1 patient)
+TTD	5		
+CARS1 deficiency	4		
+EPRS1 deficiency	4		
+GARS1 deficiency	3		
+TARS1 deficiency	2		
+MARS1 deficiency TTD	1		two labels in one string? ("MARS1 deficiency", "TTD")
+O2HE	1		also written "O2HE syndrome" (5 patients)
+PFIC2-DCDC2NSC	1		record also has a field "diseases": ["PFIC2", "DCDC2NSC"]
+TJP2	1		gene symbol used as a disease label
+TNC	1		
+Unclear	1		no diagnosis label
+primary biliary cholangitis	1		
+primary sclerosing cholangitis	1		

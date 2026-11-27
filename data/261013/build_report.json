@@ -1,0 +1,1043 @@
+{
+ "meta": {
+  "release": "261013",
+  "export": "261013_pytheasDB.json",
+  "n_export": 1784,
+  "n_patients": 1771,
+  "n_articles": 371,
+  "hpo_source": "hpo_dag.json.gz + id_to_term.json.gz",
+  "built": "2026-11-27T13:33:13"
+ },
+ "excluded": [
+  {
+   "id": "ATP1",
+   "field": "disease",
+   "value": "EXCLUDE",
+   "note": "marked for exclusion"
+  },
+  {
+   "id": "ATP2",
+   "field": "disease",
+   "value": "EXCLUDE",
+   "note": "marked for exclusion"
+  },
+  {
+   "id": "ATP8",
+   "field": "disease",
+   "value": "EXCLUDE",
+   "note": "marked for exclusion"
+  },
+  {
+   "id": "PFIC3_Nayagam2022_08",
+   "field": "disease",
+   "value": "Exclude(PFIC3)",
+   "note": "marked for exclusion"
+  },
+  {
+   "id": "PFIC2_Nayagam2022_31",
+   "field": "disease",
+   "value": "Exclude(PFIC2)",
+   "note": "marked for exclusion"
+  },
+  {
+   "id": "PFIC2_Nayagam2022_116",
+   "field": "disease",
+   "value": "Exclude(PFIC2)",
+   "note": "marked for exclusion"
+  },
+  {
+   "id": "PFIC1_Nayagam2022_45",
+   "field": "disease",
+   "value": "Exclude(PFIC1)",
+   "note": "marked for exclusion"
+  },
+  {
+   "id": "PFIC123_159",
+   "field": "disease",
+   "value": "EXCLUDE",
+   "note": "marked for exclusion"
+  },
+  {
+   "id": "PFIC123_160",
+   "field": "disease",
+   "value": "EXCLUDE",
+   "note": "marked for exclusion"
+  },
+  {
+   "id": "PFIC123_161",
+   "field": "disease",
+   "value": "EXCLUDE",
+   "note": "marked for exclusion"
+  },
+  {
+   "id": "PFIC123_162",
+   "field": "disease",
+   "value": "EXCLUDE",
+   "note": "marked for exclusion"
+  },
+  {
+   "id": "PFIC3.BA_Zhang2019",
+   "field": "disease",
+   "value": "Exclude(PFIC3+BA)",
+   "note": "marked for exclusion"
+  },
+  {
+   "id": "PFIC123_360",
+   "field": "disease",
+   "value": "Exclude(PFIC2)",
+   "note": "marked for exclusion"
+  }
+ ],
+ "hpo_edges": [
+  "removed HP:0000989 -> HP:0001396",
+  "added HP:0006580 -> HP:0001395"
+ ],
+ "present_and_absent": [
+  "Pfister2022_PFIC123_149 HP:0002028",
+  "PFIC3_Oliveira2017 HP:0000952",
+  "LSR_004_Cosar2025_1 HP:0002904",
+  "LSR_011_Laborde2026_2 HP:0002904",
+  "UNC45A_029_Wang2023 HP:0002904",
+  "UNC45A_029_Wang2023 HP:0002908",
+  "UNC45A_029_Wang2023 HP:0031964",
+  "UNC45A_029_Wang2023 HP:0030948",
+  "MYO5B_Ruemmele2004_02_iu HP:0033994",
+  "MYO5B_Ruemmele2004_03_m8 HP:0033994",
+  "MYO5B_Ruemmele2004_03_m8 HP:0001406",
+  "MYO5B_Ruemmele2004_03_m8 HP:0001046",
+  "MYO5B_Ruemmele2004_06_mb HP:0033994",
+  "MYO5B_Ruemmele2004_08_1w HP:0001944",
+  "MYO5B_Ruemmele2004_12_71 HP:0001944",
+  "MYO5B_Ruemmele2010_AldrianTS1r58 HP:0001406",
+  "MYO5B_Ruemmele2010_AldrianTS1r58 HP:0001046",
+  "MYO5B_Ruemmele2010_AldrianTS1r58 HP:0033994",
+  "MYO5B_Ruemmele2010_AldrianTS1r59 HP:0033994",
+  "MYO5B_Ruemmele2010_AldrianTS1r59 HP:0001406",
+  "MYO5B_Ruemmele2010_AldrianTS1r59 HP:0001046",
+  "MYO5B_Ruemmele2010_AldrianTS1r60 HP:0001406",
+  "MYO5B_Ruemmele2010_AldrianTS1r60 HP:0001046",
+  "MYO5B_Ruemmele2010_AldrianTS1r62 HP:0001406",
+  "MYO5B_Ruemmele2010_AldrianTS1r62 HP:0001046",
+  "MYO5B_Ruemmele2010_AldrianTS1r63 HP:0033994",
+  "MYO5B_Ruemmele2010_AldrianTS1r65 HP:0001406",
+  "MYO5B_Ruemmele2010_AldrianTS1r65 HP:0001046",
+  "MYO5B_Ruemmele2010_AldrianTS1r66 HP:0033994",
+  "MYO5B_Ruemmele2010_AldrianTS1r66 HP:0000083"
+ ],
+ "transient_not_present": [],
+ "hpo_codes_in_treatments": [
+  "Knisely2006_C_PFIC123_111 0030948",
+  "MetRS_Hadchouel2015_04 0002206",
+  "LysRS_Zhou2017_02 0031910",
+  "LysRS_Zhou2017_02 0031826",
+  "LysRS_Zhou2017_02 0012373",
+  "LysRS_Zhou2017_02 0012372",
+  "LysRS_Zhou2017_02 0000252",
+  "LysRS_Zhou2017_02 0040129",
+  "LysRS_Zhou2017_02 0001290",
+  "LysRS_Zhou2017_02 0001638",
+  "LysRS_Zhou2017_02 0001250"
+ ],
+ "legacy_treatments": [
+  {
+   "id": "KIF8",
+   "text": "A05AA02",
+   "read": [
+    "UDCA"
+   ]
+  },
+  {
+   "id": "ZFY1",
+   "text": "A05AA02_4.9",
+   "read": [
+    "UDCA"
+   ]
+  },
+  {
+   "id": "ZFY2",
+   "text": "A05AA02_5",
+   "read": [
+    "UDCA"
+   ]
+  },
+  {
+   "id": "ZFY3",
+   "text": "A05AA02_1.17",
+   "read": [
+    "UDCA"
+   ]
+  },
+  {
+   "id": "ZFY4",
+   "text": "A05AA02_1.17",
+   "read": [
+    "UDCA"
+   ]
+  },
+  {
+   "id": "ZFY5",
+   "text": "A05AA02_1.33",
+   "read": [
+    "UDCA"
+   ]
+  },
+  {
+   "id": "ZFY6",
+   "text": "A05AA02_4.9",
+   "read": [
+    "UDCA"
+   ]
+  },
+  {
+   "id": "ZFY7",
+   "text": "A05AA02_4",
+   "read": [
+    "UDCA"
+   ]
+  },
+  {
+   "id": "ZFY9",
+   "text": "A05AA02_0.25",
+   "read": [
+    "UDCA"
+   ]
+  },
+  {
+   "id": "ZFY10",
+   "text": "A05AA02_J04AB02",
+   "read": [
+    "UDCA",
+    "rifampicin"
+   ]
+  },
+  {
+   "id": "PFIC1_2021Yang.03_ATP6",
+   "text": "middle (no pruritus)",
+   "read": []
+  },
+  {
+   "id": "THE001",
+   "text": "H02AB09(6mg/kg/j)_B05BA01(d24)",
+   "read": [
+    "hydrocortisone",
+    "parenteral nutrition"
+   ]
+  },
+  {
+   "id": "THE002",
+   "text": "J01EE01 J06BA01(4y)",
+   "read": [
+    "co-trimoxazole",
+    "immunoglobulins"
+   ]
+  },
+  {
+   "id": "THE004",
+   "text": "J06BA01(neonat puis stop)",
+   "read": [
+    "immunoglobulins"
+   ]
+  },
+  {
+   "id": "THE005",
+   "text": "J06BA01(neonat puis stop)",
+   "read": [
+    "immunoglobulins"
+   ]
+  },
+  {
+   "id": "THE006",
+   "text": "J06BA01(neonat jusqu'a 14a)",
+   "read": [
+    "immunoglobulins"
+   ]
+  },
+  {
+   "id": "THE007",
+   "text": "J06BA01(neonat puis stop)",
+   "read": [
+    "immunoglobulins"
+   ]
+  },
+  {
+   "id": "THE008",
+   "text": "J06BA01(neonat puis stop)",
+   "read": [
+    "immunoglobulins"
+   ]
+  },
+  {
+   "id": "THE009",
+   "text": "J06BA01(neonat puis stop)",
+   "read": [
+    "immunoglobulins"
+   ]
+  },
+  {
+   "id": "THE010",
+   "text": "J06BA01(neonat puis stop)",
+   "read": [
+    "immunoglobulins"
+   ]
+  },
+  {
+   "id": "THE011",
+   "text": "J06BA01(neonat puis stop)",
+   "read": [
+    "immunoglobulins"
+   ]
+  },
+  {
+   "id": "THE012",
+   "text": "J06BA01(neonat puis stop)",
+   "read": [
+    "immunoglobulins"
+   ]
+  },
+  {
+   "id": "THE013",
+   "text": "J06BA01(neonat puis stop)",
+   "read": [
+    "immunoglobulins"
+   ]
+  },
+  {
+   "id": "THE014",
+   "text": "J06BA01(neonat puis stop)",
+   "read": [
+    "immunoglobulins"
+   ]
+  },
+  {
+   "id": "THE016",
+   "text": "H01AC01(9,7y)",
+   "read": [
+    "growth hormone"
+   ]
+  },
+  {
+   "id": "THE020",
+   "text": "J06BA01(3y)",
+   "read": [
+    "immunoglobulins"
+   ]
+  },
+  {
+   "id": "THE022",
+   "text": "J06BA01",
+   "read": [
+    "immunoglobulins"
+   ]
+  },
+  {
+   "id": "THE023",
+   "text": "J06BA01_J01EE01",
+   "read": [
+    "immunoglobulins",
+    "co-trimoxazole"
+   ]
+  },
+  {
+   "id": "THE055",
+   "text": "J06BA01(D336–1,858)",
+   "read": [
+    "immunoglobulins"
+   ]
+  },
+  {
+   "id": "THE057",
+   "text": "J06BA01(1,009–on going)",
+   "read": [
+    "immunoglobulins"
+   ]
+  },
+  {
+   "id": "THE058",
+   "text": "J06BA01(D202–on going)",
+   "read": [
+    "immunoglobulins"
+   ]
+  },
+  {
+   "id": "THE059",
+   "text": "J06BA01(D97–on going)",
+   "read": [
+    "immunoglobulins"
+   ]
+  },
+  {
+   "id": "THE085",
+   "text": "J06BA01",
+   "read": [
+    "immunoglobulins"
+   ]
+  },
+  {
+   "id": "THE086",
+   "text": "J06BA01",
+   "read": [
+    "immunoglobulins"
+   ]
+  },
+  {
+   "id": "THE089",
+   "text": "J06BA02",
+   "read": [
+    "IVIg"
+   ]
+  },
+  {
+   "id": "THE090",
+   "text": "J06BA02",
+   "read": [
+    "IVIg"
+   ]
+  },
+  {
+   "id": "THE091",
+   "text": "J06BA02",
+   "read": [
+    "IVIg"
+   ]
+  },
+  {
+   "id": "THE093",
+   "text": "Prophylactic trimethoprim-sulfamethoxazole (5 mg/kg/daily",
+   "read": [
+    "co-trimoxazole"
+   ]
+  },
+  {
+   "id": "THE100",
+   "text": "prednisolone (1 mg/kg/day) and azathioprine IgIV",
+   "read": [
+    "prednisolone",
+    "azathioprine",
+    "IVIg"
+   ]
+  },
+  {
+   "id": "SKIC21",
+   "text": "B05BA01",
+   "read": [
+    "parenteral nutrition"
+   ]
+  },
+  {
+   "id": "SKIC22",
+   "text": "B05BA01",
+   "read": [
+    "parenteral nutrition"
+   ]
+  },
+  {
+   "id": "SKIC23",
+   "text": "C02DA01 _H01AC01 (5y)",
+   "read": [
+    "diazoxide",
+    "growth hormone"
+   ]
+  },
+  {
+   "id": "SKIC25",
+   "text": "J06BA01(D33–4,023)",
+   "read": [
+    "immunoglobulins"
+   ]
+  },
+  {
+   "id": "SKIC26",
+   "text": "J06BA01(D99–328)",
+   "read": [
+    "immunoglobulins"
+   ]
+  },
+  {
+   "id": "SKIC27",
+   "text": "hormone replacement therapy/",
+   "read": []
+  },
+  {
+   "id": "SKIC249",
+   "text": "IgIV",
+   "read": [
+    "IVIg"
+   ]
+  },
+  {
+   "id": "SKIC250",
+   "text": "growth hormone(5y)",
+   "read": [
+    "growth hormone"
+   ]
+  },
+  {
+   "id": "SKIC251",
+   "text": "Steroides",
+   "read": [
+    "steroids"
+   ]
+  },
+  {
+   "id": "SKIC254",
+   "text": "UDCA",
+   "read": [
+    "UDCA"
+   ]
+  },
+  {
+   "id": "SKIC256",
+   "text": "IGIV",
+   "read": [
+    "IVIg"
+   ]
+  },
+  {
+   "id": "SKIC257",
+   "text": "bactrim",
+   "read": [
+    "co-trimoxazole"
+   ]
+  },
+  {
+   "id": "PFIC123_353",
+   "text": "UDCA, rifampicin and colestyramine",
+   "read": [
+    "UDCA",
+    "rifampicin",
+    "colestyramine"
+   ]
+  },
+  {
+   "id": "PFIC2_W-Zinman2017_2",
+   "text": "colestyramine and hydroxyzine",
+   "read": [
+    "colestyramine"
+   ]
+  },
+  {
+   "id": "PFIC123_371",
+   "text": "UDCA 4-phenylbutyrate therapy",
+   "read": [
+    "UDCA",
+    "NaPB"
+   ]
+  },
+  {
+   "id": "PFIC123_372",
+   "text": "UDCA 4-phenylbutyrate therapy",
+   "read": [
+    "UDCA",
+    "NaPB"
+   ]
+  },
+  {
+   "id": "PFIC123_373",
+   "text": "UDCA 4-phenylbutyrate therapy",
+   "read": [
+    "UDCA",
+    "NaPB"
+   ]
+  },
+  {
+   "id": "PFIC3_Fang2012_P13",
+   "text": "UDCA",
+   "read": [
+    "UDCA"
+   ]
+  },
+  {
+   "id": "PFIC1_2003Lyka_PFIC123_385",
+   "text": "UDCA",
+   "read": [
+    "UDCA"
+   ]
+  },
+  {
+   "id": "PFIC4_010",
+   "text": "C10AC01_A05AA02_Bicyclol",
+   "read": [
+    "colestyramine",
+    "UDCA",
+    "bicyclol"
+   ]
+  },
+  {
+   "id": "PFIC4_012",
+   "text": "A05AA02_C07AA05",
+   "read": [
+    "UDCA",
+    "propranolol"
+   ]
+  },
+  {
+   "id": "PFIC4_013",
+   "text": "A05AA02_C10AC01_FatSolubleVit",
+   "read": [
+    "UDCA",
+    "colestyramine",
+    "fat-soluble vitamins"
+   ]
+  },
+  {
+   "id": "PFIC4_014",
+   "text": "A05AA02_C10AC01_FatSolubleVit",
+   "read": [
+    "UDCA",
+    "colestyramine",
+    "fat-soluble vitamins"
+   ]
+  },
+  {
+   "id": "PFIC4_015",
+   "text": "A05AA02_C10AC01_FatSolubleVit",
+   "read": [
+    "UDCA",
+    "colestyramine",
+    "fat-soluble vitamins"
+   ]
+  },
+  {
+   "id": "PFIC4_016",
+   "text": "A05AA02_C10AC01_FatSolubleVit",
+   "read": [
+    "UDCA",
+    "colestyramine",
+    "fat-soluble vitamins"
+   ]
+  },
+  {
+   "id": "PFIC4_017",
+   "text": "A05AA02_C10AC01_FatSolubleVit",
+   "read": [
+    "UDCA",
+    "colestyramine",
+    "fat-soluble vitamins"
+   ]
+  },
+  {
+   "id": "PFIC4_018",
+   "text": "A05AA02_C10AC01_FatSolubleVit",
+   "read": [
+    "UDCA",
+    "colestyramine",
+    "fat-soluble vitamins"
+   ]
+  },
+  {
+   "id": "PFIC4_019",
+   "text": "A05AA02_C10AC01_FatSolubleVit",
+   "read": [
+    "UDCA",
+    "colestyramine",
+    "fat-soluble vitamins"
+   ]
+  },
+  {
+   "id": "PFIC4_021",
+   "text": "A05AA02_Glycyrhizine",
+   "read": [
+    "UDCA",
+    "glycyrrhizin"
+   ]
+  },
+  {
+   "id": "PFIC5_001",
+   "text": "A05AA02 C03DA01_A06AD11.",
+   "read": [
+    "UDCA",
+    "spironolactone",
+    "lactulose"
+   ]
+  },
+  {
+   "id": "PFIC5_003",
+   "text": "B05AX03",
+   "read": [
+    "blood plasma"
+   ]
+  },
+  {
+   "id": "PFIC5_005",
+   "text": "A05AA02",
+   "read": [
+    "UDCA"
+   ]
+  },
+  {
+   "id": "PFIC6_001",
+   "text": "A05AA02",
+   "read": [
+    "UDCA"
+   ]
+  },
+  {
+   "id": "PFIC6_002",
+   "text": "A05AA02",
+   "read": [
+    "UDCA"
+   ]
+  },
+  {
+   "id": "PFIC7_003",
+   "text": "J04AB02_A05AA02",
+   "read": [
+    "rifampicin",
+    "UDCA"
+   ]
+  },
+  {
+   "id": "PFIC7_004",
+   "text": "A05AA02",
+   "read": [
+    "UDCA"
+   ]
+  },
+  {
+   "id": "PFIC7_005",
+   "text": "J04AB02",
+   "read": [
+    "rifampicin"
+   ]
+  },
+  {
+   "id": "PFIC7_007",
+   "text": "J04AB02_A05AA02_C10AC01",
+   "read": [
+    "rifampicin",
+    "UDCA",
+    "colestyramine"
+   ]
+  },
+  {
+   "id": "PFIC7_012",
+   "text": "A05AA02",
+   "read": [
+    "UDCA"
+   ]
+  },
+  {
+   "id": "PFIC7_013",
+   "text": "J04AB02_A05AA02_C10AC01",
+   "read": [
+    "rifampicin",
+    "UDCA",
+    "colestyramine"
+   ]
+  },
+  {
+   "id": "PFIC7_014",
+   "text": "C10AC01_A05AA02",
+   "read": [
+    "colestyramine",
+    "UDCA"
+   ]
+  },
+  {
+   "id": "PFIC7_015",
+   "text": "prednisolone.",
+   "read": [
+    "prednisolone"
+   ]
+  },
+  {
+   "id": "PFIC7_017",
+   "text": "J04AB02",
+   "read": [
+    "rifampicin"
+   ]
+  },
+  {
+   "id": "PFIC7_018",
+   "text": "J04AB02",
+   "read": [
+    "rifampicin"
+   ]
+  },
+  {
+   "id": "PFIC7_019",
+   "text": "C10AC01_A05AA02",
+   "read": [
+    "colestyramine",
+    "UDCA"
+   ]
+  },
+  {
+   "id": "PFIC7_020",
+   "text": "C10AC01_A05AA02",
+   "read": [
+    "colestyramine",
+    "UDCA"
+   ]
+  },
+  {
+   "id": "PFIC7_021",
+   "text": "A05AA02",
+   "read": [
+    "UDCA"
+   ]
+  },
+  {
+   "id": "PFIC7_022",
+   "text": "C10AC01_A05AA02",
+   "read": [
+    "colestyramine",
+    "UDCA"
+   ]
+  },
+  {
+   "id": "PFIC7_023",
+   "text": "A05AA02",
+   "read": [
+    "UDCA"
+   ]
+  },
+  {
+   "id": "PFIC7_024",
+   "text": "C10AC01_A05AA02_cochlear implant",
+   "read": [
+    "colestyramine",
+    "UDCA"
+   ]
+  },
+  {
+   "id": "PFIC7_025",
+   "text": "C10AC01_A05AA02",
+   "read": [
+    "colestyramine",
+    "UDCA"
+   ]
+  },
+  {
+   "id": "PFIC7_026",
+   "text": "J04AB02_A05AA02",
+   "read": [
+    "rifampicin",
+    "UDCA"
+   ]
+  },
+  {
+   "id": "PFIC7_027",
+   "text": "A05AA02",
+   "read": [
+    "UDCA"
+   ]
+  },
+  {
+   "id": "MYO5B_Girard2014_P1",
+   "text": "J04AB02_C10AC01_A05AA02",
+   "read": [
+    "rifampicin",
+    "colestyramine",
+    "UDCA"
+   ]
+  },
+  {
+   "id": "MYO5B_Girard2014_P2",
+   "text": "J04AB02_C10AC01_A05AA02",
+   "read": [
+    "rifampicin",
+    "colestyramine",
+    "UDCA"
+   ]
+  },
+  {
+   "id": "MYO5B_Girard2014_P3",
+   "text": "J04AB02_C10AC01_A05AA02",
+   "read": [
+    "rifampicin",
+    "colestyramine",
+    "UDCA"
+   ]
+  },
+  {
+   "id": "MYO5B_Girard2014_P4",
+   "text": "J04AB02_C10AC01_A05AA02",
+   "read": [
+    "rifampicin",
+    "colestyramine",
+    "UDCA"
+   ]
+  },
+  {
+   "id": "MYO5B_Girard2014_P5",
+   "text": "J04AB02_C10AC01_A05AA02",
+   "read": [
+    "rifampicin",
+    "colestyramine",
+    "UDCA"
+   ]
+  },
+  {
+   "id": "MYO5B_Girard2014_P6",
+   "text": "J04AB02_C10AC01_A05AA02",
+   "read": [
+    "rifampicin",
+    "colestyramine",
+    "UDCA"
+   ]
+  },
+  {
+   "id": "MYO5B_Girard2014_P7",
+   "text": "J04AB02_C10AC01_A05AA02",
+   "read": [
+    "rifampicin",
+    "colestyramine",
+    "UDCA"
+   ]
+  },
+  {
+   "id": "MYO5B_Girard2014_P8",
+   "text": "J04AB02_C10AC01_A05AA02",
+   "read": [
+    "rifampicin",
+    "colestyramine",
+    "UDCA"
+   ]
+  },
+  {
+   "id": "PFIC10_2022Hassan01",
+   "text": "A05AA02_J04AB02",
+   "read": [
+    "UDCA",
+    "rifampicin"
+   ]
+  },
+  {
+   "id": "PFIC10_2022Hassan02",
+   "text": "A05AA02_J04AB02",
+   "read": [
+    "UDCA",
+    "rifampicin"
+   ]
+  },
+  {
+   "id": "MYO5B_Matarazzo2022_P1",
+   "text": "A05AA02_J04AB02_C10AC01",
+   "read": [
+    "UDCA",
+    "rifampicin",
+    "colestyramine"
+   ]
+  },
+  {
+   "id": "MYO5B_Matarazzo2022_P2",
+   "text": "A05AA02_J04AB02",
+   "read": [
+    "UDCA",
+    "rifampicin"
+   ]
+  },
+  {
+   "id": "MYO5B_Matarazzo2022_P3",
+   "text": "A05AA02_J04AB02",
+   "read": [
+    "UDCA",
+    "rifampicin"
+   ]
+  },
+  {
+   "id": "MYO5B_Matarazzo2022_P4",
+   "text": "A05AA02_J04AB02",
+   "read": [
+    "UDCA",
+    "rifampicin"
+   ]
+  },
+  {
+   "id": "MYO5B_Matarazzo2022_P5",
+   "text": "A05AA02_J04AB02_C10AC01",
+   "read": [
+    "UDCA",
+    "rifampicin",
+    "colestyramine"
+   ]
+  },
+  {
+   "id": "MYO5B_Matarazzo2022_P6",
+   "text": "A05AA02_J04AB02",
+   "read": [
+    "UDCA",
+    "rifampicin"
+   ]
+  },
+  {
+   "id": "MYO5B_Vij2021",
+   "text": "A05AA02_C10AC01",
+   "read": [
+    "UDCA",
+    "colestyramine"
+   ]
+  },
+  {
+   "id": "MYO5B_Aksu2021",
+   "text": "A05AA02",
+   "read": [
+    "UDCA"
+   ]
+  },
+  {
+   "id": "PFIC11_001",
+   "text": "01AC01_A05AA02",
+   "read": [
+    "UDCA"
+   ]
+  },
+  {
+   "id": "CDG2P_001",
+   "text": "J01RA01",
+   "read": [
+    "penicillin combination"
+   ]
+  }
+ ],
+ "lab_series_unread": [
+  "PFIC3_Liu2022 ALP: times and values differ in length",
+  "Jank2021_PFIC123_232 CB: times and values differ in length",
+  "PFIC2_Goto2003_02 TB: times and values differ in length",
+  "PFIC2_Takahashi2007 ALT: times and values differ in length",
+  "PFIC1_Morris2015_2 TB: times and values differ in length",
+  "PFIC1_Morris2015_2 ALT: times and values differ in length",
+  "PFIC3_Fang2012_P13 PLT: times and values differ in length"
+ ],
+ "out_of_range": [
+  "ValRS_Siekierska2019_05 birth head circumference 48.0",
+  "Bogershausen2022_05_SerRS birth head circumference 52.0"
+ ],
+ "duplicate_terms": 214,
+ "terms_from_symptoms_age": 30,
+ "onset_upper_bounds": 9,
+ "lab_points_dropped": 109,
+ "labs_left_out": {
+  "HCC []": 16
+ },
+ "unused_fields": {
+  "ttt": 3,
+  "undefined": 2,
+  "biology": 2,
+  "diseases": 1
+ },
+ "gene_values_removed": {
+  "Not tested": 146,
+  "Unclear": 1,
+  "ABCB11/ATP8B1": 1,
+  "Not found": 1,
+  "Not identified": 1,
+  "MVID": 1
+ },
+ "symptoms_age_unread": {
+  "0000952(1.5)": 1,
+  "0001744(1àm)": 1,
+  "0001394(cirrhose)": 1,
+  "0001744(0000952)": 1
+ },
+ "sex_unread": {
+  "B": 1
+ },
+ "consanguinity_unread": {
+  "f": 2
+ },
+ "n_resolved": 999,
+ "hpo_unknown": [],
+ "hpo_obsolete": []
+}

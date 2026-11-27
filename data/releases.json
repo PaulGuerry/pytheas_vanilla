@@ -1,0 +1,11 @@
+[
+ {
+  "id": "261013",
+  "date": "2026-10-13",
+  "export": "261013_pytheasDB.json",
+  "n_patients": 1771,
+  "n_articles": 371,
+  "hpo": "hpo_dag.json.gz + id_to_term.json.gz",
+  "built": "2026-11-27T13:33:13"
+ }
+]

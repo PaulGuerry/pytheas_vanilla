@@ -1,0 +1,4 @@
+# Changes applied on top of the HPO graph given to the build. action: add or remove an is_a edge child -> parent.
+child	parent	action	note
+HP:0000989	HP:0001396	remove	pruritus is not counted under cholestasis (curator's HPO)
+HP:0006580	HP:0001395	add	portal fibrosis under hepatic fibrosis (in current HPO releases)

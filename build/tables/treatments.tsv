@@ -1,0 +1,190 @@
+# raw_name: as in the export (exact, spaces included) or a token of the legacy string form; canonical: name shown on the site; class: grouping for the site
+raw_name	n	canonical	class	atc	note
+UDCA	261	UDCA	bile acid therapy	A05AA02	
+LT	101	LT	liver transplantation or surgery		8 records typed surgery, 93 transplantation
+TPN	69	TPN	parenteral nutrition		
+BD	64	BD	biliary diversion		
+fat-soluble vitamins	62	fat-soluble vitamins	vitamins	A11JA	
+OLT	57	OLT	liver transplantation or surgery		
+LDLT	49	LDLT	liver transplantation or surgery		
+colestyramine	43	colestyramine	bile acid sequestrant	C10AC01	
+tacrolimus	34	tacrolimus	immunosuppressant	L04AD02	
+rifampicin	30	rifampicin	enzyme inducer	J04AB02	
+parenteral nutrition	28	parenteral nutrition	parenteral nutrition	B05BA	
+DDLT	24	DDLT	liver transplantation or surgery		
+sodium bicarbonate	23	sodium bicarbonate	electrolytes and supplements	B05AX02	
+azathioprine	17	azathioprine	immunosuppressant	L04AX01	
+enteral nutrition	16	enteral nutrition	enteral nutrition		
+PEBD	13	PEBD	biliary diversion		
+anti-interleukin-2-receptor monoclonal antibodies	13	anti-interleukin-2-receptor monoclonal antibodies	immunosuppressant		
+phenobarbitone	13	phenobarbital	enzyme inducer	N03AA02	
+steroids	13	steroids	corticosteroid	H02AB	
+IVIg	9	IVIg	immunoglobulins		
+gluten-- and cow-milk--free formula	8	gluten-- and cow-milk--free formula	diet or formula		
+methylprednisolone	8	methylprednisolone	corticosteroid	H02AB04	
+small bowel + colon transplantation	8	small bowel + colon transplantation	intestinal transplantation or surgery		
+bicarbonate	7	bicarbonate	electrolytes and supplements		
+loperamide	7	loperamide	antidiarrheal	A07DA03	
+prednisolone	7	prednisolone	corticosteroid	H02AB06	
+alfacalcidol	6	alfacalcidol	vitamins	A11CC03	
+hydrolysate formula	6	hydrolysate formula	diet or formula		
+illeal exclusion	5	ileal exclusion	biliary diversion		
+medium-chain triglycerides	5	medium-chain triglycerides	diet or formula	B05BA02	
+phosphate	5	phosphate	electrolytes and supplements		
+prednisone	5	prednisone	corticosteroid	H02AB07	
+PIBD	4	PIBD	biliary diversion		
+PN	4	parenteral nutrition	parenteral nutrition		
+odevixibat	4	odevixibat	IBAT inhibitor	A05AX05	A4250 is a development code, not an ATC code
+pancreatic enzymes	4	pancreatic enzymes	electrolytes and supplements	A09AA02	
+potassium chloride	4	potassium chloride	electrolytes and supplements		
+tocopherol	4	tocopherol	vitamins	A11HA03	
+vitamin D	4	vitamin D	vitamins	A11CC05	
+EBD	3	EBD	biliary diversion		
+PPN	3	PPN	parenteral nutrition		
+allogeneic hepatocytes	3	allogeneic hepatocytes	liver transplantation or surgery		
+bezafibrate	3	bezafibrate	other liver-directed drug	C10AB02	
+bilateral inguinal hernia repair	3	bilateral inguinal hernia repair	other		
+combined liver-small bowel + colon transplantation	3	combined liver-small bowel + colon transplantation	intestinal transplantation or surgery		
+glycyrrhizin	3	glycyrrhizin	other liver-directed drug	A05BA08	
+hydroxizine	3	hydroxyzine	antipruritic or topical	N05BB01	
+indomethacin	3	indomethacin	other		
+mycophenolic acid	3	mycophenolic acid	immunosuppressant	L04AA06	export gives L04AD02 (tacrolimus); mycophenolic acid is L04AA06
+vitamin K	3	vitamin K	vitamins	B02BA	
+MMF	2	mycophenolate mofetil	immunosuppressant	L04AA06	
+NaPB	2	NaPB	other liver-directed drug		
+ademetionine	2	ademetionine	other liver-directed drug	A16AA02	
+amino-acid--based formula	2	amino-acid--based formula	diet or formula		
+antibiotics	2	antibiotics	other	J01	
+antifungals	2	antifungals	other	D01B	
+bone marrow transplantation	2	bone marrow transplantation	other transplantation		
+carnitine	2	carnitine	electrolytes and supplements		
+chlorothiazide	2	chlorothiazide	other		
+ciclosporin	2	ciclosporin	immunosuppressant	L04AD01	
+corticosteroid	2	corticosteroid	corticosteroid		
+fat-soluble proteins	2	fat-soluble proteins	vitamins	A11JA	
+hydrochlorothiazide	2	hydrochlorothiazide	other		
+hydrocortisone	2	hydrocortisone	corticosteroid	H02AB09	
+liver transplantation	2	LT	liver transplantation or surgery		8 records typed surgery, 93 transplantation
+metronidazole	2	metronidazole	other	J01XD01	
+pentagastrin	2	pentagastrin	other	V04CG04	
+special diet	2	special diet	diet or formula		
+thyroxine	2	levothyroxine	other		
+Antidiarrheals	1	Antidiarrheals	antidiarrheal	A07	
+Galactomin	1	Galactomin	diet or formula		
+H1-antihistamine	1	H1-antihistamine	antipruritic or topical	R06	
+HSCT	1	HSCT	other transplantation		
+IBD	1	IBD	biliary diversion		
+L-thyroxine	1	levothyroxine	other		
+MCT-containing diet	1	MCT-containing diet	diet or formula		
+NBD	1	NBD	biliary diversion		
+Nutramigen	1	Nutramigen	diet or formula		
+Pregestimil	1	Pregestimil	diet or formula		
+Small bowel transplantation	1	small bowel transplantation	intestinal transplantation or surgery		
+Total enterectomy	1	Total enterectomy	intestinal transplantation or surgery		
+Tube feeding	1	Tube feeding	enteral nutrition		
+albumin	1	albumin	electrolytes and supplements		
+aminocaproic acid	1	aminocaproic acid	transfusion or haemostasis		
+anti-psychotics	1	anti-psychotics	other		
+arginine hydrochloride	1	arginine hydrochloride	electrolytes and supplements	B05XB01	
+barbiturates	1	barbiturates	enzyme inducer		
+bicyclol	1	bicyclol	other liver-directed drug		
+biliary bypass	1	biliary bypass	biliary diversion		
+blood products	1	blood products	transfusion or haemostasis		
+blood transfusion	1	blood transfusion	transfusion or haemostasis	B05AX	
+calcium	1	calcium	electrolytes and supplements		
+calcium carbonate	1	calcium carbonate	electrolytes and supplements		
+calcium glubionate	1	calcium glubionate	electrolytes and supplements		
+calcium gluconate	1	calcium gluconate	electrolytes and supplements		
+carbohydrate-free formula	1	carbohydrate-free formula	diet or formula		
+cholecalciferol	1	cholecalciferol	vitamins		
+cimetidine	1	cimetidine	other	A02BA01	
+colchicine	1	colchicine	other	M04AC01	
+colestyramine 	1	colestyramine	bile acid sequestrant		
+combined liver-small bowel transplantation	1	combined liver-small bowel transplantation	intestinal transplantation or surgery		
+cyclosporin	1	ciclosporin	immunosuppressant		
+daclizumab	1	daclizumab	immunosuppressant	L04AC01	
+dexamethasome	1	dexamethasone	corticosteroid	H02AB02	
+diazoxide	1	diazoxide	other		
+diosmectite	1	diosmectite	antidiarrheal	A07BC05	
+diuretics	1	diuretics	other		
+elemental formula	1	elemental formula	diet or formula		
+elobixibat	1	elobixibat	IBAT inhibitor	A06AX09	
+enteral nutrition (gastrostomy)	1	enteral nutrition (gastrostomy)	enteral nutrition		
+ferrous sulfate	1	ferrous sulfate	electrolytes and supplements		
+formula supplementation	1	formula supplementation	enteral nutrition		
+glucocorticoids	1	glucocorticoids	corticosteroid		
+glucose-galactose-free formula	1	glucose-galactose-free formula	diet or formula		
+gluten-free diet	1	gluten-free diet	diet or formula		
+gluten-free formula	1	gluten-free formula	diet or formula		
+hemofiltration	1	hemofiltration	other		
+hydrochlorothiazide 	1	hydrochlorothiazide	other		
+hydrocortisone cream	1	hydrocortisone cream	antipruritic or topical		
+hydrogen citrate	1	hydrogen citrate	electrolytes and supplements		
+hydrolyzed rice formula	1	hydrolyzed rice formula	diet or formula		
+hypoallergenic formula	1	hypoallergenic formula	diet or formula		
+immunoglobulins	1	immunoglobulins	immunoglobulins	J06BA01	
+iron-fortified elemental formula	1	iron-fortified elemental formula	diet or formula		
+isolated small bowel transplantation	1	isolated small bowel transplantation	intestinal transplantation or surgery		
+levothyroxine	1	levothyroxine	other		
+lipoprotein apheresis	1	lipoprotein apheresis	other		
+loperamid	1	loperamide	antidiarrheal		
+magnesium gluconate	1	magnesium gluconate	electrolytes and supplements		
+maralixibat	1	maralixibat	IBAT inhibitor		export gives A4250, the development code of odevixibat; ATC left blank
+mercaptopurine	1	mercaptopurine	immunosuppressant	L01BB02	
+methionine	1	methionine	other liver-directed drug	V03AB26	
+nalfurafine	1	nalfurafine	antipruritic or topical	V03AX02	
+naltrexone	1	naltrexone	antipruritic or topical	N07BB04	
+octreotide	1	octreotide	antidiarrheal		
+ondansetrone	1	ondansetron	antipruritic or topical	A04AA01	
+oxymetazoline	1	oxymetazoline	other		
+pancreas transplant	1	pancreas transplant	other transplantation		
+partial liver resection	1	partial liver resection	liver transplantation or surgery		
+phenobarbital	1	phenobarbital	enzyme inducer		
+phenobarbitone 	1	phenobarbital	enzyme inducer		
+phosphate sandoz	1	phosphate sandoz	electrolytes and supplements		
+platelet concentrate	1	platelet concentrate	transfusion or haemostasis		
+prophylactic platelet transfusion	1	prophylactic platelet transfusion	transfusion or haemostasis		
+racecadotril	1	racecadotril	antidiarrheal	A07XA04	
+rapamycin	1	rapamycin	immunosuppressant	L04AA10	
+reverse BD	1	reverse BD	biliary diversion		
+rifampin	1	rifampicin	enzyme inducer		
+rifaximin	1	rifaximin	other	A07AA11	
+rituximab	1	rituximab	immunosuppressant	L01FA01	
+second intestinal transplantation	1	second intestinal transplantation	intestinal transplantation or surgery		
+second transplantation: intestinal	1	second transplantation: intestinal	intestinal transplantation or surgery		
+second transplantation: multiorgan	1	second transplantation: multiorgan	intestinal transplantation or surgery		
+simvastatin	1	simvastatin	other	C10AA01	
+small bowel transplant	1	small bowel transplantation	intestinal transplantation or surgery		
+sodium chloride	1	sodium chloride	electrolytes and supplements		
+sodium phosphate	1	sodium phosphate	electrolytes and supplements		
+soy-based formula	1	soy-based formula	diet or formula		
+steroid ointment	1	steroid ointment	antipruritic or topical		
+umbilical hernia repair	1	umbilical hernia repair	other		
+ursudeoxycholic acid	1	UDCA	bile acid therapy		
+vitamins	1	vitamins	vitamins		
+A05AA02		UDCA	bile acid therapy	A05AA02	legacy string form
+C10AC01		colestyramine	bile acid sequestrant	C10AC01	legacy string form
+J04AB02		rifampicin	enzyme inducer	J04AB02	legacy string form
+J06BA01		immunoglobulins	immunoglobulins	J06BA01	legacy string form
+J06BA02		IVIg	immunoglobulins	J06BA02	legacy string form
+B05BA01		parenteral nutrition	parenteral nutrition	B05BA01	legacy string form
+J01EE01		co-trimoxazole	antibiotic	J01EE01	legacy string form
+H01AC01		growth hormone	hormone	H01AC01	legacy string form
+H02AB09		hydrocortisone	corticosteroid	H02AB09	legacy string form
+C02DA01		diazoxide	other	C02DA01	legacy string form
+C07AA05		propranolol	other	C07AA05	legacy string form
+C03DA01		spironolactone	other	C03DA01	legacy string form
+A06AD11		lactulose	other	A06AD11	legacy string form
+B05AX03		blood plasma	transfusion or haemostasis	B05AX03	legacy string form
+J01RA01		penicillin combination	antibiotic	J01RA01	legacy string form
+IgIV		IVIg	immunoglobulins		legacy string form
+IGIV		IVIg	immunoglobulins		legacy string form
+bactrim		co-trimoxazole	antibiotic		legacy string form
+trimethoprim-sulfamethoxazole		co-trimoxazole	antibiotic		legacy string form
+Steroides		steroids	corticosteroid		legacy string form
+FatSolubleVit		fat-soluble vitamins	vitamins		legacy string form
+fat-soluble vitamins		fat-soluble vitamins	vitamins		legacy string form
+Bicyclol		bicyclol	other liver-directed drug		legacy string form
+Glycyrhizine		glycyrrhizin	other liver-directed drug		legacy string form
+4-phenylbutyrate		NaPB	other liver-directed drug		legacy string form
+growth hormone		growth hormone	hormone		legacy string form

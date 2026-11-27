@@ -1,0 +1,16 @@
+# raw: efficacy as in the export (empty = not given); category: shown on the site
+raw	n	category	note
+overall	129	response
+yes	12	response
+complete	1	response
+partial	319	partial
+biochemical	4	partial	biochemical response only
+temporary	21	transient
+transient	1	transient
+mixed	41	mixed
+none	162	none
+aggravation	41	worse
+unclear	356	unclear
+early	6	unclear	meaning to be checked (early response, early stop?)
+	113	unclear	no efficacy given
+planned	2	planned	treatment not yet given at last report
