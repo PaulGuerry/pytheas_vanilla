@@ -6,7 +6,7 @@
 
 Reads the export, the curation tables in build/tables/ and an HPO graph, and writes
 data/<release>/: patients.json.gz, lexicon.json, hpo.json.gz, reference.json,
-build_report.md and build_report.json; data/releases.json is updated. The release id
+build_report.md, build_report.json and phenomeprint_layout.json; data/releases.json is updated. The release id
 is taken from the leading digits of the export file name unless --release is given.
 
 HPO input: --hpo-json (an obographs file such as hp.json), or by default the site's
@@ -80,6 +80,17 @@ def parse_args():
     ap.add_argument("--hpo-dag", default=str(ROOT / "data" / "hpo_dag.json.gz"))
     ap.add_argument("--hpo-labels", default=str(ROOT / "data" / "id_to_term.json.gz"))
     ap.add_argument("--hpo-synonyms", default=str(ROOT / "data" / "term_to_id.json.gz"))
+    pp = ap.add_argument_group("phenomeprint layout (shared by every cohort drawn on the site)")
+    pp.add_argument("--pp-max-level", type=int, default=8, help="deepest HPO level drawn (organ systems = 1)")
+    pp.add_argument("--pp-min-freq", type=float, default=0.25, help="share of a disease carrying a term for it to be drawn")
+    pp.add_argument("--pp-min-n", type=int, default=3, help="patients of a disease carrying a term for it to be drawn")
+    pp.add_argument("--pp-scaffold-min", type=int, default=10, help="only diseases this large decide which terms are drawn")
+    pp.add_argument("--pp-organ-width", choices=["setmax", "patients", "terms", "equal"], default="setmax",
+                    help="angular width of the organ systems without a fixed share in phenomeprint_organs.tsv: largest "
+                         "share, among those diseases, of patients with a term in it (setmax, the groupmax of "
+                         "extract_aars_phenomeprint.py; default); patients of the release with a term in it; terminal "
+                         "terms drawn; equal")
+    pp.add_argument("--pp-gap", type=float, default=2.0, help="gap between organ systems, degrees")
     return ap.parse_args()
 
 
@@ -595,6 +606,151 @@ def build_lexicon(records, hpo, T, release):
     }
 
 
+# ---------------------------------------------------------------- phenomeprint layout
+# Port of the layout part of extract_aars_phenomeprint.py. Angle = organ system, clockwise from 12 o'clock;
+# radius = HPO level (shortest is_a distance from HP:0000118, organ systems = 1); one angular slot per
+# terminal term. A term under several organ systems appears once in each. True-path rule; absent terms unused.
+ORGAN_ORDER = ["HP:0000707", "HP:0000152", "HP:0000478", "HP:0000598", "HP:0001507", "HP:0033127",
+               "HP:0040064", "HP:0001574", "HP:0001197", "HP:0025031", "HP:0002086", "HP:0045027",
+               "HP:0001626", "HP:0001871", "HP:0002715", "HP:0001939", "HP:0000818", "HP:0000119",
+               "HP:0025142", "HP:0025354", "HP:0001608", "HP:0000769"]
+ORGAN_SHORT = {"HP:0000707": "Nervous system", "HP:0000152": "Head and neck", "HP:0000478": "Eye",
+               "HP:0000598": "Ear", "HP:0001507": "Growth", "HP:0033127": "Musculoskeletal", "HP:0040064": "Limbs",
+               "HP:0001574": "Integument", "HP:0001197": "Prenatal and birth", "HP:0025031": "Digestive",
+               "HP:0002086": "Respiratory", "HP:0045027": "Thoracic cavity", "HP:0001626": "Cardiovascular",
+               "HP:0001871": "Blood", "HP:0002715": "Immune", "HP:0001939": "Metabolism", "HP:0000818": "Endocrine",
+               "HP:0000119": "Genitourinary", "HP:0025142": "Constitutional", "HP:0025354": "Cellular",
+               "HP:0001608": "Voice", "HP:0000769": "Breast"}
+ORGAN_COLOURS = {"HP:0000707": "#4b2c84", "HP:0000152": "#8166b8", "HP:0000478": "#3567a8", "HP:0000598": "#7ea6d8",
+                 "HP:0001507": "#2c8c87", "HP:0033127": "#4e9a3f", "HP:0040064": "#9cc47f", "HP:0001574": "#c7b04a",
+                 "HP:0001197": "#a39e8f", "HP:0025031": "#b5561d", "HP:0002086": "#e08a2c", "HP:0045027": "#e8b27a",
+                 "HP:0001626": "#b8324a", "HP:0001871": "#e0707e", "HP:0002715": "#c99aa6", "HP:0001939": "#7d4e2d",
+                 "HP:0000818": "#e3c04f", "HP:0000119": "#9b6a8f", "HP:0025142": "#6b6b67", "HP:0025354": "#b9b8b3",
+                 "HP:0001608": "#8a8a82", "HP:0000769": "#d9b8c4"}
+DEFAULT_COLOUR = "#b9b8b3"
+
+
+def short_organ(code, name):
+    if code in ORGAN_SHORT:
+        return ORGAN_SHORT[code]
+    for p in ("Abnormality of the ", "Abnormality of ", "Abnormal "):
+        if name.startswith(p):
+            name = name[len(p):]
+            break
+    return name[:1].upper() + name[1:]
+
+
+def organ_places(hpo):
+    """place(c) = {organ system: (level, parents of c on the shortest paths through it)}."""
+    memo = {}
+
+    def place(c):
+        if c in memo:
+            return memo[c]
+        memo[c] = {}                                   # guard against cycles
+        out, ps = {}, hpo.parents.get(c, ())
+        if PHENOTYPIC_ABNORMALITY in ps:
+            out[c] = (1, {PHENOTYPIC_ABNORMALITY})
+        for par in sorted(ps):
+            if par == PHENOTYPIC_ABNORMALITY:
+                continue
+            for organ, (lev, _) in place(par).items():
+                best, pars = out.get(organ, (99, set()))
+                if lev + 1 < best:
+                    out[organ] = (lev + 1, {par})
+                elif lev + 1 == best:
+                    pars.add(par)
+        memo[c] = out
+        return out
+    return place
+
+
+def phenomeprint_layout(hpo, carried, cohort_ids, scaffold, width_sets, max_level=6, min_freq=0.25, min_n=3,
+                        scaffold_min=10, organ_width="setmax", gap_deg=2.0, organ_table=None):
+    """carried: id -> set of terms (with ancestors). scaffold: name -> ids of the sets deciding the terms drawn
+    (those of at least scaffold_min patients); width_sets: name -> ids for the setmax widths. organ_table: rows
+    {hpo, name, colour, share} in drawing order (default: the order and colours of extract_aars_phenomeprint.py)."""
+    if organ_table is None:
+        organ_table = [{"hpo": o, "name": ORGAN_SHORT.get(o, ""), "colour": ORGAN_COLOURS.get(o, ""), "share": None}
+                       for o in ORGAN_ORDER]
+    order = [r["hpo"] for r in organ_table]
+    info = {r["hpo"]: r for r in organ_table}
+    place = organ_places(hpo)
+    label = lambda c: hpo.labels.get(c, c)
+    count = lambda ids: Counter(c for i in ids for c in carried[i])
+    cohort = count(cohort_ids)
+
+    keep = set()
+    for ids in scaffold.values():
+        n = len(ids)
+        if n < scaffold_min:
+            continue
+        for c, k in count(ids).items():
+            if k >= min_n and k / n >= min_freq:
+                for organ, (lev, _) in place(c).items():
+                    if lev <= max_level:
+                        keep.add((organ, c))
+    children, parent_of = defaultdict(list), {}
+    for organ, c in keep:
+        lev, pars = place(c)[organ]
+        if lev == 1:
+            continue
+        par = max(sorted(pars), key=lambda x: cohort.get(x, 0))    # most frequent shortest-path parent
+        parent_of[(organ, c)] = (organ, par)
+        children[(organ, par)].append((organ, c))
+    missing = sum(1 for p in parent_of.values() if p not in keep)
+
+    organs = sorted({o for o, c in keep if c == o},
+                    key=lambda o: (order.index(o) if o in order else 99, -cohort.get(o, 0)))
+    span, slot = {}, [0.0]
+
+    def place_node(node):
+        kids = sorted(children.get(node, []), key=lambda x: (-cohort.get(x[1], 0), label(x[1])))
+        start = slot[0]
+        if not kids:
+            slot[0] += 1
+        for k in kids:
+            place_node(k)
+        span[node] = (start, slot[0])
+
+    leaves = {}
+    for o in organs:
+        slot[0] = 0.0
+        place_node((o, o))
+        leaves[o] = slot[0]
+    wcount = {name: count(ids) for name, ids in width_sets.items() if ids}
+    setmax = {o: max((cnt.get(o, 0) / len(width_sets[name]) for name, cnt in wcount.items()), default=0.0)
+              for o in organs}
+    fixed = {o: info[o]["share"] for o in organs if o in info and info[o].get("share")}
+    weight = {o: {"setmax": setmax[o], "patients": cohort.get(o, 0), "terms": leaves[o], "equal": 1}[organ_width]
+              for o in organs if o not in fixed}
+    gap = gap_deg / 360
+    free, total = 1 - gap * len(organs) - sum(fixed.values()), sum(weight.values()) or 1
+    if free <= 0:
+        sys.exit("phenomeprint_organs.tsv: the fixed shares leave no room for the other organ systems")
+    origin, unit, pos, organ_rows = {}, {}, gap / 2, []
+    for rank, o in enumerate(organs, 1):
+        width = fixed[o] if o in fixed else free * weight[o] / total
+        origin[o], unit[o] = pos, width / leaves[o]
+        organ_rows.append({"hpo": o, "name": (info.get(o) or {}).get("name") or short_organ(o, label(o)), "rank": rank,
+                           "colour": (info.get(o) or {}).get("colour") or DEFAULT_COLOUR, "start": round(pos, 6),
+                           "end": round(pos + width, 6), "fixed_share": fixed.get(o), "patients": cohort.get(o, 0),
+                           "terms": int(leaves[o]), "setmax": round(setmax[o], 4)})
+        pos += width + gap
+    r6 = lambda v: round(v, 6)
+    nodes = []
+    for (o, c), (a, b) in sorted(span.items(), key=lambda kv: (organs.index(kv[0][0]), kv[1][0], place(kv[0][1])[kv[0][0]][0])):
+        nodes.append({"node": f"{o}|{c}", "organ": o, "hpo": c, "term": label(c), "level": place(c)[o][0],
+                      "parent": "|".join(parent_of[(o, c)]) if (o, c) in parent_of else "",
+                      "xmin": r6(origin[o] + a * unit[o]), "xmax": r6(origin[o] + b * unit[o]),
+                      "x": r6(origin[o] + (a + b) / 2 * unit[o]), "slot": r6(unit[o]),
+                      "leaf": int(not children.get((o, c)))})
+    params = {"max_level": max_level, "min_freq": min_freq, "min_n": min_n, "scaffold_min": scaffold_min,
+              "organ_width": organ_width, "gap_deg": gap_deg, "fixed_shares": fixed,
+              "scaffold_sets": sorted(k for k, v in scaffold.items() if len(v) >= scaffold_min)}
+    return {"params": params, "organs": organ_rows, "nodes": nodes, "missing_parents": missing}
+
+
 def build_hpo_subset(records, hpo, R):
     used = set()
     for r in records:
@@ -630,6 +786,8 @@ def write_report(R, path_md, path_json, meta):
             L.extend([f"## {title} ({len(xs)})", ""] + [f"- {x}" for x in xs[:limit]]
                      + ([f"- ... {len(xs) - limit} more"] if len(xs) > limit else []) + [""])
 
+    if R.get("phenomeprint"):
+        L.extend([f"Phenomeprint layout: {R['phenomeprint']}.", ""])
     items("Records left out", [f"`{e['id']}`: {e['field']} = `{e['value']}` ({e['note']})" for e in R["excluded"]])
     counter("Gene values removed", R["gene_values_removed"])
     counter("Disease labels not in disease_labels.tsv", R["new_disease_labels"])
@@ -692,8 +850,32 @@ def main():
         json.dump(build_hpo_subset(records, hpo, R), fh, separators=(",", ":"), ensure_ascii=False)
     (out / "lexicon.json").write_text(json.dumps(build_lexicon(records, hpo, T, release), ensure_ascii=False,
                                                  separators=(",", ":")), encoding="utf-8")
-    (out / "reference.json").write_text(json.dumps(build_reference(records, hpo, release), indent=1,
-                                                   ensure_ascii=False), encoding="utf-8")
+    carried = {r["id"]: hpo.closure([c for c, _ in r.get("hp", [])]) for r in records}
+    by_disease = defaultdict(list)
+    for r in records:
+        for d in r.get("dis", []):
+            by_disease[d].append(r["id"])
+    width_sets = {d: ids for d, ids in by_disease.items() if len(ids) >= args.pp_scaffold_min}
+    organ_table = [{"hpo": hp_code(r["hpo"]), "name": r["name"].strip(), "colour": r["colour"].strip(),
+                    "share": num(r.get("share"))} for r in read_table(Path(args.tables) / "phenomeprint_organs.tsv")]
+    layout = phenomeprint_layout(hpo, carried, list(carried), dict(by_disease), width_sets, args.pp_max_level,
+                                 args.pp_min_freq, args.pp_min_n, args.pp_scaffold_min, args.pp_organ_width, args.pp_gap,
+                                 organ_table)
+    layout["release"] = release
+    (out / "phenomeprint_layout.json").write_text(json.dumps(layout, ensure_ascii=False, separators=(",", ":")),
+                                                  encoding="utf-8")
+    reference = build_reference(records, hpo, release)
+    organs = [o["hpo"] for o in layout["organs"]]
+    reference["phenomeprint"] = {
+        "nodes": len(layout["nodes"]), "leaves": sum(n["leaf"] for n in layout["nodes"]), "organs": organs,
+        "organ_counts": {d: {o: sum(o in carried[i] for i in ids) for o in organs} for d, ids in sorted(width_sets.items())},
+        "rule": "organ_counts = patients of the disease carrying the organ-system term (true-path rule)"}
+    (out / "reference.json").write_text(json.dumps(reference, indent=1, ensure_ascii=False), encoding="utf-8")
+    R["phenomeprint"] = (f"{len(layout['nodes'])} nodes ({reference['phenomeprint']['leaves']} terminal) in "
+                         f"{len(organs)} organ systems, from {len(width_sets)} diseases of at least "
+                         f"{args.pp_scaffold_min} patients, levels 1-{args.pp_max_level}; parents not drawn: "
+                         f"{layout['missing_parents']}. Widths (fixed shares, then {args.pp_organ_width}): " + ", ".join(f"{o['name']} {360 * (o['end'] - o['start']):.0f}\u00b0"
+                                                                  for o in layout["organs"]))
 
     n_articles = len({a["doi"] for r in records for a in r.get("art", []) if "doi" in a})
     built = datetime.datetime.now().isoformat(timespec="seconds")
@@ -703,10 +885,13 @@ def main():
 
     rel_path = Path(args.out) / "releases.json"
     releases = json.loads(rel_path.read_text(encoding="utf-8")) if rel_path.exists() else []
+    kept = {k: v for r in releases if r["id"] == release for k, v in r.items() if k == "alphi"}   # cluster results of build_clusters.py
+    if kept:
+        print(f"ALPHI results of an earlier build of {release} kept; rerun build/build_clusters.py if the export changed.")
     releases = [r for r in releases if r["id"] != release]
     date = f"20{release[:2]}-{release[2:4]}-{release[4:6]}" if len(release) == 6 else None
     releases.append({"id": release, "date": date, "export": export.name, "n_patients": len(records),
-                     "n_articles": n_articles, "hpo": hpo_source, "built": built})
+                     "n_articles": n_articles, "hpo": hpo_source, "built": built, **kept})
     releases.sort(key=lambda r: r["id"], reverse=True)
     rel_path.write_text(json.dumps(releases, indent=1), encoding="utf-8")
 

@@ -1,83 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pytheas DB</title>
-  <!-- Plotly.js CDN -->
-  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-  <link rel="stylesheet" href="css/styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PytheasDB</title>
+  <link rel="stylesheet" href="css/app.css">
   <link rel="icon" href="data:,">
 </head>
 <body>
-
-  <!-- Centered Top Header -->
-  <header class="top-header">
-    <a href="index.html">
-      <img src="data/PYTHEAS_Logo.svg" alt="Pytheas Logo" class="main-logo" onerror="this.src='https://via.placeholder.com/220x72?text=PYTHEAS'" />
-    </a>
-    <div class="lang-switcher">
-      <button class="lang-btn active" id="btn-en" onclick="setLanguage('en')">EN</button>
-      <span class="lang-divider">|</span>
-      <button class="lang-btn" id="btn-fr" onclick="setLanguage('fr')">FR</button>
-    </div>
+  <header class="top">
+    <a href="./" class="brand"><img src="data/PYTHEAS_Logo.svg" alt="PytheasDB" class="logo"></a>
+    <nav class="lang">
+      <button type="button" class="lang-btn" data-lang="en">EN</button><span>|</span><button type="button" class="lang-btn" data-lang="fr">FR</button>
+    </nav>
   </header>
 
-  <!-- Dialogue Stream Window -->
-  <main class="chat-stream" id="chatStream">
-    <!-- AI Welcome Message -->
-    <div class="message ai">
-      <div class="ai-card">
-        <div class="ai-card-header">
-          <img src="data/PYTHEAS_Logo.svg" alt="Pytheas" class="small-logo" onerror="this.src='https://via.placeholder.com/24x24?text=P'" />
-          <span class="ai-card-title" data-i18n="assistantTitle">Pytheas Assistant</span>
-        </div>
-        <p id="welcomeMessage" data-i18n="welcomeMsg">Ask a query to explore metrics and static subgroups (e.g., <em>"survival ATP8B1 PFIC boys"</em>, <em>"CADD score PFIC1"</em>, <em>"ALT newborn period"</em>, or <i>"longitudinal weight"</i>).</p>
+  <main>
+    <section class="bar">
+      <div class="input-wrap">
+        <input id="query" type="text" autocomplete="off" spellcheck="false" aria-label="Query">
+        <ul id="dropdown" class="dropdown" hidden></ul>
       </div>
-    </div>
-
-    <!-- Container for dynamic AI/User messages -->
-    <div id="messagesContainer" style="display: flex; flex-direction: column; gap: 20px; width: 100%;"></div>
-
-    <!-- Dialogue Input Box Below Response Window -->
-    <div class="input-container">
-      <div style="width: 100%; max-width: 900px;">
-        <!-- Live Pill Tokenizer Container -->
-        <div id="pillContainer" class="pill-container"></div>
-
-        <div class="chat-box">
-          <input type="text" id="queryInput" class="chat-input" placeholder="Ask Pytheas a question..." data-i18n-placeholder="inputPlaceholder" />
-          <button class="send-btn" onclick="submitQuery()" aria-label="Send query">
-            <svg viewBox="0 0 24 24">
-              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
-            </svg>
-          </button>
-        </div>
-      </div>
-    </div>
+      <div id="pills" class="pills" aria-live="polite"></div>
+      <div class="examples"><span id="examples-label"></span> <span id="chips"></span></div>
+      <p id="status" class="muted"></p>
+    </section>
+    <div id="error-slot"></div>
+    <section id="cards"></section>
   </main>
 
-  <!-- Compact Footer -->
-  <footer class="site-footer">
-    <div class="footer-content">
-      <div class="footer-section">
-        <strong data-i18n="footerContact">Contact:</strong>
-        <a href="mailto:contact.pytheasdb@gmail.com">contact.pytheasdb@gmail.com</a>
-      </div>
-      <div class="footer-section">
-        <strong data-i18n="footerCite">Please cite:</strong>
-        <a href="https://pubmed.ncbi.nlm.nih.gov/39628627/" target="_blank" rel="noopener">Percheron, Guerry &amp; Fabre (2024)</a>
-      </div>
-      <div class="footer-section">
-        <strong data-i18n="footerSponsors">Sponsors:</strong>
-        <div class="sponsor-links">
-          <a href="https://mirumpharma.com/" target="_blank" rel="noopener">Mirum</a>
-          <a href="https://www.ipsen.com/" target="_blank" rel="noopener">Ipsen</a>
-        </div>
-      </div>
-    </div>
+  <footer class="foot">
+    <p id="release" class="muted"></p>
+    <p>
+      <strong id="f-contact"></strong> <a href="mailto:contact.pytheasdb@gmail.com">contact.pytheasdb@gmail.com</a> ·
+      <strong id="f-cite"></strong> <a href="https://pubmed.ncbi.nlm.nih.gov/39628627/" target="_blank" rel="noopener">Percheron, Guerry &amp; Fabre (2024)</a> ·
+      <strong id="f-sponsors"></strong> <a href="https://mirumpharma.com/" target="_blank" rel="noopener">Mirum</a>,
+      <a href="https://www.ipsen.com/" target="_blank" rel="noopener">Ipsen</a>
+    </p>
   </footer>
-
-<script type="module" src="js/main.js"></script>
+  <script type="module" src="js/ui/app.js"></script>
 </body>
 </html>

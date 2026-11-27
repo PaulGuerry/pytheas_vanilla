@@ -1,0 +1,4 @@
+key	label_en	label_fr
+# Labels of the ALPHI cohorts on the site; cohorts not listed are named by their genes (MYO5B + STX3).
+AARS1_CARS1_DARS1_EPRS1_FARSA_FARSB_GARS1_HARS1_IARS1_KARS1_LARS1_MARS1_NARS1_QARS1_RARS1_SARS1_TARS1_VARS1_YARS1	aaRS genes (19)	gènes aaRS (19)
+ABCB11_ABCB4_ATP8B1_FOCAD_KIF12_LSR_MYO5B_SKIC2_SKIC3_STX3_STXBP2_TJP2_UNC45A_USP53_VPS33B_ZFYVE19	16 cholestasis and enteropathy genes	16 gènes de cholestase et d’entéropathie
